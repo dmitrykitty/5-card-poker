@@ -8,6 +8,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -17,14 +19,12 @@ public class HandResult implements Comparable<HandResult> {
     private final HandRank handRank;
     private final List<Card> mainCards;
     private final List<Card> otherCards;
-    private final List<Card> allCards;
 
     @Builder
-    public HandResult(HandRank handRank, List<Card> mainCards, List<Card> kickers, List<Card> allCards) {
+    public HandResult(HandRank handRank, List<Card> mainCards, List<Card> otherCards) {
         this.handRank = handRank;
         this.mainCards = mainCards != null ? List.copyOf(mainCards) : List.of();
-        this.otherCards = kickers != null ? List.copyOf(kickers) : List.of();
-        this.allCards = allCards != null ? List.copyOf(allCards) : List.of();
+        this.otherCards = otherCards != null ? List.copyOf(otherCards) : List.of();
     }
 
     @Override
@@ -40,6 +40,12 @@ public class HandResult implements Comparable<HandResult> {
             return mainCardsComparison;
         }
         return compareCardLists(otherCards, other.otherCards);
+    }
+
+    public List<Card> getAllCards() {
+        List<Card> combined = new ArrayList<>(mainCards);
+        combined.addAll(otherCards);
+        return Collections.unmodifiableList(combined); //read-only
     }
 
     private int compareCardLists(List<Card> mainCards, List<Card> otherCards) {
