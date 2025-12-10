@@ -1,4 +1,4 @@
-package com.dnikitin.poker.model;
+package com.dnikitin.poker.gamelogic;
 
 import com.dnikitin.poker.common.model.Card;
 import com.dnikitin.poker.common.model.HandRank;
@@ -18,7 +18,7 @@ public class StandardFiveCardHandEvaluator implements HandEvaluator {
         ArrayList<Card> cards = new ArrayList<>(cardsFromPlayer);
 
         if (cards.size() != 5) {
-            throw new NoFiveCardsException("Required 5 cards in the en of game.");
+            throw new NoFiveCardsException("Required 5 cards in the end of game");
         }
 
         cards.sort(Collections.reverseOrder());

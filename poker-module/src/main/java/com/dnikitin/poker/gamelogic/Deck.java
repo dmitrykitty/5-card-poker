@@ -1,4 +1,4 @@
-package com.dnikitin.poker.model;
+package com.dnikitin.poker.gamelogic;
 
 import com.dnikitin.poker.common.exceptions.EmptyDeckException;
 import com.dnikitin.poker.common.model.Card;
