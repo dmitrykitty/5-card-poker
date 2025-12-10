@@ -6,6 +6,7 @@ import com.dnikitin.poker.common.model.Rank;
 import com.dnikitin.poker.common.model.Suit;
 import com.dnikitin.poker.exceptions.NoFiveCardsException;
 import com.dnikitin.poker.exceptions.WrongRankException;
+import com.dnikitin.poker.model.HandResult;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -6,6 +6,7 @@ import com.dnikitin.poker.common.model.Rank;
 import com.dnikitin.poker.common.model.Suit;
 import com.dnikitin.poker.exceptions.NoFiveCardsException;
 import com.dnikitin.poker.exceptions.WrongRankException;
+import com.dnikitin.poker.model.HandResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
