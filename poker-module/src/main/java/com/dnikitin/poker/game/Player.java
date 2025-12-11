@@ -112,7 +112,7 @@ public class Player {
      * and the {@code hand}, as the game hand is not yet over.
      * </p>
      */
-    public void resetRoundState(){
+    public void resetRoundBet(){
         currentBet = 0;
     }
 

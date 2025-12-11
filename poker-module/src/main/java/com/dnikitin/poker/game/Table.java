@@ -2,6 +2,7 @@ package com.dnikitin.poker.game;
 
 import com.dnikitin.poker.common.model.Card;
 import com.dnikitin.poker.exceptions.IllegalPlayerAmountException;
+import com.dnikitin.poker.exceptions.InvalidMoveException;
 import com.dnikitin.poker.exceptions.NotEnoughChipsException;
 import com.dnikitin.poker.exceptions.WrongGameStateException;
 import com.dnikitin.poker.gamelogic.HandEvaluator;
@@ -99,16 +100,82 @@ public class Table {
         startNewHand();
     }
 
-    public Player getCurrentPlayer(){
+    /**
+     * Returns the Player object who is currently expected to act.
+     * Used by the Server to validate incoming commands.
+     *
+     * @return The active Player or null if list is empty.
+     */
+    public Player getCurrentPlayer() {
         return players.isEmpty() ? null : players.get(currentPlayerIndex);
     }
 
+    /**
+     * Advances the turn to the next active (not folded) player.
+     * Wraps around the list size.
+     */
+    public void nextTurn() {
+        if (!players.isEmpty()) {
+            int attempts = 0;
+            do {
+                currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+                attempts++;
+            } while (getCurrentPlayer().isFolded() && attempts < players.size());
+        }
+
+        log.debug("Turn passed to: {}", getCurrentPlayer().getName());
+    }
+
+    /**
+     * Handles a CHECK or CALL action from a player.
+     * <p>
+     * Validates turn order and advances the game state.
+     * In the simplified version, this just passes the turn.
+     * </p>
+     *
+     * @param player The player performing the action.
+     * @throws InvalidMoveException if it is not the player's turn.
+     */
+    public void playerCheckOrCall(Player player){
+        validateTurn(player);
+
+        nextTurn();
+
+
+    }
+
+    /**
+     * Handles a FOLD action from a player.
+     * <p>
+     * Marks the player as folded for the current hand and passes the turn.
+     * </p>
+     *
+     * @param player The player performing the action.
+     * @throws InvalidMoveException if it is not the player's turn.
+     */
+    public void playerFold(Player player){
+        validateTurn(player);
+
+        player.fold();
+        log.info("Player {} folded.", player.getName());
+        nextTurn();
+    }
+    //PRIVATE HELPERS
+
+    /**
+     * Orchestrates the beginning of a new hand (round).
+     * Resets state, shuffles deck, collects ante, and deals cards.
+     */
     private void startNewHand() {
+
+        rotateDealer();
+
         pot = 0;
         deck = Deck.createDeck(); //each game - new Deck
         deck.shuffle();
 
         players.forEach(Player::clearHand);
+        players.forEach(Player::resetRoundBet);
 
         changeState(GameState.ANTE);
         collectAnte();
@@ -116,10 +183,55 @@ public class Table {
         changeState(GameState.DEALING);
         dealCards();
 
+        currentPlayerIndex = (dealerIndex + 1) % players.size(); //left of the dealer
+
         changeState(GameState.BETTING_1);
-        log.info("Hand started. Pot: {}. Deck size remaining: {}", pot, deck.size());
+        log.info("""
+                        Hand started. Dealer: {}.
+                        First to act: {}.
+                        Pot: {}.
+                        Deck size remaining: {}
+                        """,
+                players.get(dealerIndex).getName(),
+                getCurrentPlayer().getName(),
+                pot,
+                deck.size());
     }
 
+    /**
+     * Validates if the player making a request is the one currently allowed to move.
+     *
+     * @param player The player to validate.
+     * @throws InvalidMoveException if IDs do not match.
+     */
+    private void validateTurn(Player player){
+        if(!player.getId().equals(getCurrentPlayer().getId())){
+            throw new InvalidMoveException("Not your turn!");
+        }
+    }
+
+    /**
+     * Moves the dealer button to the next player.
+     * Should be called once per hand.
+     */
+    private void rotateDealer() {
+        if (!players.isEmpty()) {
+            if (dealerIndex == -1) {
+                dealerIndex = 0; // First game
+            } else {
+                dealerIndex = (dealerIndex + 1) % players.size();
+            }
+
+            // Safety check if a player left
+            if (dealerIndex >= players.size()) {
+                dealerIndex = 0;
+            }
+        }
+    }
+
+    /**
+     * Distributes 5 cards to each active player from the deck.
+     */
     private void dealCards() {
         log.info("Dealing 5 cards to each active player.");
         for (Player player : players) {
@@ -131,6 +243,10 @@ public class Table {
         }
     }
 
+    /**
+     * Collects mandatory ante chips from all players.
+     * Removes players who cannot afford to pay.
+     */
     private void collectAnte() {
         int ante = config.ante();
         log.info("Collecting ante: {}", ante);
@@ -151,6 +267,9 @@ public class Table {
         }
     }
 
+    /**
+     * Transitions the game state machine and logs the change.
+     */
     private void changeState(GameState newState) {
         log.info("State transition: {} -> {}", currentState, newState);
         currentState = newState;

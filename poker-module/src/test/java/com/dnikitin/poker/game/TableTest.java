@@ -89,4 +89,23 @@ public class TableTest {
                 .isInstanceOf(WrongGameStateException.class)
                 .hasMessageContaining("Game already started");
     }
+
+    @Test
+    void testPassTurnAfterFold() {
+        Player p1 = new Player("1", "Alice", 1000);
+        Player p2 = new Player("2", "Bob", 1000);
+        table.addPlayer(p1);
+        table.addPlayer(p2);
+        table.startGame();
+
+        Player firstToAct = table.getCurrentPlayer();
+        Player secondToAct = firstToAct == p1 ? p2 : p1;
+
+        table.playerFold(firstToAct);
+
+        assertAll(
+                () -> assertThat(firstToAct.isFolded()).isTrue(),
+                () -> assertThat(table.getCurrentPlayer()).isEqualTo(secondToAct)
+        );
+    }
 }
