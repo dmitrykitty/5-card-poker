@@ -19,7 +19,7 @@ import java.util.List;
  * </p>
  */
 @Getter
-@ToString(of = {"id", "name"})
+@ToString(of = {"id", "name"}, includeFieldNames = false)
 public class Player {
 
     private final String id;
