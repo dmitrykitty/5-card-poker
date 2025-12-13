@@ -6,16 +6,21 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Manages the lifecycle of multiple game tables.
+ * Acts as a registry where the Server can look up games by ID.
+ * Thread-safe implementation using ConcurrentHashMap.
+ */
 @Slf4j
 public class GameManager {
+
     // Singleton instance
     private static final GameManager INSTANCE = new GameManager();
 
     private final Map<String, Table> activeGames = new ConcurrentHashMap<>();
-
     private final GameFactory defaultFactory;
 
-    public GameManager() {
+    private GameManager() {
         defaultFactory = new FiveCardDrawFactory();
     }
 
