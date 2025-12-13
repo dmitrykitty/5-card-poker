@@ -1,6 +1,6 @@
 package com.dnikitin.poker.game;
 
-import com.dnikitin.poker.common.model.Card;
+import com.dnikitin.poker.common.model.game.Card;
 import com.dnikitin.poker.exceptions.NotEnoughChipsException;
 import lombok.Getter;
 import lombok.ToString;

@@ -1,4 +1,4 @@
-package com.dnikitin.poker.common.model;
+package com.dnikitin.poker.common.model.game;
 
 import org.junit.jupiter.api.Test;
 

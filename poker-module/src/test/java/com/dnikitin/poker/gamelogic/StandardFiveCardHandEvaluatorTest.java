@@ -1,9 +1,9 @@
 package com.dnikitin.poker.gamelogic;
 
-import com.dnikitin.poker.common.model.Card;
-import com.dnikitin.poker.common.model.HandRank;
-import com.dnikitin.poker.common.model.Rank;
-import com.dnikitin.poker.common.model.Suit;
+import com.dnikitin.poker.common.model.game.Card;
+import com.dnikitin.poker.common.model.game.HandRank;
+import com.dnikitin.poker.common.model.game.Rank;
+import com.dnikitin.poker.common.model.game.Suit;
 import com.dnikitin.poker.exceptions.NoFiveCardsException;
 import com.dnikitin.poker.exceptions.WrongRankException;
 import com.dnikitin.poker.model.HandResult;

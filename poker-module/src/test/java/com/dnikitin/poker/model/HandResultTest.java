@@ -1,13 +1,13 @@
 package com.dnikitin.poker.model;
 
-import com.dnikitin.poker.common.model.Card;
-import com.dnikitin.poker.common.model.HandRank;
+import com.dnikitin.poker.common.model.game.Card;
+import com.dnikitin.poker.common.model.game.HandRank;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static com.dnikitin.poker.common.model.Rank.*;
-import static com.dnikitin.poker.common.model.Suit.*;
+import static com.dnikitin.poker.common.model.game.Rank.*;
+import static com.dnikitin.poker.common.model.game.Suit.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class HandResultTest {

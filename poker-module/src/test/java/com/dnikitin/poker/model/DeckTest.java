@@ -1,7 +1,7 @@
 package com.dnikitin.poker.model;
 
 import com.dnikitin.poker.common.exceptions.EmptyDeckException;
-import com.dnikitin.poker.common.model.Card;
+import com.dnikitin.poker.common.model.game.Card;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

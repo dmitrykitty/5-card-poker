@@ -1,6 +1,8 @@
 package com.dnikitin.poker.game;
 
-import com.dnikitin.poker.common.model.Card;
+import com.dnikitin.poker.common.model.events.GameEvent;
+import com.dnikitin.poker.common.model.events.GameObserver;
+import com.dnikitin.poker.common.model.game.Card;
 import com.dnikitin.poker.exceptions.IllegalPlayerAmountException;
 import com.dnikitin.poker.exceptions.InvalidMoveException;
 import com.dnikitin.poker.exceptions.NotEnoughChipsException;
@@ -13,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Represents a single Poker Table instance.
@@ -31,6 +35,8 @@ public class Table {
     private final HandEvaluator evaluator;
 
     private final List<Player> players = new ArrayList<>();
+    private final List<GameObserver> observers = new ArrayList<>();
+    private final ReentrantLock lock = new ReentrantLock();
     private Deck deck;
 
     /**
@@ -42,6 +48,8 @@ public class Table {
      * Total amount of chips currently in the pot for this hand.
      */
     private int pot;
+
+    private int currentRoundHighestBet = 0;
 
     /**
      * Index of the player who holds the "Dealer Button".
@@ -67,6 +75,15 @@ public class Table {
         currentState = GameState.LOBBY;
     }
 
+    public void addObserver(GameObserver observer) {
+        lock.lock();
+        try {
+            observers.add(observer);
+        } finally {
+            lock.unlock();
+        }
+    }
+
     /**
      * Adds a player to the table.
      * Allowed only if the game is in LOBBY state and table is not full.
@@ -76,14 +93,20 @@ public class Table {
      * @throws IllegalPlayerAmountException if table is full.
      */
     public void addPlayer(Player player) {
-        if (currentState != GameState.LOBBY) {
-            throw new WrongGameStateException("Game already started");
+        lock.lock();
+        try {
+            if (currentState != GameState.LOBBY) {
+                throw new WrongGameStateException("Game already started");
+            }
+            if (players.size() >= config.maxPlayers()) {
+                throw new IllegalPlayerAmountException("Table is full");
+            }
+            players.add(player);
+            log.info("Player {} joined table {}. Total players: {}", player.getName(), id, players.size());
+            notifyObservers(new GameEvent.PlayerJoined(player.getId(), player.getName(), player.getChips()));
+        } finally {
+            lock.unlock();
         }
-        if (players.size() >= config.maxPlayers()) {
-            throw new IllegalPlayerAmountException("Table is full");
-        }
-        players.add(player);
-        log.info("Player {} joined table {}. Total players: {}", player.getName(), id, players.size());
     }
 
     /**
@@ -93,11 +116,17 @@ public class Table {
      * @throws IllegalPlayerAmountException if there are not enough players.
      */
     public void startGame() {
-        if (players.size() < config.minPlayers()) {
-            throw new IllegalPlayerAmountException("Not enough players to start. Min: " + config.minPlayers());
+        lock.lock();
+        try {
+            if (players.size() < config.minPlayers()) {
+                throw new IllegalPlayerAmountException("Not enough players to start. Min: " + config.minPlayers());
+            }
+            log.info("Starting game on table {}", id);
+            notifyObservers(new GameEvent.GameStarted(id));
+            startNewHand();
+        } finally {
+            lock.unlock();
         }
-        log.info("Starting game on table {}", id);
-        startNewHand();
     }
 
     /**
@@ -111,22 +140,6 @@ public class Table {
     }
 
     /**
-     * Advances the turn to the next active (not folded) player.
-     * Wraps around the list size.
-     */
-    public void nextTurn() {
-        if (!players.isEmpty()) {
-            int attempts = 0;
-            do {
-                currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
-                attempts++;
-            } while (getCurrentPlayer().isFolded() && attempts < players.size());
-        }
-
-        log.debug("Turn passed to: {}", getCurrentPlayer().getName());
-    }
-
-    /**
      * Handles a CHECK or CALL action from a player.
      * <p>
      * Validates turn order and advances the game state.
@@ -136,12 +149,58 @@ public class Table {
      * @param player The player performing the action.
      * @throws InvalidMoveException if it is not the player's turn.
      */
-    public void playerCheckOrCall(Player player){
-        validateTurn(player);
+    public void playerCheck(Player player) {
+        lock.lock();
+        try {
+            validateTurn(player);
+            if (player.getCurrentBet() < currentRoundHighestBet) {
+                throw new InvalidMoveException("Cannot CHECK, you must CALL " +
+                        (currentRoundHighestBet - player.getCurrentBet()));
+            }
+            log.info("Player {} checked.", player.getName());
+            notifyObservers(new GameEvent.PlayerAction(player.getId(), "CHECK", 0, "Checked"));
+            nextTurn();
+        } finally {
+            lock.unlock();
+        }
+    }
 
-        nextTurn();
+    public void playerCall(Player player) {
+        lock.lock();
+        try {
+            validateTurn(player);
+            int toCall = currentRoundHighestBet - player.getCurrentBet();
+            if (toCall <= 0) {
+                playerCheck(player);
+            }
+            player.bet(toCall);
+            pot += toCall;
 
+            log.info("Player {} called {}.", player.getName(), toCall);
+            notifyObservers(new GameEvent.PlayerAction(player.getId(), "CALL", toCall, "Called " + toCall));
+            nextTurn();
+        } finally {
+            lock.unlock();
+        }
+    }
 
+    public void playerRaise(Player player, int raiseAmount) {
+        lock.lock();
+        try {
+            validateTurn(player);
+            int toCall = currentRoundHighestBet - player.getCurrentBet();
+            int totalAmount = toCall + raiseAmount;
+
+            player.bet(totalAmount);
+            pot += totalAmount;
+            currentRoundHighestBet += raiseAmount;
+
+            log.info("Player {} raised by {}.", player.getName(), raiseAmount);
+            notifyObservers(new GameEvent.PlayerAction(
+                    player.getId(), "RAISE", totalAmount, "Raised by " + raiseAmount));
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -153,14 +212,65 @@ public class Table {
      * @param player The player performing the action.
      * @throws InvalidMoveException if it is not the player's turn.
      */
-    public void playerFold(Player player){
-        validateTurn(player);
+    public void playerFold(Player player) {
+        lock.lock();
+        try {
+            validateTurn(player);
+            player.fold();
 
-        player.fold();
-        log.info("Player {} folded.", player.getName());
-        nextTurn();
+            log.info("Player {} folded.", player.getName());
+            notifyObservers(new GameEvent.PlayerAction(player.getId(), "FOLD", 0, "Folded"));
+            if (isOnyOnePlayerLeft()) {
+                endGamePrematurely();
+            } else {
+                nextTurn();
+            }
+        } finally {
+            lock.unlock();
+        }
     }
+
+    private void endGamePrematurely() {
+        Player winner = players.stream()
+                .filter(player -> !player.isFolded())
+                .findFirst()
+                .orElseThrow();
+
+        winner.winChips(pot);
+        notifyObservers(new GameEvent.GameFinished(winner.getId(), pot, "Opponents Folded"));
+        changeState(GameState.FINISHED);
+    }
+
     //PRIVATE HELPERS
+    private boolean isOnyOnePlayerLeft() {
+        long activePlayers = players.stream()
+                .filter(player -> !player.isFolded())
+                .count();
+        return activePlayers == 1;
+    }
+
+    /**
+     * Advances the turn to the next active (not folded) player.
+     * Wraps around the list size.
+     */
+    private void nextTurn() {
+        if (!players.isEmpty()) {
+            int attempts = 0;
+            do {
+                currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+                attempts++;
+            } while (getCurrentPlayer().isFolded() && attempts < players.size());
+        }
+        Player current = getCurrentPlayer();
+        log.debug("Turn passed to: {}", current.getName());
+        notifyObservers(new GameEvent.TurnChanged(current.getId()));
+    }
+
+    private void notifyObservers(GameEvent event) {
+        for (GameObserver observer : observers) {
+            observer.onGameEvent(event);
+        }
+    }
 
     /**
      * Orchestrates the beginning of a new hand (round).
@@ -171,6 +281,8 @@ public class Table {
         rotateDealer();
 
         pot = 0;
+        currentRoundHighestBet = 0;
+
         deck = Deck.createDeck(); //each game - new Deck
         deck.shuffle();
 
@@ -186,16 +298,11 @@ public class Table {
         currentPlayerIndex = (dealerIndex + 1) % players.size(); //left of the dealer
 
         changeState(GameState.BETTING_1);
-        log.info("""
-                        Hand started. Dealer: {}.
-                        First to act: {}.
-                        Pot: {}.
-                        Deck size remaining: {}
-                        """,
+        notifyObservers(new GameEvent.TurnChanged(getCurrentPlayer().getId()));
+        log.info(" Hand started. Dealer: {}. First to act: {}. Pot: {}",
                 players.get(dealerIndex).getName(),
                 getCurrentPlayer().getName(),
-                pot,
-                deck.size());
+                pot);
     }
 
     /**
@@ -204,8 +311,8 @@ public class Table {
      * @param player The player to validate.
      * @throws InvalidMoveException if IDs do not match.
      */
-    private void validateTurn(Player player){
-        if(!player.getId().equals(getCurrentPlayer().getId())){
+    private void validateTurn(Player player) {
+        if (!player.getId().equals(getCurrentPlayer().getId())) {
             throw new InvalidMoveException("Not your turn!");
         }
     }
@@ -221,11 +328,6 @@ public class Table {
             } else {
                 dealerIndex = (dealerIndex + 1) % players.size();
             }
-
-            // Safety check if a player left
-            if (dealerIndex >= players.size()) {
-                dealerIndex = 0;
-            }
         }
     }
 
@@ -240,6 +342,7 @@ public class Table {
                 hand.add(deck.deal());
             }
             player.receiveCards(hand);
+            notifyObservers(new GameEvent.CardsDealt(player.getId(), hand));
         }
     }
 
@@ -256,9 +359,11 @@ public class Table {
             try {
                 player.bet(ante);
                 pot += ante;
+                notifyObservers(new GameEvent.PlayerAction(player.getId(), "ANTE", ante, "Paid Ante"));
             } catch (NotEnoughChipsException e) {
-                log.warn("Player {} cannot pay ante and has been removed. The reason: {}", player.getName(), e.getMessage());
                 bankrupts.add(player);
+                notifyObservers(new GameEvent.PlayerAction(player.getId(), "LEAVE", 0, "Bankrupt (Ante)"));
+                log.warn("Player {} cannot pay ante and has been removed. The reason: {}", player.getName(), e.getMessage());
             }
         }
         players.removeAll(bankrupts);
@@ -273,5 +378,11 @@ public class Table {
     private void changeState(GameState newState) {
         log.info("State transition: {} -> {}", currentState, newState);
         currentState = newState;
+        notifyObservers(new GameEvent.StateChanged(currentState.name()));
+
+        if (currentState == GameState.BETTING_1 || currentState == GameState.BETTING_2) {
+            currentRoundHighestBet = 0;
+            players.forEach(Player::resetRoundBet);
+        }
     }
 }

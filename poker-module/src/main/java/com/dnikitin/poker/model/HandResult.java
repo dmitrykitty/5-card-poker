@@ -1,8 +1,8 @@
 package com.dnikitin.poker.model;
 
 
-import com.dnikitin.poker.common.model.Card;
-import com.dnikitin.poker.common.model.HandRank;
+import com.dnikitin.poker.common.model.game.Card;
+import com.dnikitin.poker.common.model.game.HandRank;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
