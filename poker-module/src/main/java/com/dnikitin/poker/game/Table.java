@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -230,6 +229,14 @@ public class Table {
         }
     }
 
+    //PRIVATE HELPERS
+    private boolean isOnyOnePlayerLeft() {
+        long activePlayers = players.stream()
+                .filter(player -> !player.isFolded())
+                .count();
+        return activePlayers == 1;
+    }
+
     private void endGamePrematurely() {
         Player winner = players.stream()
                 .filter(player -> !player.isFolded())
@@ -239,14 +246,6 @@ public class Table {
         winner.winChips(pot);
         notifyObservers(new GameEvent.GameFinished(winner.getId(), pot, "Opponents Folded"));
         changeState(GameState.FINISHED);
-    }
-
-    //PRIVATE HELPERS
-    private boolean isOnyOnePlayerLeft() {
-        long activePlayers = players.stream()
-                .filter(player -> !player.isFolded())
-                .count();
-        return activePlayers == 1;
     }
 
     /**
