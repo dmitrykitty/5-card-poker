@@ -31,6 +31,7 @@ public class Player {
      * Flag indicating if the player has folded (resigned) in the current hand.
      */
     private boolean folded;
+    private PlayerStatus status;
     private final List<Card> hand = new ArrayList<>();
 
     /**
@@ -45,6 +46,7 @@ public class Player {
         this.name = name;
         this.chips = startingChips;
         this.folded = false;
+        this.status = PlayerStatus.ACTIVE;
     }
 
     /**
@@ -68,6 +70,11 @@ public class Player {
             throw new NotEnoughChipsException("Not enough chips");
         chips -= betAmount;
         currentBet += betAmount;
+
+        // Check if player is now all-in
+        if (chips == 0 && status == PlayerStatus.ACTIVE) {
+            status = PlayerStatus.ALL_IN;
+        }
     }
 
     /**
@@ -103,6 +110,7 @@ public class Player {
      */
     public void fold(){
         folded = true;
+        status = PlayerStatus.FOLDED;
     }
 
     /**
@@ -126,6 +134,9 @@ public class Player {
     public void clearHand(){
         hand.clear();
         folded = false;
+        if (chips > 0) {
+            status = PlayerStatus.ACTIVE;
+        }
     }
 
     /**
@@ -135,7 +146,31 @@ public class Player {
      * {@code false} otherwise.
      */
     public boolean isActive() {
-        return !folded && chips > 0;
+        return !folded && chips > 0 && status != PlayerStatus.SITTING_OUT;
+    }
 
+    /**
+     * Checks if the player is all-in.
+     *
+     * @return {@code true} if the player has no chips left but is still in the hand
+     */
+    public boolean isAllIn() {
+        return status == PlayerStatus.ALL_IN || (chips == 0 && !folded);
+    }
+
+    /**
+     * Sets the player status to sitting out.
+     */
+    public void setSittingOut() {
+        status = PlayerStatus.SITTING_OUT;
+    }
+
+    /**
+     * Checks if the player can act (not folded and not all-in).
+     *
+     * @return {@code true} if the player can make actions
+     */
+    public boolean canAct() {
+        return status == PlayerStatus.ACTIVE && !folded;
     }
 }

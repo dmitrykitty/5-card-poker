@@ -208,6 +208,7 @@ public class Table {
             log.info("Player {} raised by {}.", player.getName(), raiseAmount);
             notifyObservers(new GameEvent.PlayerAction(
                     player.getId(), "RAISE", totalAmount, "Raised by " + raiseAmount));
+            nextTurn();
         } finally {
             lock.unlock();
         }
@@ -337,7 +338,7 @@ public class Table {
 
     private void advanceGamePhase() {
         actionsInCurrentRound = 0;
-        lastAggressorIndex = -1; // Reset agresora
+        lastAggressorIndex = -1;
 
         switch (currentState) {
             case BETTING_1 -> changeState(GameState.DRAWING);
