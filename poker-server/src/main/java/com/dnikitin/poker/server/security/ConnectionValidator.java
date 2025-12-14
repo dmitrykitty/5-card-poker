@@ -56,21 +56,6 @@ public class ConnectionValidator {
     }
 
     /**
-     * Validates player ID format.
-     *
-     * @param playerId Player ID to validate
-     * @return true if valid
-     */
-    public boolean isValidPlayerId(String playerId) {
-        if (playerId == null || playerId.isEmpty()) {
-            return false;
-        }
-
-        // Should be UUID-like or alphanumeric
-        return playerId.matches("[a-zA-Z0-9-]{8,64}");
-    }
-
-    /**
      * Validates game ID format.
      *
      * @param gameId Game ID to validate

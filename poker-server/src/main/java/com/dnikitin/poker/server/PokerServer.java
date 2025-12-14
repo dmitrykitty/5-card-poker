@@ -2,6 +2,7 @@ package com.dnikitin.poker.server;
 
 import com.dnikitin.poker.server.security.RateLimiter;
 import com.dnikitin.poker.server.security.TimeoutManager;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -24,12 +25,22 @@ public class PokerServer {
     private static final int TURN_TIMEOUT_SECONDS = 45;
     private static final int CLEANUP_INTERVAL_MINUTES = 5;
 
+    /**
+     * -- GETTER --
+     *  Gets the port the server is running on.
+     */
+    @Getter
     private final int port;
     private final ExecutorService executor;
     private final ScheduledExecutorService scheduledExecutor;
     private final RateLimiter rateLimiter;
     private final TimeoutManager timeoutManager;
 
+    /**
+     * -- GETTER --
+     *  Checks if the server is running.
+     */
+    @Getter
     private volatile boolean running = false;
     private ServerSocketChannel serverSocket;
 
@@ -124,17 +135,4 @@ public class PokerServer {
         }
     }
 
-    /**
-     * Gets the port the server is running on.
-     */
-    public int getPort() {
-        return port;
-    }
-
-    /**
-     * Checks if the server is running.
-     */
-    public boolean isRunning() {
-        return running;
-    }
 }

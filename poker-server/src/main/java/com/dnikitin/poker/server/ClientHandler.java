@@ -1,14 +1,14 @@
 package com.dnikitin.poker.server;
 
-import com.dnikitin.poker.common.exceptions.ProtocolException;
 import com.dnikitin.poker.common.exceptions.PokerSecurityException;
+import com.dnikitin.poker.common.exceptions.ProtocolException;
 import com.dnikitin.poker.common.model.events.GameEvent;
 import com.dnikitin.poker.common.model.events.GameObserver;
 import com.dnikitin.poker.common.protocol.Command;
 import com.dnikitin.poker.common.protocol.ProtocolEncoder;
 import com.dnikitin.poker.common.protocol.ProtocolParser;
 import com.dnikitin.poker.common.protocol.commands.*;
-import com.dnikitin.poker.exceptions.moves.InvalidMoveException;
+import com.dnikitin.poker.exceptions.PokerGameException;
 import com.dnikitin.poker.game.GameManager;
 import com.dnikitin.poker.game.Player;
 import com.dnikitin.poker.game.Table;
@@ -80,15 +80,15 @@ public class ClientHandler implements Runnable, GameObserver {
                 } catch (PokerSecurityException e) {
                     log.warn("Security violation from client {}: {}", clientId, e.getMessage());
                     sendError(e.getCode(), e.getMessage());
-                    break; // Disconnect on security violation
+                    break;
 
                 } catch (ProtocolException e) {
                     log.warn("Protocol error from client {}: {}", clientId, e.getMessage());
                     sendError(e.getCode(), e.getMessage());
 
-                } catch (InvalidMoveException e) {
-                    log.debug("Invalid move from client {}: {}", clientId, e.getMessage());
-                    sendError("INVALID_MOVE", e.getMessage());
+                } catch (PokerGameException e) {
+                    log.debug("Game error [{}]: {}", e.getCode(), e.getMessage());
+                    sendError(e.getCode(), e.getMessage());
 
                 } catch (Exception e) {
                     log.error("Unexpected error from client {}", clientId, e);
@@ -153,48 +153,39 @@ public class ClientHandler implements Runnable, GameObserver {
     }
 
     private void handleCreate(CreateCommand command) {
-        // Create a new game with specified config
         String gameId = GameManager.getInstance().createGame();
         sendMessage(encoder.encodeOk("GAME_ID=" + gameId));
         log.info("Client {} created game {}", clientId, gameId);
     }
 
     private void handleJoin(JoinCommand command) {
-        // Validate player name
         if (!validator.isValidPlayerName(command.getName())) {
             sendError("INVALID_NAME", "Player name must be 2-20 alphanumeric characters");
             return;
         }
 
-        // Validate game ID
         if (!validator.isValidGameId(command.getGameId())) {
             sendError("INVALID_GAME_ID", "Invalid game ID format");
             return;
         }
 
         GameManager.getInstance().findGame(command.getGameId()).ifPresentOrElse(foundTable -> {
-            try {
-                this.table = foundTable;
-                this.player = new Player(UUID.randomUUID().toString(), command.getName(), 1000);
 
-                table.addObserver(this);
-                table.addPlayer(player);
+            this.table = foundTable;
+            this.player = new Player(UUID.randomUUID().toString(), command.getName(), 1000);
 
-                sendMessage(encoder.encodeWelcome(command.getGameId(), player.getId()));
-                log.info("Client {} joined game {} as {}", clientId, command.getGameId(), player.getName());
+            table.addObserver(this);
+            table.addPlayer(player); // Może rzucić błąd (np. Full table)
 
-            } catch (Exception e) {
-                log.error("Error joining game", e);
-                sendError("JOIN_FAILED", e.getMessage());
-            }
+            sendMessage(encoder.encodeWelcome(command.getGameId(), player.getId()));
+            log.info("Client {} joined game {} as {}", clientId, command.getGameId(), player.getName());
+
         }, () -> sendError("GAME_NOT_FOUND", "Game does not exist"));
     }
 
     private void handleStart(SimpleCommand command) {
         validatePlayerAndTable();
-
-        // Verify player is authorized to start (could check if they're the host)
-        table.startGame();
+        table.startGame(); // Może rzucić IllegalPlayerAmountException -> obsłużone w run()
         sendMessage(encoder.encodeOk("Game started"));
         log.info("Client {} started game", clientId);
     }
@@ -202,15 +193,13 @@ public class ClientHandler implements Runnable, GameObserver {
     private void handleCall(SimpleCommand command) {
         validatePlayerAndTable();
         cancelTimeout();
-
-        table.playerCall(player);
+        table.playerCall(player); // Może rzucić OutOfTurnException -> obsłużone w run()
         sendMessage(encoder.encodeOk());
     }
 
     private void handleCheck(SimpleCommand command) {
         validatePlayerAndTable();
         cancelTimeout();
-
         table.playerCheck(player);
         sendMessage(encoder.encodeOk());
     }
@@ -218,7 +207,6 @@ public class ClientHandler implements Runnable, GameObserver {
     private void handleFold(SimpleCommand command) {
         validatePlayerAndTable();
         cancelTimeout();
-
         table.playerFold(player);
         sendMessage(encoder.encodeOk());
     }
@@ -232,6 +220,7 @@ public class ClientHandler implements Runnable, GameObserver {
             return;
         }
 
+        // Może rzucić NotEnoughChipsException -> obsłużone w run()
         table.playerRaise(player, command.getAmount());
         sendMessage(encoder.encodeOk());
     }
@@ -240,7 +229,7 @@ public class ClientHandler implements Runnable, GameObserver {
         validatePlayerAndTable();
         cancelTimeout();
 
-        // Validate card indexes
+        // Podstawowa walidacja wejścia zostaje tutaj (szybki fail)
         for (int index : command.getCardIndexes()) {
             if (index < 0 || index > 4) {
                 sendError("INVALID_CARD_INDEX", "Card index must be 0-4");
@@ -253,31 +242,27 @@ public class ClientHandler implements Runnable, GameObserver {
             return;
         }
 
+        // Może rzucić StateMismatchException lub IllegalDrawException (brak kart w talii)
         table.playerExchangeCards(player, command.getCardIndexes());
         sendMessage(encoder.encodeOk());
     }
 
     private void handleStatus(SimpleCommand command) {
         validatePlayerAndTable();
-
-        // Send current game status
         sendMessage(encoder.encodeRound(table.getPot(), table.getCurrentRoundHighestBet()));
 
         if (table.getCurrentPlayer() != null) {
             sendMessage(encoder.encodeTurn(
-                table.getCurrentPlayer().getId(),
-                table.getCurrentState().name(),
-                table.getCurrentRoundHighestBet() - player.getCurrentBet(),
-                10 // min raise - should come from config
+                    table.getCurrentPlayer().getId(),
+                    table.getCurrentState().name(),
+                    table.getCurrentRoundHighestBet() - player.getCurrentBet(),
+                    10
             ));
         }
     }
 
     private void handleDisconnect() {
-        // Cancel any active timeout
         cancelTimeout();
-
-        // Remove from rate limiter
         rateLimiter.removeClient(clientId);
 
         try {
@@ -296,14 +281,21 @@ public class ClientHandler implements Runnable, GameObserver {
                 log.error("Error handling player disconnect", e);
             }
         }
-
         log.info("Client {} disconnected", clientId);
     }
 
-    private void handleTimeout() {
-        log.warn("Player {} timed out, auto-folding", player != null ? player.getName() : "unknown");
-        if (table != null && player != null) {
+    private void handleTimeout(String timeoutPlayerId) {
+        // Opcjonalne zabezpieczenie: upewniamy się, że timeout dotyczy tego gracza
+        if (player == null || !player.getId().equals(timeoutPlayerId)) {
+            return;
+        }
+
+        log.warn("Player {} timed out, auto-folding", player.getName());
+
+        if (table != null) {
             try {
+                // Table.playerFold jest thread-safe (ma ReentrantLock),
+                // więc bezpiecznie możemy to wywołać z wątku TimeoutManagera
                 table.playerFold(player);
             } catch (Exception e) {
                 log.error("Error auto-folding timed out player", e);
@@ -324,8 +316,10 @@ public class ClientHandler implements Runnable, GameObserver {
     }
 
     private void validatePlayerAndTable() {
+        // Ten wyjątek (InvalidMoveException) dziedziczy po PokerGameException,
+        // więc też zostanie złapany przez nowy blok catch w run()!
         if (table == null || player == null) {
-            throw new InvalidMoveException("Not in a game");
+            throw new com.dnikitin.poker.exceptions.moves.InvalidMoveException("Not in a game");
         }
     }
 
