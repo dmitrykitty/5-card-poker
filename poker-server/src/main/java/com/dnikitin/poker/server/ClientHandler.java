@@ -5,6 +5,7 @@ import com.dnikitin.poker.common.model.events.GameObserver;
 import com.dnikitin.poker.game.GameManager;
 import com.dnikitin.poker.game.Player;
 import com.dnikitin.poker.game.Table;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
@@ -13,8 +14,11 @@ import java.io.PrintWriter;
 import java.nio.channels.Channels;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
+@RequiredArgsConstructor
 public class ClientHandler implements Runnable, GameObserver {
 
     private final SocketChannel socketChannel;
@@ -77,7 +81,7 @@ public class ClientHandler implements Runnable, GameObserver {
         String[] parts = line.split("\\s+");
         String command = parts[0].toUpperCase();
 
-        try{
+        try {
             switch (command) {
                 case "CREATE" -> handleCreate();
                 case "JOIN" -> handleJoin(parts);
@@ -86,6 +90,7 @@ public class ClientHandler implements Runnable, GameObserver {
                 case "CHECK" -> handleCheck();
                 case "CALL" -> handleCall();
                 case "RAISE" -> handleRaise(parts);
+                case "DRAW" -> handleDraw(parts);
                 case "QUIT" -> throw new IOException("Client requested quit");
                 default -> out.println("ERR REASON=UNKNOWN_COMMAND");
             }
@@ -100,10 +105,29 @@ public class ClientHandler implements Runnable, GameObserver {
         out.println("OK GAME_ID=" + gameId);
     }
 
-    private void handleJoin(String[] parts) {}
+    private void handleJoin(String[] parts) {
+        try {
+            String gameId = parseParam(parts, "GAME");
+            String name = parseParam(parts, "NAME");
+
+            GameManager.getInstance().findGame(gameId).ifPresentOrElse(foundTable -> {
+                this.table = foundTable;
+                this.player = new Player(java.util.UUID.randomUUID().toString(), name, 1000);
+
+                table.addObserver(this);
+                table.addPlayer(player);
+
+                out.println("WELCOME PLAYER_ID=" + player.getId());
+
+            }, () -> out.println("ERR REASON=GAME_NOT_FOUND"));
+
+        } catch (Exception e) {
+            out.println("ERR REASON=INVALID_PARAMS");
+        }
+    }
 
     private void handleStart() {
-        if(table != null) {
+        if (table != null) {
             table.startGame();
         }
     }
@@ -139,13 +163,59 @@ public class ClientHandler implements Runnable, GameObserver {
 
     private void handleDisconnect() {
         try {
-            socketChannel.close();
-            if (table != null && player != null) {
-                // Logika usuwania gracza lub foldowania (jeśli gra trwa)
-                // table.playerFold(player);
+            if (socketChannel != null && socketChannel.isOpen()) {
+                socketChannel.close();
             }
         } catch (IOException e) {
-            // ignore
+            log.warn("Error closing socket during disconnect: {}", e.getMessage());
+        }
+
+        if (table != null && player != null) {
+            try {
+                table.playerDisconnect(player);
+            } catch (Exception e) {
+                log.error("Error handling player disconnect logic", e);
+            }
+        }
+
+        log.info("Client handler resources released for player: {}",
+                (player != null ? player.getName() : "Unknown"));
+    }
+
+
+    private void handleDraw(String[] parts) {
+        // DRAW CARDS=0,2,4
+        try {
+            String cardsParam = parseParam(parts, "CARDS");
+            List<Integer> indexes = new ArrayList<>();
+
+            if (!cardsParam.equalsIgnoreCase("NONE")) {
+                String[] split = cardsParam.split(",");
+                for (String s : split) {
+                    indexes.add(Integer.parseInt(s.trim()));
+                }
+            }
+
+            if (table != null && player != null) {
+                table.playerExchangeCards(player, indexes);
+                out.println("OK");
+            }
+        } catch (NumberFormatException e) {
+            out.println("ERR REASON=INVALID_CARD_INDEXES");
+        } catch (Exception e) {
+            out.println("ERR REASON=" + e.getMessage());
         }
     }
+
+
+    private String parseParam(String[] parts, String key) {
+        String prefix = key + "=";
+        for (String part : parts) {
+            if (part.startsWith(prefix)) {
+                return part.substring(prefix.length());
+            }
+        }
+        throw new IllegalArgumentException("Missing parameter: " + key);
+    }
 }
+

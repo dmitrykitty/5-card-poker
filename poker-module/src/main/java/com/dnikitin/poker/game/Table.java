@@ -9,6 +9,7 @@ import com.dnikitin.poker.exceptions.NotEnoughChipsException;
 import com.dnikitin.poker.exceptions.WrongGameStateException;
 import com.dnikitin.poker.gamelogic.HandEvaluator;
 import com.dnikitin.poker.model.Deck;
+import com.dnikitin.poker.model.HandResult;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,6 +50,12 @@ public class Table {
     private int pot;
 
     private int currentRoundHighestBet = 0;
+
+    private int actionsInCurrentRound = 0;
+
+    private int lastAggressorIndex = -1;
+
+    private int drawsCompletedCount = 0;
 
     /**
      * Index of the player who holds the "Dealer Button".
@@ -156,6 +163,7 @@ public class Table {
                 throw new InvalidMoveException("Cannot CHECK, you must CALL " +
                         (currentRoundHighestBet - player.getCurrentBet()));
             }
+            actionsInCurrentRound++;
             log.info("Player {} checked.", player.getName());
             notifyObservers(new GameEvent.PlayerAction(player.getId(), "CHECK", 0, "Checked"));
             nextTurn();
@@ -174,6 +182,7 @@ public class Table {
             }
             player.bet(toCall);
             pot += toCall;
+            actionsInCurrentRound++;
 
             log.info("Player {} called {}.", player.getName(), toCall);
             notifyObservers(new GameEvent.PlayerAction(player.getId(), "CALL", toCall, "Called " + toCall));
@@ -193,6 +202,8 @@ public class Table {
             player.bet(totalAmount);
             pot += totalAmount;
             currentRoundHighestBet += raiseAmount;
+            lastAggressorIndex = currentPlayerIndex;
+            actionsInCurrentRound = 1;
 
             log.info("Player {} raised by {}.", player.getName(), raiseAmount);
             notifyObservers(new GameEvent.PlayerAction(
@@ -219,7 +230,7 @@ public class Table {
 
             log.info("Player {} folded.", player.getName());
             notifyObservers(new GameEvent.PlayerAction(player.getId(), "FOLD", 0, "Folded"));
-            if (isOnyOnePlayerLeft()) {
+            if (isOnlyOnePlayerLeft()) {
                 endGamePrematurely();
             } else {
                 nextTurn();
@@ -229,12 +240,147 @@ public class Table {
         }
     }
 
+    public void playerExchangeCards(Player player, List<Integer> indexesToDiscard) {
+        lock.lock();
+        try {
+            validateTurn(player);
+            if (currentState != GameState.DRAWING) {
+                throw new InvalidMoveException("Cannot draw cards now. Current state: " + currentState);
+            }
+
+            if (indexesToDiscard.size() > config.maxDrawCount()) {
+                throw new InvalidMoveException("Cannot discard more than " + config.maxDrawCount() + " cards.");
+            }
+
+            //remove selected cardsx
+            player.discardCards(indexesToDiscard);
+
+            //add new
+            List<Card> newCards = new ArrayList<>();
+            for (int i = 0; i < indexesToDiscard.size(); i++) {
+                newCards.add(deck.deal());
+            }
+            player.receiveCards(newCards);
+
+            log.info("Player {} exchanged {} cards.", player.getName(), indexesToDiscard.size());
+
+            notifyObservers(new GameEvent.CardsDealt(player.getId(), player.getHand()));
+            notifyObservers(new GameEvent.PlayerAction(player.getId(), "DRAW", 0, "Exchanged " + indexesToDiscard.size() + " cards"));
+
+            drawsCompletedCount++;
+            if (drawsCompletedCount >= getActivePlayersCount()) {
+                changeState(GameState.BETTING_2);
+            } else {
+                nextTurn();
+            }
+
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void playerDisconnect(Player player) {
+        lock.lock();
+        try {
+            // 1 case - lobby -> total remove
+            if (currentState == GameState.LOBBY) {
+                players.remove(player);
+                log.info("Player {} removed from lobby due to disconnect.", player.getName());
+
+                notifyObservers(new GameEvent.PlayerAction(player.getId(), "LEAVE", 0, "Disconnected"));
+            }
+            // 2 case - during the game -> folding
+            else if (currentState != GameState.FINISHED) {
+                log.info("Player {} disconnected during game. Auto-folding.", player.getName());
+
+                if (!player.isFolded()) {
+                    player.fold();
+                    notifyObservers(new GameEvent.PlayerAction(player.getId(), "FOLD", 0,
+                            "Disconnected (Auto-Fold)"));
+
+                    Player current = getCurrentPlayer();
+                    if (current != null && current.getId().equals(player.getId())) {
+                        nextTurn();
+                    }
+
+
+                    if (isOnlyOnePlayerLeft()) {
+                        endGamePrematurely();
+                    }
+                }
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
     //PRIVATE HELPERS
-    private boolean isOnyOnePlayerLeft() {
-        long activePlayers = players.stream()
-                .filter(player -> !player.isFolded())
-                .count();
-        return activePlayers == 1;
+    private boolean isBettingRoundFinished() {
+        long activePlayers = getActivePlayersCount();
+
+        if (activePlayers < 2) {
+            return false;
+        }
+
+        if (actionsInCurrentRound < activePlayers) {
+            return false;
+        }
+
+        return players.stream()
+                .filter(p -> !p.isFolded())
+                .allMatch(p -> p.getCurrentBet() == currentRoundHighestBet);
+    }
+
+    private long getActivePlayersCount() {
+        return players.stream().filter(p -> !p.isFolded()).count();
+    }
+
+    private void advanceGamePhase() {
+        actionsInCurrentRound = 0;
+        lastAggressorIndex = -1; // Reset agresora
+
+        switch (currentState) {
+            case BETTING_1 -> changeState(GameState.DRAWING);
+            case DRAWING -> {
+                changeState(GameState.BETTING_2);
+            }
+            case BETTING_2 -> resolveShowdown();
+            default -> log.error("Unexpected state transition from {}", currentState);
+        }
+    }
+
+    private void resolveShowdown() {
+        changeState(GameState.SHOWDOWN);
+
+        // only active players
+        List<Player> activePlayers = players.stream()
+                .filter(p -> !p.isFolded())
+                .toList();
+
+        Player winner = null;
+        HandResult bestHand = null;
+
+        for (Player player : activePlayers) {
+            HandResult result = evaluator.evaluate(player.getHand());
+            notifyObservers(new GameEvent.CardsDealt(player.getId(), player.getHand()));
+
+            if (bestHand == null || result.compareTo(bestHand) > 0) {
+                bestHand = result;
+                winner = player;
+            }
+        }
+
+        if (winner != null) {
+            winner.winChips(pot);
+            log.info("Winner: {} with {}", winner.getName(), bestHand.getHandRank());
+            notifyObservers(new GameEvent.GameFinished(winner.getId(), pot, bestHand.getHandRank().getLabel()));
+        }
+
+        changeState(GameState.FINISHED);
+    }
+
+    private boolean isOnlyOnePlayerLeft() {
+        return getActivePlayersCount() == 1;
     }
 
     private void endGamePrematurely() {
@@ -253,6 +399,11 @@ public class Table {
      * Wraps around the list size.
      */
     private void nextTurn() {
+        if (isBettingRoundFinished()) {
+            advanceGamePhase();
+            return;
+        }
+
         if (!players.isEmpty()) {
             int attempts = 0;
             do {
@@ -260,6 +411,7 @@ public class Table {
                 attempts++;
             } while (getCurrentPlayer().isFolded() && attempts < players.size());
         }
+
         Player current = getCurrentPlayer();
         log.debug("Turn passed to: {}", current.getName());
         notifyObservers(new GameEvent.TurnChanged(current.getId()));
@@ -281,6 +433,9 @@ public class Table {
 
         pot = 0;
         currentRoundHighestBet = 0;
+        actionsInCurrentRound = 0;
+        lastAggressorIndex = -1;
+        drawsCompletedCount = 0;
 
         deck = Deck.createDeck(); //each game - new Deck
         deck.shuffle();
