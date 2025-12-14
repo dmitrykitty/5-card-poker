@@ -1,5 +1,6 @@
-package com.dnikitin.poker.game;
+package com.dnikitin.poker.game.engine;
 
+import com.dnikitin.poker.game.Player;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -138,14 +139,5 @@ public class TurnOrder {
             currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
             attempts++;
         }
-    }
-
-    /**
-     * Resets turn order for a new hand.
-     * Does not rotate dealer - call rotateDealer() separately.
-     */
-    public void reset() {
-        currentPlayerIndex = 0;
-        log.debug("TurnOrder reset");
     }
 }

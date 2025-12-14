@@ -1,8 +1,10 @@
 package com.dnikitin.poker.game;
 
-import com.dnikitin.poker.exceptions.IllegalPlayerAmountException;
-import com.dnikitin.poker.exceptions.WrongGameStateException;
-import org.assertj.core.api.Assertions;
+import com.dnikitin.poker.exceptions.rules.IllegalPlayerAmountException;
+import com.dnikitin.poker.exceptions.moves.WrongGameStateException;
+import com.dnikitin.poker.game.setup.FiveCardDrawFactory;
+import com.dnikitin.poker.game.setup.GameFactory;
+import com.dnikitin.poker.game.state.GameState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

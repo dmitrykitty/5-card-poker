@@ -1,4 +1,4 @@
-package com.dnikitin.poker.game;
+package com.dnikitin.poker.game.state;
 
 /**
  * Represents the current status of a player in a poker hand.

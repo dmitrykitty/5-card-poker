@@ -1,4 +1,4 @@
-package com.dnikitin.poker.exceptions;
+package com.dnikitin.poker.exceptions.moves;
 
 /**
  * Thrown when a player attempts an invalid card draw operation.

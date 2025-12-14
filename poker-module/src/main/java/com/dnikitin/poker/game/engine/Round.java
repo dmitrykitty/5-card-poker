@@ -1,5 +1,6 @@
-package com.dnikitin.poker.game;
+package com.dnikitin.poker.game.engine;
 
+import com.dnikitin.poker.game.state.GameState;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;

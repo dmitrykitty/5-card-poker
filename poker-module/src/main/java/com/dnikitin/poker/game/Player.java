@@ -1,7 +1,8 @@
 package com.dnikitin.poker.game;
 
 import com.dnikitin.poker.common.model.game.Card;
-import com.dnikitin.poker.exceptions.NotEnoughChipsException;
+import com.dnikitin.poker.exceptions.moves.NotEnoughChipsException;
+import com.dnikitin.poker.game.state.PlayerStatus;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -146,7 +147,7 @@ public class Player {
      * {@code false} otherwise.
      */
     public boolean isActive() {
-        return !folded && chips > 0 && status != PlayerStatus.SITTING_OUT;
+        return !folded && status != PlayerStatus.SITTING_OUT;
     }
 
     /**

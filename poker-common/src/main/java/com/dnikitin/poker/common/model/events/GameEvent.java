@@ -36,4 +36,7 @@ public sealed interface GameEvent {
     // Zdarzenie: Błąd (np. nielegalny ruch)
     record ErrorOccurred(String playerId, String errorMessage) implements GameEvent {
     }
+
+    record RoundInfo(int potAmount, int highestBet) implements GameEvent {
+    }
 }

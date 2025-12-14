@@ -8,7 +8,7 @@ import com.dnikitin.poker.common.protocol.Command;
 import com.dnikitin.poker.common.protocol.ProtocolEncoder;
 import com.dnikitin.poker.common.protocol.ProtocolParser;
 import com.dnikitin.poker.common.protocol.commands.*;
-import com.dnikitin.poker.exceptions.InvalidMoveException;
+import com.dnikitin.poker.exceptions.moves.InvalidMoveException;
 import com.dnikitin.poker.game.GameManager;
 import com.dnikitin.poker.game.Player;
 import com.dnikitin.poker.game.Table;

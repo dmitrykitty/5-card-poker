@@ -1,5 +1,6 @@
-package com.dnikitin.poker.game;
+package com.dnikitin.poker.game.engine;
 
+import com.dnikitin.poker.game.Player;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -157,19 +158,6 @@ public class PotManager {
         int amount = pot.getAmount();
         winner.winChips(amount);
         log.info("Awarded {} from pot {} to player {}", amount, potIndex, winner.getName());
-        return amount;
-    }
-
-    /**
-     * Awards the main pot to a winner.
-     *
-     * @param winner The winning player
-     * @return The amount won
-     */
-    public int awardMainPot(Player winner) {
-        int amount = mainPot.getAmount();
-        winner.winChips(amount);
-        log.info("Awarded main pot {} to player {}", amount, winner.getName());
         return amount;
     }
 

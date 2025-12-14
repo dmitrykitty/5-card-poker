@@ -1,6 +1,7 @@
-package com.dnikitin.poker.game;
+package com.dnikitin.poker.game.engine;
 
 import com.dnikitin.poker.common.model.game.Card;
+import com.dnikitin.poker.game.Player;
 import com.dnikitin.poker.model.Deck;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
