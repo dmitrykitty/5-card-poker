@@ -17,6 +17,10 @@ import java.util.Map;
 public class ProtocolParser {
 
     private static final int MAX_MESSAGE_SIZE = 512;
+    private static final String PARAM_AMOUNT = "AMOUNT";
+    private static final String PARAM_CARDS = "CARDS";
+    private static final String PARAM_GAME = "GAME";
+    private static final String PARAM_NAME = "NAME";
 
     /**
      * Parses a protocol line into a Command object.
@@ -42,7 +46,6 @@ public class ProtocolParser {
 
         String firstToken = parts[0].toUpperCase();
 
-        // Special handling for commands that don't follow standard format
         return switch (firstToken) {
             case "HELLO" -> parseHello(parts);
             case "CREATE" -> parseCreate(parts);
@@ -72,8 +75,8 @@ public class ProtocolParser {
 
     private Command parseJoin(String[] parts) {
         Map<String, String> params = extractParams(parts, 1);
-        String gameId = params.get("GAME");
-        String name = params.get("NAME");
+        String gameId = params.get(PARAM_GAME);
+        String name = params.get(PARAM_NAME);
 
         if (gameId == null || name == null) {
             throw new ProtocolException("MISSING_PARAMS", "JOIN requires GAME and NAME");
@@ -103,14 +106,14 @@ public class ProtocolParser {
 
         return switch (commandType) {
             case BET, RAISE -> {
-                int amount = parseIntParam(params, "AMOUNT", -1);
+                int amount = parseIntParam(params, PARAM_AMOUNT, -1);
                 if (amount < 0) {
                     throw new ProtocolException("MISSING_PARAMS", "BET/RAISE requires AMOUNT");
                 }
                 yield new BetCommand(gameId, playerId, commandType, amount);
             }
             case DRAW -> {
-                String cardsStr = params.get("CARDS");
+                String cardsStr = params.get(PARAM_CARDS);
                 if (cardsStr == null) {
                     throw new ProtocolException("MISSING_PARAMS", "DRAW requires CARDS");
                 }

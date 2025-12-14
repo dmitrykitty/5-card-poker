@@ -1,7 +1,7 @@
 package com.dnikitin.poker.server;
 
 import com.dnikitin.poker.common.exceptions.ProtocolException;
-import com.dnikitin.poker.common.exceptions.SecurityException;
+import com.dnikitin.poker.common.exceptions.PokerSecurityException;
 import com.dnikitin.poker.common.model.events.GameEvent;
 import com.dnikitin.poker.common.model.events.GameObserver;
 import com.dnikitin.poker.common.protocol.Command;
@@ -77,7 +77,7 @@ public class ClientHandler implements Runnable, GameObserver {
                     // Parse and handle command
                     handleCommand(line.trim());
 
-                } catch (SecurityException e) {
+                } catch (PokerSecurityException e) {
                     log.warn("Security violation from client {}: {}", clientId, e.getMessage());
                     sendError(e.getCode(), e.getMessage());
                     break; // Disconnect on security violation

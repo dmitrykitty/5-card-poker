@@ -1,7 +1,7 @@
 package com.dnikitin.poker.server.security;
 
 import com.dnikitin.poker.common.exceptions.ProtocolException;
-import com.dnikitin.poker.common.exceptions.SecurityException;
+import com.dnikitin.poker.common.exceptions.PokerSecurityException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -16,7 +16,7 @@ public class ConnectionValidator {
      * Validates a message before processing.
      *
      * @param message The message to validate
-     * @throws SecurityException if message fails security checks
+     * @throws PokerSecurityException if message fails security checks
      * @throws ProtocolException if message is malformed
      */
     public void validateMessage(String message) {
@@ -27,14 +27,14 @@ public class ConnectionValidator {
         // Check message size
         if (message.length() > MAX_MESSAGE_SIZE) {
             log.warn("Message too large: {} bytes", message.length());
-            throw new SecurityException("MESSAGE_TOO_LARGE",
+            throw new PokerSecurityException("MESSAGE_TOO_LARGE",
                 String.format("Message exceeds %d bytes", MAX_MESSAGE_SIZE));
         }
 
         // Check for suspicious patterns
         if (message.contains("\0") || message.contains("\r\n")) {
             log.warn("Suspicious characters in message");
-            throw new SecurityException("INVALID_CHARACTERS",
+            throw new PokerSecurityException("INVALID_CHARACTERS",
                 "Message contains invalid characters");
         }
 
@@ -42,7 +42,7 @@ public class ConnectionValidator {
         String[] parts = message.split("\\s+");
         if (parts.length > MAX_COMMAND_PARTS) {
             log.warn("Too many command parts: {}", parts.length);
-            throw new SecurityException("TOO_MANY_PARTS",
+            throw new PokerSecurityException("TOO_MANY_PARTS",
                 "Message has too many components");
         }
 
@@ -50,7 +50,7 @@ public class ConnectionValidator {
         String upper = message.toUpperCase();
         if (upper.contains("SCRIPT") || upper.contains("EXEC")) {
             log.warn("Potential injection attempt detected");
-            throw new SecurityException("INJECTION_ATTEMPT",
+            throw new PokerSecurityException("INJECTION_ATTEMPT",
                 "Suspicious message content");
         }
     }

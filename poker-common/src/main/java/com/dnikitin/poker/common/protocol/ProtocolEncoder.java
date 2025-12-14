@@ -44,6 +44,9 @@ public class ProtocolEncoder {
                 String.format("WINNER PLAYER=%s POT=%d RANK=%s",
                     gf.winnerId(), gf.potAmount(), gf.handRank());
 
+            case GameEvent.RoundInfo ri ->
+                    encodeRound(ri.potAmount(), ri.highestBet());
+
             default -> null;
         };
     }

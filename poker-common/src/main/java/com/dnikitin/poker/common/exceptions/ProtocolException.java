@@ -1,9 +1,12 @@
 package com.dnikitin.poker.common.exceptions;
 
+import lombok.Getter;
+
 /**
  * Thrown when protocol parsing or validation fails.
  * Examples: malformed messages, unknown commands, invalid parameters.
  */
+@Getter
 public class ProtocolException extends RuntimeException {
     private final String code;
 
@@ -16,7 +19,4 @@ public class ProtocolException extends RuntimeException {
         this("PROTOCOL_ERROR", message);
     }
 
-    public String getCode() {
-        return code;
-    }
 }

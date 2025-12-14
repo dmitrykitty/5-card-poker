@@ -83,8 +83,12 @@ public class PotManager {
      * @param players List of all players in the hand
      */
     public void distributeBets(List<Player> players) {
+        int currentMainPotAmount = mainPot.getAmount();
+        pots.clear();
+
         // Group players by their current bet amount
         Map<Integer, List<Player>> betLevels = new HashMap<>();
+
 
         for (Player player : players) {
             if (player.getCurrentBet() > 0) {
@@ -95,10 +99,17 @@ public class PotManager {
 
         // If all bets are equal, simple case - add to main pot
         if (betLevels.size() <= 1) {
-            int totalBets = players.stream()
-                .mapToInt(Player::getCurrentBet)
-                .sum();
-            addToMainPot(totalBets);
+            int totalBets = players.stream().mapToInt(Player::getCurrentBet).sum();
+
+            List<String> activePlayerIds = players.stream()
+                    .filter(p -> !p.isFolded())
+                    .map(Player::getId)
+                    .toList();
+
+            mainPot = new Pot(activePlayerIds);
+            mainPot.addToPot(currentMainPotAmount + totalBets);
+
+            pots.add(mainPot);
             return;
         }
 
