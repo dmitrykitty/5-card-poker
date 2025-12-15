@@ -129,6 +129,7 @@ public class Table {
     public void playerCheck(Player player) {
         lock.lock();
         try {
+            validateBettingPhase();
             validateTurn(player);
             if (player.getCurrentBet() < currentRound.getCurrentBet()) {
                 throw new InvalidMoveException("Cannot CHECK, you must CALL " +
@@ -148,6 +149,7 @@ public class Table {
     public void playerCall(Player player) {
         lock.lock();
         try {
+            validateBettingPhase();
             validateTurn(player);
             int toCall = currentRound.getCurrentBet() - player.getCurrentBet();
 
@@ -171,6 +173,7 @@ public class Table {
     public void playerRaise(Player player, int raiseAmount) {
         lock.lock();
         try {
+            validateBettingPhase();
             validateTurn(player);
             int toCall = currentRound.getCurrentBet() - player.getCurrentBet();
             int totalAmount = toCall + raiseAmount;
@@ -193,6 +196,7 @@ public class Table {
     public void playerFold(Player player) {
         lock.lock();
         try {
+            validateBettingPhase();
             validateTurn(player);
             player.fold();
 
@@ -254,7 +258,7 @@ public class Table {
                 notifyObservers(new GameEvent.PlayerAction(player.getId(), "LEAVE", 0, "Disconnected"));
             } else if (currentState != GameState.FINISHED) {
                 log.info("Player {} disconnected during game. Auto-folding.", player.getName());
-                player.setSittingOut(); // Use the logic we discussed
+                player.setSittingOut();
 
                 if (player.canAct()) {
                     player.fold();
@@ -295,9 +299,17 @@ public class Table {
         }
 
         Player current = getCurrentPlayer();
-        log.debug("Turn passed to: {}", current.getName());
 
-        notifyObservers(new GameEvent.TurnChanged(current.getId()));
+        int amountToCall = currentRound.getCurrentBet() - current.getCurrentBet();
+        if (amountToCall < 0) amountToCall = 0;
+
+        // Minimalne przebicie to zazwyczaj Big Blind lub wysokość poprzedniego przebicia
+        // Tutaj dla uproszczenia przyjmijmy np. wartość ANTE lub ostatni raise
+        int minRaise = config.ante();
+
+        log.debug("Turn passed to: {}. To call: {}", current.getName(), amountToCall);
+
+        notifyObservers(new GameEvent.TurnChanged(current.getId(), amountToCall, minRaise));
     }
 
     private void advanceGamePhase() {
@@ -420,7 +432,7 @@ public class Table {
         turnOrder.startFromLeftOfDealer();
 
         changeState(GameState.BETTING_1);
-        notifyObservers(new GameEvent.TurnChanged(getCurrentPlayer().getId()));
+        notifyObservers(new GameEvent.TurnChanged(getCurrentPlayer().getId(), 0, 0));
     }
 
     private void collectAnte() {
@@ -456,6 +468,12 @@ public class Table {
             currentRound.reset();
         }
         notifyObservers(new GameEvent.StateChanged(currentState.name()));
+    }
+
+    private void validateBettingPhase() {
+        if (currentState != GameState.BETTING_1 && currentState != GameState.BETTING_2) {
+            throw new InvalidMoveException("Action allowed only during betting phases. Current: " + currentState);
+        }
     }
 
     private void notifyObservers(GameEvent event) {

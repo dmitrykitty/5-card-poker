@@ -95,7 +95,7 @@ public class PokerClient {
         log.debug("Server: {}", line);
         ServerMessage msg = parser.parse(line);
 
-        boolean shouldRepaint = false;
+        boolean showDashboard = false;
 
         switch (msg.type()) {
             case HELLO -> ui.printMessage("✓ Connected to server.");
@@ -112,11 +112,7 @@ public class PokerClient {
 
             case LOBBY -> {
                 // Zapamiętujemy imię i żetony gracza (siebie i innych)
-                String pId = msg.get("PLAYER").orElse(null); // Serwer musi wysyłać ID w LOBBY!
-                // Uwaga: Jeśli Twój obecny serwer wysyła "LOBBY PLAYER=Name", a nie ID,
-                // to trzeba poprawić serwer lub zgadywać.
-                // Zakładam, że protokół to: LOBBY PLAYER=<uuid> CHIPS=<n> NAME=<name>
-
+                String pId = msg.get("PLAYER").orElse(null);
                 String name = msg.get("NAME").orElse("Unknown");
                 int chips = msg.getInt("CHIPS", -1);
 
@@ -126,42 +122,38 @@ public class PokerClient {
                     gameState.updatePlayerInfo(pId, name, chips);
                 }
 
-                ui.printMessage(" [LOBBY] " + name + " (" + chips + " chips)");
+                ui.printMessage(" [LOBBY] " + name + (chips >= 0 ? " (" + chips + " chips)" : ""));;
             }
 
             case STARTED -> {
                 gameState.setLastMessage("Game Started!");
-                shouldRepaint = true;
             }
 
             case STATE -> {
-                String phase = msg.get("PHASE").orElse(gameState.getCurrentPhase());
-                gameState.updateTurn(phase, gameState.getAmountToCall());
-                shouldRepaint = true;
+                String phase = msg.get("PHASE").orElse("UNKNOWN");
+                gameState.updatePhase(phase);
+
+                // Jeśli faza to DRAWING i to my, chcemy widzieć dashboard żeby wiedzieć co wymienić
+                // Ale serwer wyśle też TURN lub DEAL, więc tu wystarczy log
+                ui.printMessage(" --- PHASE: " + phase + " ---");
             }
 
             case ROUND -> {
                 int pot = msg.getInt("POT", gameState.getCurrentPot());
-                gameState.updateRoundInfo(pot);
-                shouldRepaint = true;
+                int highest = msg.getInt("HIGHESTBET", 0);
+                gameState.updateRoundInfo(pot, highest);
             }
 
             case TURN -> {
-                String activePlayerId = msg.get("PLAYER").orElse("");
-                String phase = msg.get("PHASE").orElse(gameState.getCurrentPhase());
-                int toCall = msg.getInt("CALL", 0);
+                String activePlayer = msg.get("PLAYER").orElse("");
 
-                gameState.updateTurn(phase, toCall);
-
-                if (isMe(activePlayerId)) {
+                // Jeśli to moja kolej - OBOWIĄZKOWO dashboard
+                if (isMe(activePlayer)) {
                     gameState.setLastMessage(">>> YOUR TURN! <<<");
-                    ui.printDashboard(gameState);
-                    shouldRepaint = false;
+                    showDashboard = true;
                 } else {
-                    // Wyświetlamy imię zamiast ID
-                    String opponentName = gameState.getPlayerName(activePlayerId);
-                    gameState.setLastMessage("Waiting for " + opponentName + "...");
-                    shouldRepaint = true;
+                    String opponent = gameState.getPlayerName(activePlayer);
+                    ui.printMessage(" Waiting for " + opponent + "...");
                 }
             }
 
@@ -171,45 +163,46 @@ public class PokerClient {
                 String text = msg.get("MSG").orElse("");
                 int amount = msg.getInt("AMOUNT", 0);
 
-                // --- POPRAWKA 1: Logika Żetonów ---
-                // Jeśli akcja wiąże się z wydaniem kasy, aktualizujemy stan lokalny
-                if (amount > 0 && (type.equals("ANTE") || type.equals("BET") || type.equals("RAISE") || type.equals("CALL"))) {
+                // Aktualizujemy lokalnie żetony i zakłady
+                if (amount > 0) {
                     gameState.deductChips(pId, amount);
-                    // Jeśli to ja, musimy przerysować dashboard
-                    if (isMe(pId)) shouldRepaint = true;
                 }
+                // Jeśli fold, to fold
 
-                // --- POPRAWKA 2: Wyświetlanie Imienia ---
-                String displayName = gameState.getPlayerName(pId);
-                ui.printMessage(" > " + displayName + ": " + type + " (" + text + ")");
+                String name = gameState.getPlayerName(pId);
+                ui.printMessage(" > " + name + ": " + type + (amount > 0 ? " " + amount : "") + " (" + text + ")");
+
+                // Jeśli to JA wykonałem akcję (np. CALL/CHECK), pokaż dashboard na chwilę jako potwierdzenie stanu
+                if (isMe(pId)) {
+                    // showDashboard = true; // Opcjonalne: wyłączam, żebyś nie widział go 2 razy (raz przy akcji, raz przy nastepnej turze)
+                }
             }
 
             case DEAL -> {
+                // Aktualizujemy rękę po cichu
                 if (isMe(msg.get("PLAYER").orElse(""))) {
                     msg.get("CARDS").ifPresent(gameState::updateMyHand);
-                    shouldRepaint = true;
+                    // Tutaj MOŻNA narysować dashboard, bo dostałeś karty
+                    showDashboard = true;
                 }
             }
 
             case WINNER -> {
                 String winnerId = msg.get("PLAYER").orElse("?");
                 String rank = msg.get("RANK").orElse("?");
-                String pot = msg.get("POT").orElse("0");
+                String potStr = msg.get("POT").orElse("0");
+                int pot = Integer.parseInt(potStr);
 
                 String winnerName = gameState.getPlayerName(winnerId);
 
-                // --- POPRAWKA 3: Formatowanie ---
-                // Zamiana podkreśleń na spacje w rankingu (np. Opponents_Folded -> Opponents Folded)
-                String displayRank = rank.replace("_", " ");
+                // Formatowanie "Opponents Folded" -> "Won by Fold"
+                String displayRank = rank.contains("Fold") ? "Won by Fold" : rank.replace("_", " ");
 
-                ui.printMessage("\n ★ WINNER: " + winnerName +
-                        " | " + displayRank + " | Pot: " + pot + "\n");
+                ui.printMessage("\n 🏆 WINNER: " + winnerName + " | " + displayRank + " | Pot: " + pot + "\n");
 
-                // Zwycięzca zgarnia pulę (opcjonalna aktualizacja lokalna dla efektu)
-                gameState.addChips(winnerId, Integer.parseInt(pot));
-
-                gameState.setLastMessage("Hand Finished. Winner: " + winnerName);
-                shouldRepaint = true;
+                // Dodaj żetony zwycięzcy, żeby w następnej rundzie (ANTE) było widać poprawną sumę
+                gameState.addChips(winnerId, pot);
+                gameState.setLastMessage("Winner: " + winnerName);
             }
 
             case OK -> msg.get("MESSAGE").ifPresent(m -> ui.printMessage("✓ " + m));
@@ -217,7 +210,7 @@ public class PokerClient {
             case ERR -> ui.printError(msg.get("REASON").orElse("Unknown Error"));
         }
 
-        if (shouldRepaint) {
+        if (showDashboard) {
             ui.printDashboard(gameState);
         }
     }

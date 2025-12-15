@@ -1,174 +1,191 @@
-2025-12-15 10:11:50.680 [main] INFO  c.dnikitin.poker.server.PokerServer - PokerServer initialized with security features:
-2025-12-15 10:11:50.682 [main] INFO  c.dnikitin.poker.server.PokerServer -   - Rate limit: 10 messages per second
-2025-12-15 10:11:50.684 [main] INFO  c.dnikitin.poker.server.PokerServer -   - Turn timeout: 45 seconds
-2025-12-15 10:11:50.687 [main] INFO  c.dnikitin.poker.server.PokerServer - Poker Server started on port: 7777
-2025-12-15 10:11:50.687 [main] INFO  c.dnikitin.poker.server.PokerServer - Using virtual threads for client handling
-2025-12-15 10:11:57.626 [main] INFO  c.dnikitin.poker.server.PokerServer - New connection accepted: /127.0.0.1:62108
-2025-12-15 10:11:57.665 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: HELLO VERSION=1.0
-2025-12-15 10:11:57.666 [virtual-32] INFO  c.d.poker.server.ClientHandler - Client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599 connected
-2025-12-15 10:12:04.394 [main] INFO  c.dnikitin.poker.server.PokerServer - New connection accepted: /127.0.0.1:62114
-2025-12-15 10:12:04.395 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: HELLO VERSION=1.0
-2025-12-15 10:12:04.395 [virtual-36] INFO  c.d.poker.server.ClientHandler - Client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b connected
-2025-12-15 10:12:32.658 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: JOIN GAME=dd NAME=dd
-2025-12-15 10:12:32.660 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ERR CODE=INVALID_GAME_ID REASON=Invalid_game_ID_format
-2025-12-15 10:12:41.160 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: CREATE ANTE=10 BET=10 LIMIT=FIXED
-2025-12-15 10:12:41.170 [virtual-32] INFO  com.dnikitin.poker.model.Deck - Deck shuffled. Cards count: 52
-2025-12-15 10:12:41.171 [virtual-32] INFO  c.dnikitin.poker.game.engine.Dealer - New deck created and shuffled. Seed: -830288567566789225 (for audit)
-2025-12-15 10:12:41.171 [virtual-32] DEBUG c.d.poker.game.engine.PotManager - PotManager reset
-2025-12-15 10:12:41.172 [virtual-32] INFO  com.dnikitin.poker.game.GameManager - Created new game table: ba84e645-4651-422d-a478-1cfbd64cc4a1. Active games: 1
-2025-12-15 10:12:41.173 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: OK MESSAGE=GAME_ID=ba84e645-4651-422d-a478-1cfbd64cc4a1
-2025-12-15 10:12:41.173 [virtual-32] INFO  c.d.poker.server.ClientHandler - Client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599 created game ba84e645-4651-422d-a478-1cfbd64cc4a1
-2025-12-15 10:12:58.802 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: JOIN GAME=ba84e645-4651-422d-a478-1cfbd64cc4a1 NAME=Dima
-2025-12-15 10:12:58.805 [virtual-32] INFO  com.dnikitin.poker.game.Table - Player Dima joined table ba84e645-4651-422d-a478-1cfbd64cc4a1. Total players: 1
-2025-12-15 10:12:58.818 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: LOBBY PLAYER=94607b9d-d6d6-44ea-b2c0-531e506d2aeb CHIPS=1000 NAME=Dima
-2025-12-15 10:12:58.818 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: WELCOME GAME=ba84e645-4651-422d-a478-1cfbd64cc4a1 PLAYER=94607b9d-d6d6-44ea-b2c0-531e506d2aeb
-2025-12-15 10:12:58.818 [virtual-32] INFO  c.d.poker.server.ClientHandler - Client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599 joined game ba84e645-4651-422d-a478-1cfbd64cc4a1 as Dima
-2025-12-15 10:13:09.895 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ba84e645-4651-422d-a478-1cfbd64cc4a1 94607b9d-d6d6-44ea-b2c0-531e506d2aeb CHECK
-2025-12-15 10:13:09.896 [virtual-32] DEBUG c.dnikitin.poker.game.engine.Round - Action recorded in LOBBY. Total actions: 1
-2025-12-15 10:13:09.896 [virtual-32] INFO  com.dnikitin.poker.game.Table - Player Dima checked.
-2025-12-15 10:13:09.896 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ACTION PLAYER=94607b9d-d6d6-44ea-b2c0-531e506d2aeb TYPE=CHECK AMOUNT=0 MSG=Checked
-2025-12-15 10:13:09.902 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ROUND POT=0 HIGHESTBET=0
-2025-12-15 10:13:09.902 [virtual-32] DEBUG c.dnikitin.poker.game.engine.Round - Round reset for phase: LOBBY
-2025-12-15 10:13:09.903 [virtual-32] ERROR com.dnikitin.poker.game.Table - Unexpected state transition from LOBBY
-2025-12-15 10:13:09.904 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: OK
-2025-12-15 10:13:35.365 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ba84e645-4651-422d-a478-1cfbd64cc4a1 94607b9d-d6d6-44ea-b2c0-531e506d2aeb CALL
-2025-12-15 10:13:35.365 [virtual-32] DEBUG c.dnikitin.poker.game.engine.Round - Action recorded in LOBBY. Total actions: 1
-2025-12-15 10:13:35.365 [virtual-32] INFO  com.dnikitin.poker.game.Table - Player Dima checked.
-2025-12-15 10:13:35.366 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ACTION PLAYER=94607b9d-d6d6-44ea-b2c0-531e506d2aeb TYPE=CHECK AMOUNT=0 MSG=Checked
-2025-12-15 10:13:35.366 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ROUND POT=0 HIGHESTBET=0
-2025-12-15 10:13:35.366 [virtual-32] DEBUG c.dnikitin.poker.game.engine.Round - Round reset for phase: LOBBY
-2025-12-15 10:13:35.366 [virtual-32] ERROR com.dnikitin.poker.game.Table - Unexpected state transition from LOBBY
-2025-12-15 10:13:35.366 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: OK
-2025-12-15 10:14:00.486 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ba84e645-4651-422d-a478-1cfbd64cc4a1 94607b9d-d6d6-44ea-b2c0-531e506d2aeb DRAW CARDS=0,
-2025-12-15 10:14:00.488 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Game error [STATE_MISMATCH]: Cannot draw cards now. Current state: LOBBY
-2025-12-15 10:14:00.488 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ERR CODE=STATE_MISMATCH REASON=Cannot_draw_cards_now_Current_state_LOBBY
-2025-12-15 10:14:13.636 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ba84e645-4651-422d-a478-1cfbd64cc4a1 94607b9d-d6d6-44ea-b2c0-531e506d2aeb START
-2025-12-15 10:14:13.637 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Game error [BAD_PLAYER_COUNT]: Not enough players to start. Min: 2
-2025-12-15 10:14:13.638 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ERR CODE=BAD_PLAYER_COUNT REASON=Not_enough_players_to_start_Min_2
-2025-12-15 10:14:35.103 [virtual-36] DEBUG c.d.poker.server.ClientHandler - Client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: JOIN GAME=ba84e645-4651-422d-a478-1cfbd64cc4a1 NAME=Kris
-2025-12-15 10:14:35.104 [virtual-36] INFO  com.dnikitin.poker.game.Table - Player Kris joined table ba84e645-4651-422d-a478-1cfbd64cc4a1. Total players: 2
-2025-12-15 10:14:35.104 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: LOBBY PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65 CHIPS=1000 NAME=Kris
-2025-12-15 10:14:35.105 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: LOBBY PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65 CHIPS=1000 NAME=Kris
-2025-12-15 10:14:35.105 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: WELCOME GAME=ba84e645-4651-422d-a478-1cfbd64cc4a1 PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65
-2025-12-15 10:14:35.105 [virtual-36] INFO  c.d.poker.server.ClientHandler - Client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b joined game ba84e645-4651-422d-a478-1cfbd64cc4a1 as Kris
-2025-12-15 10:14:41.964 [virtual-36] DEBUG c.d.poker.server.ClientHandler - Client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: ba84e645-4651-422d-a478-1cfbd64cc4a1 49acc162-2cd0-4a3b-8b1c-11113973ee65 START
-2025-12-15 10:14:41.965 [virtual-36] INFO  com.dnikitin.poker.game.Table - Starting game on table ba84e645-4651-422d-a478-1cfbd64cc4a1
-2025-12-15 10:14:41.965 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: STARTED GAME=ba84e645-4651-422d-a478-1cfbd64cc4a1
-2025-12-15 10:14:41.966 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: STARTED GAME=ba84e645-4651-422d-a478-1cfbd64cc4a1
-2025-12-15 10:14:41.966 [virtual-36] DEBUG c.d.poker.game.engine.TurnOrder - Dealer rotated to position 0: Dima
-2025-12-15 10:14:41.966 [virtual-36] DEBUG c.d.poker.game.engine.PotManager - PotManager reset
-2025-12-15 10:14:41.967 [virtual-36] INFO  com.dnikitin.poker.model.Deck - Deck shuffled. Cards count: 52
-2025-12-15 10:14:41.968 [virtual-36] INFO  c.dnikitin.poker.game.engine.Dealer - New deck created and shuffled. Seed: 7565278256371943792 (for audit)
-2025-12-15 10:14:41.968 [virtual-36] INFO  com.dnikitin.poker.game.Table - Hand started. Dealer: Dima. Deck Seed: DECK_SEED:68FD447DDA094970
-2025-12-15 10:14:41.969 [virtual-36] INFO  com.dnikitin.poker.game.Table - State transition: LOBBY -> ANTE
-2025-12-15 10:14:41.970 [virtual-36] DEBUG c.dnikitin.poker.game.engine.Round - Round reset for phase: LOBBY
-2025-12-15 10:14:41.970 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: STATE PHASE=ANTE
-2025-12-15 10:14:41.971 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: STATE PHASE=ANTE
-2025-12-15 10:14:41.971 [virtual-36] DEBUG c.d.poker.game.engine.PotManager - Added 10 to main pot. Total: 10
-2025-12-15 10:14:41.971 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ACTION PLAYER=94607b9d-d6d6-44ea-b2c0-531e506d2aeb TYPE=ANTE AMOUNT=10 MSG=Paid Ante
-2025-12-15 10:14:41.971 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: ACTION PLAYER=94607b9d-d6d6-44ea-b2c0-531e506d2aeb TYPE=ANTE AMOUNT=10 MSG=Paid Ante
-2025-12-15 10:14:41.971 [virtual-36] DEBUG c.d.poker.game.engine.PotManager - Added 10 to main pot. Total: 20
-2025-12-15 10:14:41.972 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ACTION PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65 TYPE=ANTE AMOUNT=10 MSG=Paid Ante
-2025-12-15 10:14:41.972 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: ACTION PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65 TYPE=ANTE AMOUNT=10 MSG=Paid Ante
-2025-12-15 10:14:41.972 [virtual-36] INFO  com.dnikitin.poker.game.Table - State transition: ANTE -> DEALING
-2025-12-15 10:14:41.972 [virtual-36] DEBUG c.dnikitin.poker.game.engine.Round - Round reset for phase: LOBBY
-2025-12-15 10:14:41.972 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: STATE PHASE=DEALING
-2025-12-15 10:14:41.972 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: STATE PHASE=DEALING
-2025-12-15 10:14:41.974 [virtual-36] INFO  c.dnikitin.poker.game.engine.Dealer - Dealing 5 cards to 2 players
-2025-12-15 10:14:41.974 [virtual-36] DEBUG c.dnikitin.poker.game.engine.Dealer - Dealt 5 cards to player Dima
-2025-12-15 10:14:41.974 [virtual-36] DEBUG c.dnikitin.poker.game.engine.Dealer - Dealt 5 cards to player Kris
-2025-12-15 10:14:41.975 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: DEAL PLAYER=94607b9d-d6d6-44ea-b2c0-531e506d2aeb CARDS=2♥,6♣,6♠,J♠,A♠
-2025-12-15 10:14:41.976 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: DEAL PLAYER=94607b9d-d6d6-44ea-b2c0-531e506d2aeb CARDS=HIDDEN COUNT=5
-2025-12-15 10:14:41.976 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: DEAL PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65 CARDS=HIDDEN COUNT=5
-2025-12-15 10:14:41.976 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: DEAL PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65 CARDS=J♦,8♣,4♣,K♣,3♥
-2025-12-15 10:14:41.977 [virtual-36] DEBUG c.d.poker.game.engine.TurnOrder - Starting turn from left of dealer: Kris
-2025-12-15 10:14:41.977 [virtual-36] INFO  com.dnikitin.poker.game.Table - State transition: DEALING -> BETTING_1
-2025-12-15 10:14:41.977 [virtual-36] DEBUG c.dnikitin.poker.game.engine.Round - Round reset for phase: LOBBY
-2025-12-15 10:14:41.977 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: STATE PHASE=BETTING_1
-2025-12-15 10:14:41.977 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: STATE PHASE=BETTING_1
-2025-12-15 10:14:41.978 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: TURN PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65
-2025-12-15 10:14:41.980 [virtual-36] DEBUG c.d.p.server.security.TimeoutManager - Timeout started for player 49acc162-2cd0-4a3b-8b1c-11113973ee65: 45s
-2025-12-15 10:14:41.980 [virtual-36] DEBUG c.d.poker.server.ClientHandler - Started timeout for player Kris
-2025-12-15 10:14:41.980 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: TURN PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65
-2025-12-15 10:14:41.980 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: OK MESSAGE=Game started
-2025-12-15 10:14:41.981 [virtual-36] INFO  c.d.poker.server.ClientHandler - Client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b started game
-2025-12-15 10:14:57.895 [virtual-36] DEBUG c.d.poker.server.ClientHandler - Client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: ba84e645-4651-422d-a478-1cfbd64cc4a1 49acc162-2cd0-4a3b-8b1c-11113973ee65 CHECK
-2025-12-15 10:14:57.895 [virtual-36] DEBUG c.d.p.server.security.TimeoutManager - Timeout cancelled for player 49acc162-2cd0-4a3b-8b1c-11113973ee65
-2025-12-15 10:14:57.895 [virtual-36] DEBUG c.dnikitin.poker.game.engine.Round - Action recorded in LOBBY. Total actions: 1
-2025-12-15 10:14:57.895 [virtual-36] INFO  com.dnikitin.poker.game.Table - Player Kris checked.
-2025-12-15 10:14:57.896 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ACTION PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65 TYPE=CHECK AMOUNT=0 MSG=Checked
-2025-12-15 10:14:57.896 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: ACTION PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65 TYPE=CHECK AMOUNT=0 MSG=Checked
-2025-12-15 10:14:57.896 [virtual-36] DEBUG c.d.poker.game.engine.TurnOrder - Turn advanced to: Dima
-2025-12-15 10:14:57.896 [virtual-36] DEBUG com.dnikitin.poker.game.Table - Turn passed to: Dima
-2025-12-15 10:14:57.896 [virtual-36] DEBUG c.d.p.server.security.TimeoutManager - Timeout started for player 94607b9d-d6d6-44ea-b2c0-531e506d2aeb: 45s
-2025-12-15 10:14:57.897 [virtual-36] DEBUG c.d.poker.server.ClientHandler - Started timeout for player Dima
-2025-12-15 10:14:57.897 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: TURN PLAYER=94607b9d-d6d6-44ea-b2c0-531e506d2aeb
-2025-12-15 10:14:57.897 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: TURN PLAYER=94607b9d-d6d6-44ea-b2c0-531e506d2aeb
-2025-12-15 10:14:57.897 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: OK
-2025-12-15 10:15:13.792 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ba84e645-4651-422d-a478-1cfbd64cc4a1 94607b9d-d6d6-44ea-b2c0-531e506d2aeb RAISE AMOUNT=50
-2025-12-15 10:15:13.793 [virtual-32] DEBUG c.d.p.server.security.TimeoutManager - Timeout cancelled for player 94607b9d-d6d6-44ea-b2c0-531e506d2aeb
-2025-12-15 10:15:13.793 [virtual-32] DEBUG c.dnikitin.poker.game.engine.Round - Raise recorded in LOBBY. New bet: 50, aggressor: 0
-2025-12-15 10:15:13.793 [virtual-32] INFO  com.dnikitin.poker.game.Table - Player Dima raised by 50. New highest bet: 50
-2025-12-15 10:15:13.794 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ACTION PLAYER=94607b9d-d6d6-44ea-b2c0-531e506d2aeb TYPE=RAISE AMOUNT=40 MSG=Raised by 50
-2025-12-15 10:15:13.794 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: ACTION PLAYER=94607b9d-d6d6-44ea-b2c0-531e506d2aeb TYPE=RAISE AMOUNT=40 MSG=Raised by 50
-2025-12-15 10:15:13.794 [virtual-32] DEBUG c.d.poker.game.engine.TurnOrder - Turn advanced to: Kris
-2025-12-15 10:15:13.794 [virtual-32] DEBUG com.dnikitin.poker.game.Table - Turn passed to: Kris
-2025-12-15 10:15:13.795 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: TURN PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65
-2025-12-15 10:15:13.795 [virtual-32] DEBUG c.d.p.server.security.TimeoutManager - Timeout started for player 49acc162-2cd0-4a3b-8b1c-11113973ee65: 45s
-2025-12-15 10:15:13.795 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Started timeout for player Kris
-2025-12-15 10:15:13.795 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: TURN PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65
-2025-12-15 10:15:13.795 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: OK
-2025-12-15 10:15:35.379 [virtual-36] DEBUG c.d.poker.server.ClientHandler - Client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: ba84e645-4651-422d-a478-1cfbd64cc4a1 49acc162-2cd0-4a3b-8b1c-11113973ee65 CALL
-2025-12-15 10:15:35.380 [virtual-36] DEBUG c.d.p.server.security.TimeoutManager - Timeout cancelled for player 49acc162-2cd0-4a3b-8b1c-11113973ee65
-2025-12-15 10:15:35.380 [virtual-36] DEBUG c.dnikitin.poker.game.engine.Round - Action recorded in LOBBY. Total actions: 2
-2025-12-15 10:15:35.380 [virtual-36] INFO  com.dnikitin.poker.game.Table - Player Kris called 40.
-2025-12-15 10:15:35.380 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ACTION PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65 TYPE=CALL AMOUNT=40 MSG=Called 40
-2025-12-15 10:15:35.381 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: ACTION PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65 TYPE=CALL AMOUNT=40 MSG=Called 40
-2025-12-15 10:15:35.382 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ROUND POT=120 HIGHESTBET=0
-2025-12-15 10:15:35.382 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: ROUND POT=120 HIGHESTBET=0
-2025-12-15 10:15:35.382 [virtual-36] DEBUG c.dnikitin.poker.game.engine.Round - Round reset for phase: LOBBY
-2025-12-15 10:15:35.382 [virtual-36] INFO  com.dnikitin.poker.game.Table - State transition: BETTING_1 -> DRAWING
-2025-12-15 10:15:35.383 [virtual-36] DEBUG c.dnikitin.poker.game.engine.Round - Round reset for phase: LOBBY
-2025-12-15 10:15:35.383 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: STATE PHASE=DRAWING
-2025-12-15 10:15:35.383 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: STATE PHASE=DRAWING
-2025-12-15 10:15:35.383 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: OK
-2025-12-15 10:15:52.795 [virtual-36] DEBUG c.d.poker.server.ClientHandler - Client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: ba84e645-4651-422d-a478-1cfbd64cc4a1 49acc162-2cd0-4a3b-8b1c-11113973ee65 RAISE AMOUNT=50
-2025-12-15 10:15:52.796 [virtual-36] DEBUG c.dnikitin.poker.game.engine.Round - Raise recorded in LOBBY. New bet: 50, aggressor: 1
-2025-12-15 10:15:52.796 [virtual-36] INFO  com.dnikitin.poker.game.Table - Player Kris raised by 50. New highest bet: 50
-2025-12-15 10:15:52.797 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ACTION PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65 TYPE=RAISE AMOUNT=50 MSG=Raised by 50
-2025-12-15 10:15:52.797 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: ACTION PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65 TYPE=RAISE AMOUNT=50 MSG=Raised by 50
-2025-12-15 10:15:52.797 [virtual-36] DEBUG c.d.poker.game.engine.TurnOrder - Turn advanced to: Dima
-2025-12-15 10:15:52.797 [virtual-36] DEBUG com.dnikitin.poker.game.Table - Turn passed to: Dima
-2025-12-15 10:15:52.797 [virtual-36] DEBUG c.d.p.server.security.TimeoutManager - Timeout started for player 94607b9d-d6d6-44ea-b2c0-531e506d2aeb: 45s
-2025-12-15 10:15:52.797 [virtual-36] DEBUG c.d.poker.server.ClientHandler - Started timeout for player Dima
-2025-12-15 10:15:52.797 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: TURN PLAYER=94607b9d-d6d6-44ea-b2c0-531e506d2aeb
-2025-12-15 10:15:52.798 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: TURN PLAYER=94607b9d-d6d6-44ea-b2c0-531e506d2aeb
-2025-12-15 10:15:52.798 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: OK
-2025-12-15 10:16:14.778 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ba84e645-4651-422d-a478-1cfbd64cc4a1 94607b9d-d6d6-44ea-b2c0-531e506d2aeb RAISE AMOUNT=70
-2025-12-15 10:16:14.779 [virtual-32] DEBUG c.d.p.server.security.TimeoutManager - Timeout cancelled for player 94607b9d-d6d6-44ea-b2c0-531e506d2aeb
-2025-12-15 10:16:14.779 [virtual-32] DEBUG c.dnikitin.poker.game.engine.Round - Raise recorded in LOBBY. New bet: 120, aggressor: 0
-2025-12-15 10:16:14.779 [virtual-32] INFO  com.dnikitin.poker.game.Table - Player Dima raised by 70. New highest bet: 120
-2025-12-15 10:16:14.780 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ACTION PLAYER=94607b9d-d6d6-44ea-b2c0-531e506d2aeb TYPE=RAISE AMOUNT=120 MSG=Raised by 70
-2025-12-15 10:16:14.780 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: ACTION PLAYER=94607b9d-d6d6-44ea-b2c0-531e506d2aeb TYPE=RAISE AMOUNT=120 MSG=Raised by 70
-2025-12-15 10:16:14.780 [virtual-32] DEBUG c.d.poker.game.engine.TurnOrder - Turn advanced to: Kris
-2025-12-15 10:16:14.780 [virtual-32] DEBUG com.dnikitin.poker.game.Table - Turn passed to: Kris
-2025-12-15 10:16:14.780 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: TURN PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65
-2025-12-15 10:16:14.780 [virtual-32] DEBUG c.d.p.server.security.TimeoutManager - Timeout started for player 49acc162-2cd0-4a3b-8b1c-11113973ee65: 45s
-2025-12-15 10:16:14.780 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Started timeout for player Kris
-2025-12-15 10:16:14.780 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: TURN PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65
-2025-12-15 10:16:14.781 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: OK
-2025-12-15 10:16:59.783 [virtual-37] WARN  c.d.p.server.security.TimeoutManager - Player 49acc162-2cd0-4a3b-8b1c-11113973ee65 timed out
-2025-12-15 10:16:59.783 [virtual-37] WARN  c.d.poker.server.ClientHandler - Player Kris timed out, auto-folding
-2025-12-15 10:16:59.783 [virtual-37] INFO  com.dnikitin.poker.game.Table - Player Kris folded.
-2025-12-15 10:16:59.784 [virtual-37] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ACTION PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65 TYPE=FOLD AMOUNT=0 MSG=Folded
-2025-12-15 10:16:59.784 [virtual-37] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: ACTION PLAYER=49acc162-2cd0-4a3b-8b1c-11113973ee65 TYPE=FOLD AMOUNT=0 MSG=Folded
-2025-12-15 10:16:59.785 [virtual-37] DEBUG c.d.poker.game.engine.PotManager - Created pot: 100 with 1 eligible players
-2025-12-15 10:16:59.785 [virtual-37] DEBUG c.d.poker.game.engine.PotManager - Created pot: 70 with 1 eligible players
-2025-12-15 10:16:59.785 [virtual-37] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: ROUND POT=170 HIGHESTBET=0
-2025-12-15 10:16:59.785 [virtual-37] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: ROUND POT=170 HIGHESTBET=0
-2025-12-15 10:16:59.786 [virtual-37] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: WINNER PLAYER=94607b9d-d6d6-44ea-b2c0-531e506d2aeb POT=170 RANK=Opponents Folded
-2025-12-15 10:16:59.787 [virtual-37] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: WINNER PLAYER=94607b9d-d6d6-44ea-b2c0-531e506d2aeb POT=170 RANK=Opponents Folded
-2025-12-15 10:16:59.787 [virtual-37] INFO  com.dnikitin.poker.game.Table - State transition: DRAWING -> FINISHED
-2025-12-15 10:16:59.787 [virtual-37] DEBUG c.dnikitin.poker.game.engine.Round - Round reset for phase: LOBBY
-2025-12-15 10:16:59.787 [virtual-37] DEBUG c.d.poker.server.ClientHandler - To client e4f3bb63-b82b-41f8-b4b6-87f1e3dee599: STATE PHASE=FINISHED
-2025-12-15 10:16:59.787 [virtual-37] DEBUG c.d.poker.server.ClientHandler - To client 039a5d28-9ba5-47c0-87f8-3c7e13ff456b: STATE PHASE=FINISHED
+2025-12-15 11:05:33.527 [main] INFO  c.dnikitin.poker.server.PokerServer - PokerServer initialized with security features:
+2025-12-15 11:05:33.530 [main] INFO  c.dnikitin.poker.server.PokerServer -   - Rate limit: 10 messages per second
+2025-12-15 11:05:33.531 [main] INFO  c.dnikitin.poker.server.PokerServer -   - Turn timeout: 45 seconds
+2025-12-15 11:05:33.533 [main] INFO  c.dnikitin.poker.server.PokerServer - Poker Server started on port: 7777
+2025-12-15 11:05:33.534 [main] INFO  c.dnikitin.poker.server.PokerServer - Using virtual threads for client handling
+2025-12-15 11:05:40.995 [main] INFO  c.dnikitin.poker.server.PokerServer - New connection accepted: /127.0.0.1:57135
+2025-12-15 11:05:41.035 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: HELLO VERSION=1.0
+2025-12-15 11:05:41.036 [virtual-32] INFO  c.d.poker.server.ClientHandler - Client c3981c92-df92-4f70-a70f-5fc514634466 connected
+2025-12-15 11:05:42.976 [main] INFO  c.dnikitin.poker.server.PokerServer - New connection accepted: /127.0.0.1:57140
+2025-12-15 11:05:42.977 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: HELLO VERSION=1.0
+2025-12-15 11:05:42.977 [virtual-36] INFO  c.d.poker.server.ClientHandler - Client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33 connected
+2025-12-15 11:05:52.426 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Client c3981c92-df92-4f70-a70f-5fc514634466: CREATE ANTE=10 BET=10 LIMIT=FIXED
+2025-12-15 11:05:52.437 [virtual-32] INFO  com.dnikitin.poker.model.Deck - Deck shuffled. Cards count: 52
+2025-12-15 11:05:52.437 [virtual-32] INFO  c.dnikitin.poker.game.engine.Dealer - New deck created and shuffled. Seed: 474027735711934741 (for audit)
+2025-12-15 11:05:52.438 [virtual-32] DEBUG c.d.poker.game.engine.PotManager - PotManager reset
+2025-12-15 11:05:52.439 [virtual-32] INFO  com.dnikitin.poker.game.GameManager - Created new game table: e3486661-e00c-4657-b8a4-629f5bde6537. Active games: 1
+2025-12-15 11:05:52.439 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: OK MESSAGE=GAME_ID=e3486661-e00c-4657-b8a4-629f5bde6537
+2025-12-15 11:05:52.440 [virtual-32] INFO  c.d.poker.server.ClientHandler - Client c3981c92-df92-4f70-a70f-5fc514634466 created game e3486661-e00c-4657-b8a4-629f5bde6537
+2025-12-15 11:06:05.135 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Client c3981c92-df92-4f70-a70f-5fc514634466: JOIN GAME=e3486661-e00c-4657-b8a4-629f5bde6537 NAME=Dima
+2025-12-15 11:06:05.138 [virtual-32] INFO  com.dnikitin.poker.game.Table - Player Dima joined table e3486661-e00c-4657-b8a4-629f5bde6537. Total players: 1
+2025-12-15 11:06:05.150 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: LOBBY PLAYER=2900b2b0-18ed-4be9-b79a-534f4b03bd9f CHIPS=1000 NAME=Dima
+2025-12-15 11:06:05.150 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: WELCOME GAME=e3486661-e00c-4657-b8a4-629f5bde6537 PLAYER=2900b2b0-18ed-4be9-b79a-534f4b03bd9f
+2025-12-15 11:06:05.150 [virtual-32] INFO  c.d.poker.server.ClientHandler - Client c3981c92-df92-4f70-a70f-5fc514634466 joined game e3486661-e00c-4657-b8a4-629f5bde6537 as Dima
+2025-12-15 11:06:11.785 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Client c3981c92-df92-4f70-a70f-5fc514634466: e3486661-e00c-4657-b8a4-629f5bde6537 2900b2b0-18ed-4be9-b79a-534f4b03bd9f START
+2025-12-15 11:06:11.787 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Game error [BAD_PLAYER_COUNT]: Not enough players to start. Min: 2
+2025-12-15 11:06:11.788 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: ERR CODE=BAD_PLAYER_COUNT REASON=Not_enough_players_to_start_Min_2
+2025-12-15 11:06:16.768 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Client c3981c92-df92-4f70-a70f-5fc514634466: e3486661-e00c-4657-b8a4-629f5bde6537 2900b2b0-18ed-4be9-b79a-534f4b03bd9f CHECK
+2025-12-15 11:06:16.769 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Game error [INVALID_MOVE]: Action allowed only during betting phases. Current: LOBBY
+2025-12-15 11:06:16.769 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: ERR CODE=INVALID_MOVE REASON=Action_allowed_only_during_betting_phases_Current_LOBBY
+2025-12-15 11:06:21.526 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Client c3981c92-df92-4f70-a70f-5fc514634466: e3486661-e00c-4657-b8a4-629f5bde6537 2900b2b0-18ed-4be9-b79a-534f4b03bd9f FOLD
+2025-12-15 11:06:21.527 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Game error [INVALID_MOVE]: Action allowed only during betting phases. Current: LOBBY
+2025-12-15 11:06:21.527 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: ERR CODE=INVALID_MOVE REASON=Action_allowed_only_during_betting_phases_Current_LOBBY
+2025-12-15 11:06:42.430 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Client c3981c92-df92-4f70-a70f-5fc514634466: e3486661-e00c-4657-b8a4-629f5bde6537 2900b2b0-18ed-4be9-b79a-534f4b03bd9f DRAW CARDS=1,
+2025-12-15 11:06:42.433 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Game error [STATE_MISMATCH]: Cannot draw cards now. Current state: LOBBY
+2025-12-15 11:06:42.433 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: ERR CODE=STATE_MISMATCH REASON=Cannot_draw_cards_now_Current_state_LOBBY
+2025-12-15 11:07:09.668 [virtual-36] DEBUG c.d.poker.server.ClientHandler - Client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: JOIN GAME=e3486661-e00c-4657-b8a4-629f5bde6537 NAME=Krisik
+2025-12-15 11:07:09.668 [virtual-36] INFO  com.dnikitin.poker.game.Table - Player Krisik joined table e3486661-e00c-4657-b8a4-629f5bde6537. Total players: 2
+2025-12-15 11:07:09.669 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: LOBBY PLAYER=0bede397-910d-4543-b492-75781f382732 CHIPS=1000 NAME=Krisik
+2025-12-15 11:07:09.669 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: LOBBY PLAYER=0bede397-910d-4543-b492-75781f382732 CHIPS=1000 NAME=Krisik
+2025-12-15 11:07:09.669 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: WELCOME GAME=e3486661-e00c-4657-b8a4-629f5bde6537 PLAYER=0bede397-910d-4543-b492-75781f382732
+2025-12-15 11:07:09.670 [virtual-36] INFO  c.d.poker.server.ClientHandler - Client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33 joined game e3486661-e00c-4657-b8a4-629f5bde6537 as Krisik
+2025-12-15 11:07:14.975 [virtual-36] DEBUG c.d.poker.server.ClientHandler - Client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: e3486661-e00c-4657-b8a4-629f5bde6537 0bede397-910d-4543-b492-75781f382732 START
+2025-12-15 11:07:14.976 [virtual-36] INFO  com.dnikitin.poker.game.Table - Starting game on table e3486661-e00c-4657-b8a4-629f5bde6537
+2025-12-15 11:07:14.976 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: STARTED GAME=e3486661-e00c-4657-b8a4-629f5bde6537
+2025-12-15 11:07:14.976 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: STARTED GAME=e3486661-e00c-4657-b8a4-629f5bde6537
+2025-12-15 11:07:14.977 [virtual-36] DEBUG c.d.poker.game.engine.TurnOrder - Dealer rotated to position 0: Dima
+2025-12-15 11:07:14.977 [virtual-36] DEBUG c.d.poker.game.engine.PotManager - PotManager reset
+2025-12-15 11:07:14.978 [virtual-36] INFO  com.dnikitin.poker.model.Deck - Deck shuffled. Cards count: 52
+2025-12-15 11:07:14.978 [virtual-36] INFO  c.dnikitin.poker.game.engine.Dealer - New deck created and shuffled. Seed: -6784410478829835393 (for audit)
+2025-12-15 11:07:14.979 [virtual-36] INFO  com.dnikitin.poker.game.Table - Hand started. Dealer: Dima. Deck Seed: DECK_SEED:A1D8EE9D66E8EB7F
+2025-12-15 11:07:14.980 [virtual-36] INFO  com.dnikitin.poker.game.Table - State transition: LOBBY -> ANTE
+2025-12-15 11:07:14.980 [virtual-36] DEBUG c.dnikitin.poker.game.engine.Round - Round reset for phase: LOBBY
+2025-12-15 11:07:14.980 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: STATE PHASE=ANTE
+2025-12-15 11:07:14.980 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: STATE PHASE=ANTE
+2025-12-15 11:07:14.980 [virtual-36] DEBUG c.d.poker.game.engine.PotManager - Added 10 to main pot. Total: 10
+2025-12-15 11:07:14.981 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: ACTION PLAYER=2900b2b0-18ed-4be9-b79a-534f4b03bd9f TYPE=ANTE AMOUNT=10 MSG=Paid Ante
+2025-12-15 11:07:14.981 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: ACTION PLAYER=2900b2b0-18ed-4be9-b79a-534f4b03bd9f TYPE=ANTE AMOUNT=10 MSG=Paid Ante
+2025-12-15 11:07:14.981 [virtual-36] DEBUG c.d.poker.game.engine.PotManager - Added 10 to main pot. Total: 20
+2025-12-15 11:07:14.981 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: ACTION PLAYER=0bede397-910d-4543-b492-75781f382732 TYPE=ANTE AMOUNT=10 MSG=Paid Ante
+2025-12-15 11:07:14.981 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: ACTION PLAYER=0bede397-910d-4543-b492-75781f382732 TYPE=ANTE AMOUNT=10 MSG=Paid Ante
+2025-12-15 11:07:14.981 [virtual-36] INFO  com.dnikitin.poker.game.Table - State transition: ANTE -> DEALING
+2025-12-15 11:07:14.982 [virtual-36] DEBUG c.dnikitin.poker.game.engine.Round - Round reset for phase: LOBBY
+2025-12-15 11:07:14.982 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: STATE PHASE=DEALING
+2025-12-15 11:07:14.982 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: STATE PHASE=DEALING
+2025-12-15 11:07:14.982 [virtual-36] INFO  c.dnikitin.poker.game.engine.Dealer - Dealing 5 cards to 2 players
+2025-12-15 11:07:14.982 [virtual-36] DEBUG c.dnikitin.poker.game.engine.Dealer - Dealt 5 cards to player Dima
+2025-12-15 11:07:14.982 [virtual-36] DEBUG c.dnikitin.poker.game.engine.Dealer - Dealt 5 cards to player Krisik
+2025-12-15 11:07:14.983 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: DEAL PLAYER=2900b2b0-18ed-4be9-b79a-534f4b03bd9f CARDS=J♠,10♠,3♠,9♥,10♦
+2025-12-15 11:07:14.984 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: DEAL PLAYER=2900b2b0-18ed-4be9-b79a-534f4b03bd9f CARDS=HIDDEN COUNT=5
+2025-12-15 11:07:14.984 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: DEAL PLAYER=0bede397-910d-4543-b492-75781f382732 CARDS=HIDDEN COUNT=5
+2025-12-15 11:07:14.984 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: DEAL PLAYER=0bede397-910d-4543-b492-75781f382732 CARDS=5♠,10♣,3♥,2♠,K♦
+2025-12-15 11:07:14.984 [virtual-36] DEBUG c.d.poker.game.engine.TurnOrder - Starting turn from left of dealer: Krisik
+2025-12-15 11:07:14.985 [virtual-36] INFO  com.dnikitin.poker.game.Table - State transition: DEALING -> BETTING_1
+2025-12-15 11:07:14.985 [virtual-36] DEBUG c.dnikitin.poker.game.engine.Round - Round reset for phase: LOBBY
+2025-12-15 11:07:14.985 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: STATE PHASE=BETTING_1
+2025-12-15 11:07:14.985 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: STATE PHASE=BETTING_1
+2025-12-15 11:07:14.985 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: TURN PLAYER=0bede397-910d-4543-b492-75781f382732 PHASE=UNKNOWN CALL=0 MINRAISE=0
+2025-12-15 11:07:14.987 [virtual-36] DEBUG c.d.p.server.security.TimeoutManager - Timeout started for player 0bede397-910d-4543-b492-75781f382732: 45s
+2025-12-15 11:07:14.987 [virtual-36] DEBUG c.d.poker.server.ClientHandler - Started timeout for player Krisik
+2025-12-15 11:07:14.988 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: TURN PLAYER=0bede397-910d-4543-b492-75781f382732 PHASE=UNKNOWN CALL=0 MINRAISE=0
+2025-12-15 11:07:14.988 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: OK MESSAGE=Game started
+2025-12-15 11:07:14.988 [virtual-36] INFO  c.d.poker.server.ClientHandler - Client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33 started game
+2025-12-15 11:07:46.376 [virtual-36] DEBUG c.d.poker.server.ClientHandler - Client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: e3486661-e00c-4657-b8a4-629f5bde6537 0bede397-910d-4543-b492-75781f382732 RAISE AMOUNT=50
+2025-12-15 11:07:46.376 [virtual-36] DEBUG c.d.p.server.security.TimeoutManager - Timeout cancelled for player 0bede397-910d-4543-b492-75781f382732
+2025-12-15 11:07:46.377 [virtual-36] DEBUG c.dnikitin.poker.game.engine.Round - Raise recorded in LOBBY. New bet: 50, aggressor: 1
+2025-12-15 11:07:46.377 [virtual-36] INFO  com.dnikitin.poker.game.Table - Player Krisik raised by 50. New highest bet: 50
+2025-12-15 11:07:46.378 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: ACTION PLAYER=0bede397-910d-4543-b492-75781f382732 TYPE=RAISE AMOUNT=40 MSG=Raised by 50
+2025-12-15 11:07:46.378 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: ACTION PLAYER=0bede397-910d-4543-b492-75781f382732 TYPE=RAISE AMOUNT=40 MSG=Raised by 50
+2025-12-15 11:07:46.379 [virtual-36] DEBUG c.d.poker.game.engine.TurnOrder - Turn advanced to: Dima
+2025-12-15 11:07:46.379 [virtual-36] DEBUG com.dnikitin.poker.game.Table - Turn passed to: Dima. To call: 40
+2025-12-15 11:07:46.380 [virtual-36] DEBUG c.d.p.server.security.TimeoutManager - Timeout started for player 2900b2b0-18ed-4be9-b79a-534f4b03bd9f: 45s
+2025-12-15 11:07:46.380 [virtual-36] DEBUG c.d.poker.server.ClientHandler - Started timeout for player Dima
+2025-12-15 11:07:46.380 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: TURN PLAYER=2900b2b0-18ed-4be9-b79a-534f4b03bd9f PHASE=UNKNOWN CALL=40 MINRAISE=10
+2025-12-15 11:07:46.380 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: TURN PLAYER=2900b2b0-18ed-4be9-b79a-534f4b03bd9f PHASE=UNKNOWN CALL=40 MINRAISE=10
+2025-12-15 11:07:46.380 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: OK
+2025-12-15 11:08:12.116 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Client c3981c92-df92-4f70-a70f-5fc514634466: e3486661-e00c-4657-b8a4-629f5bde6537 2900b2b0-18ed-4be9-b79a-534f4b03bd9f CALL
+2025-12-15 11:08:12.116 [virtual-32] DEBUG c.d.p.server.security.TimeoutManager - Timeout cancelled for player 2900b2b0-18ed-4be9-b79a-534f4b03bd9f
+2025-12-15 11:08:12.116 [virtual-32] DEBUG c.dnikitin.poker.game.engine.Round - Action recorded in LOBBY. Total actions: 2
+2025-12-15 11:08:12.116 [virtual-32] INFO  com.dnikitin.poker.game.Table - Player Dima called 40.
+2025-12-15 11:08:12.117 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: ACTION PLAYER=2900b2b0-18ed-4be9-b79a-534f4b03bd9f TYPE=CALL AMOUNT=40 MSG=Called 40
+2025-12-15 11:08:12.117 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: ACTION PLAYER=2900b2b0-18ed-4be9-b79a-534f4b03bd9f TYPE=CALL AMOUNT=40 MSG=Called 40
+2025-12-15 11:08:12.121 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: ROUND POT=120 HIGHESTBET=0
+2025-12-15 11:08:12.122 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: ROUND POT=120 HIGHESTBET=0
+2025-12-15 11:08:12.122 [virtual-32] DEBUG c.dnikitin.poker.game.engine.Round - Round reset for phase: LOBBY
+2025-12-15 11:08:12.123 [virtual-32] INFO  com.dnikitin.poker.game.Table - State transition: BETTING_1 -> DRAWING
+2025-12-15 11:08:12.123 [virtual-32] DEBUG c.dnikitin.poker.game.engine.Round - Round reset for phase: LOBBY
+2025-12-15 11:08:12.124 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: STATE PHASE=DRAWING
+2025-12-15 11:08:12.124 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: STATE PHASE=DRAWING
+2025-12-15 11:08:12.124 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: OK
+2025-12-15 11:08:26.471 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Client c3981c92-df92-4f70-a70f-5fc514634466: e3486661-e00c-4657-b8a4-629f5bde6537 2900b2b0-18ed-4be9-b79a-534f4b03bd9f FOLD
+2025-12-15 11:08:26.471 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Game error [INVALID_MOVE]: Action allowed only during betting phases. Current: DRAWING
+2025-12-15 11:08:26.472 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: ERR CODE=INVALID_MOVE REASON=Action_allowed_only_during_betting_phases_Current_DRAWING
+2025-12-15 11:08:50.624 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Client c3981c92-df92-4f70-a70f-5fc514634466: e3486661-e00c-4657-b8a4-629f5bde6537 2900b2b0-18ed-4be9-b79a-534f4b03bd9f RAISE AMOUNT=50
+2025-12-15 11:08:50.624 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Game error [INVALID_MOVE]: Action allowed only during betting phases. Current: DRAWING
+2025-12-15 11:08:50.625 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: ERR CODE=INVALID_MOVE REASON=Action_allowed_only_during_betting_phases_Current_DRAWING
+2025-12-15 11:10:03.189 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Client c3981c92-df92-4f70-a70f-5fc514634466: e3486661-e00c-4657-b8a4-629f5bde6537 2900b2b0-18ed-4be9-b79a-534f4b03bd9f DRAW CARDS=2
+2025-12-15 11:10:03.191 [virtual-32] INFO  c.dnikitin.poker.game.engine.Dealer - Player Dima exchanged 1 cards
+2025-12-15 11:10:03.192 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: DEAL PLAYER=2900b2b0-18ed-4be9-b79a-534f4b03bd9f CARDS=J♠,10♠,9♥,10♦,A♥
+2025-12-15 11:10:03.193 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: DEAL PLAYER=2900b2b0-18ed-4be9-b79a-534f4b03bd9f CARDS=HIDDEN COUNT=5
+2025-12-15 11:10:03.193 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: ACTION PLAYER=2900b2b0-18ed-4be9-b79a-534f4b03bd9f TYPE=DRAW AMOUNT=0 MSG=Exchanged 1 cards
+2025-12-15 11:10:03.193 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: ACTION PLAYER=2900b2b0-18ed-4be9-b79a-534f4b03bd9f TYPE=DRAW AMOUNT=0 MSG=Exchanged 1 cards
+2025-12-15 11:10:03.193 [virtual-32] DEBUG c.d.poker.game.engine.TurnOrder - Turn advanced to: Krisik
+2025-12-15 11:10:03.194 [virtual-32] DEBUG com.dnikitin.poker.game.Table - Turn passed to: Krisik. To call: 0
+2025-12-15 11:10:03.194 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: TURN PLAYER=0bede397-910d-4543-b492-75781f382732 PHASE=UNKNOWN CALL=0 MINRAISE=10
+2025-12-15 11:10:03.194 [virtual-32] DEBUG c.d.p.server.security.TimeoutManager - Timeout started for player 0bede397-910d-4543-b492-75781f382732: 45s
+2025-12-15 11:10:03.194 [virtual-32] DEBUG c.d.poker.server.ClientHandler - Started timeout for player Krisik
+2025-12-15 11:10:03.194 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: TURN PLAYER=0bede397-910d-4543-b492-75781f382732 PHASE=UNKNOWN CALL=0 MINRAISE=10
+2025-12-15 11:10:03.195 [virtual-32] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: OK
+2025-12-15 11:10:48.195 [virtual-40] WARN  c.d.p.server.security.TimeoutManager - Player 0bede397-910d-4543-b492-75781f382732 timed out
+2025-12-15 11:10:48.195 [virtual-40] WARN  c.d.poker.server.ClientHandler - Player Krisik timed out, auto-folding
+2025-12-15 11:10:48.196 [virtual-40] ERROR c.d.poker.server.ClientHandler - Error auto-folding timed out player
+com.dnikitin.poker.exceptions.moves.InvalidMoveException: Action allowed only during betting phases. Current: DRAWING
+	at com.dnikitin.poker.game.Table.validateBettingPhase(Table.java:475)
+	at com.dnikitin.poker.game.Table.playerFold(Table.java:199)
+	at com.dnikitin.poker.server.ClientHandler.handleTimeout(ClientHandler.java:298)
+	at com.dnikitin.poker.server.security.TimeoutManager.lambda$startTimeout$0(TimeoutManager.java:47)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:309)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)
+	at java.base/java.lang.VirtualThread.run(VirtualThread.java:456)
+2025-12-15 11:12:46.102 [virtual-36] DEBUG c.d.poker.server.ClientHandler - Client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: e3486661-e00c-4657-b8a4-629f5bde6537 0bede397-910d-4543-b492-75781f382732 DRAW CARDS=0,
+2025-12-15 11:12:46.102 [virtual-36] INFO  c.dnikitin.poker.game.engine.Dealer - Player Krisik exchanged 1 cards
+2025-12-15 11:12:46.103 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: DEAL PLAYER=0bede397-910d-4543-b492-75781f382732 CARDS=HIDDEN COUNT=5
+2025-12-15 11:12:46.103 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: DEAL PLAYER=0bede397-910d-4543-b492-75781f382732 CARDS=10♣,3♥,2♠,K♦,Q♣
+2025-12-15 11:12:46.105 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: ACTION PLAYER=0bede397-910d-4543-b492-75781f382732 TYPE=DRAW AMOUNT=0 MSG=Exchanged 1 cards
+2025-12-15 11:12:46.106 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: ACTION PLAYER=0bede397-910d-4543-b492-75781f382732 TYPE=DRAW AMOUNT=0 MSG=Exchanged 1 cards
+2025-12-15 11:12:46.106 [virtual-36] INFO  com.dnikitin.poker.game.Table - State transition: DRAWING -> BETTING_2
+2025-12-15 11:12:46.106 [virtual-36] DEBUG c.dnikitin.poker.game.engine.Round - Round reset for phase: LOBBY
+2025-12-15 11:12:46.106 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: STATE PHASE=BETTING_2
+2025-12-15 11:12:46.107 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: STATE PHASE=BETTING_2
+2025-12-15 11:12:46.107 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: OK
+2025-12-15 11:15:14.331 [virtual-36] DEBUG c.d.poker.server.ClientHandler - Client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: e3486661-e00c-4657-b8a4-629f5bde6537 0bede397-910d-4543-b492-75781f382732 RAISE AMOUNT=50
+2025-12-15 11:15:14.332 [virtual-36] DEBUG c.dnikitin.poker.game.engine.Round - Raise recorded in LOBBY. New bet: 50, aggressor: 1
+2025-12-15 11:15:14.332 [virtual-36] INFO  com.dnikitin.poker.game.Table - Player Krisik raised by 50. New highest bet: 50
+2025-12-15 11:15:14.332 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: ACTION PLAYER=0bede397-910d-4543-b492-75781f382732 TYPE=RAISE AMOUNT=50 MSG=Raised by 50
+2025-12-15 11:15:14.333 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: ACTION PLAYER=0bede397-910d-4543-b492-75781f382732 TYPE=RAISE AMOUNT=50 MSG=Raised by 50
+2025-12-15 11:15:14.333 [virtual-36] DEBUG c.d.poker.game.engine.TurnOrder - Turn advanced to: Dima
+2025-12-15 11:15:14.333 [virtual-36] DEBUG com.dnikitin.poker.game.Table - Turn passed to: Dima. To call: 50
+2025-12-15 11:15:14.333 [virtual-36] DEBUG c.d.p.server.security.TimeoutManager - Timeout started for player 2900b2b0-18ed-4be9-b79a-534f4b03bd9f: 45s
+2025-12-15 11:15:14.333 [virtual-36] DEBUG c.d.poker.server.ClientHandler - Started timeout for player Dima
+2025-12-15 11:15:14.333 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: TURN PLAYER=2900b2b0-18ed-4be9-b79a-534f4b03bd9f PHASE=UNKNOWN CALL=50 MINRAISE=10
+2025-12-15 11:15:14.334 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: TURN PLAYER=2900b2b0-18ed-4be9-b79a-534f4b03bd9f PHASE=UNKNOWN CALL=50 MINRAISE=10
+2025-12-15 11:15:14.334 [virtual-36] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: OK
+2025-12-15 11:15:59.334 [virtual-37] WARN  c.d.p.server.security.TimeoutManager - Player 2900b2b0-18ed-4be9-b79a-534f4b03bd9f timed out
+2025-12-15 11:15:59.334 [virtual-37] WARN  c.d.poker.server.ClientHandler - Player Dima timed out, auto-folding
+2025-12-15 11:15:59.335 [virtual-37] INFO  com.dnikitin.poker.game.Table - Player Dima folded.
+2025-12-15 11:15:59.335 [virtual-37] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: ACTION PLAYER=2900b2b0-18ed-4be9-b79a-534f4b03bd9f TYPE=FOLD AMOUNT=0 MSG=Folded
+2025-12-15 11:15:59.335 [virtual-37] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: ACTION PLAYER=2900b2b0-18ed-4be9-b79a-534f4b03bd9f TYPE=FOLD AMOUNT=0 MSG=Folded
+2025-12-15 11:15:59.336 [virtual-37] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: ROUND POT=170 HIGHESTBET=0
+2025-12-15 11:15:59.336 [virtual-37] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: ROUND POT=170 HIGHESTBET=0
+2025-12-15 11:15:59.337 [virtual-37] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: WINNER PLAYER=0bede397-910d-4543-b492-75781f382732 POT=170 RANK=Opponents Folded
+2025-12-15 11:15:59.337 [virtual-37] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: WINNER PLAYER=0bede397-910d-4543-b492-75781f382732 POT=170 RANK=Opponents Folded
+2025-12-15 11:15:59.337 [virtual-37] INFO  com.dnikitin.poker.game.Table - State transition: BETTING_2 -> FINISHED
+2025-12-15 11:15:59.337 [virtual-37] DEBUG c.dnikitin.poker.game.engine.Round - Round reset for phase: LOBBY
+2025-12-15 11:15:59.338 [virtual-37] DEBUG c.d.poker.server.ClientHandler - To client c3981c92-df92-4f70-a70f-5fc514634466: STATE PHASE=FINISHED
+2025-12-15 11:15:59.338 [virtual-37] DEBUG c.d.poker.server.ClientHandler - To client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33: STATE PHASE=FINISHED
+2025-12-15 11:20:22.501 [virtual-32] INFO  c.d.poker.server.ClientHandler - Client c3981c92-df92-4f70-a70f-5fc514634466 disconnected: Connection reset
+2025-12-15 11:20:22.502 [virtual-32] INFO  c.d.poker.server.ClientHandler - Player Dima disconnected from game
+2025-12-15 11:20:22.502 [virtual-32] INFO  c.d.poker.server.ClientHandler - Client c3981c92-df92-4f70-a70f-5fc514634466 disconnected
+2025-12-15 11:20:24.096 [virtual-36] INFO  c.d.poker.server.ClientHandler - Client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33 disconnected: Connection reset
+2025-12-15 11:20:24.097 [virtual-36] INFO  c.d.poker.server.ClientHandler - Player Krisik disconnected from game
+2025-12-15 11:20:24.097 [virtual-36] INFO  c.d.poker.server.ClientHandler - Client 3ca2a979-a9d2-48f2-a04a-c0c3749e8f33 disconnected
+2025-12-15 11:20:25.862 [Thread-0] INFO  c.dnikitin.poker.server.PokerServer - Shutting down server...
+2025-12-15 11:20:25.862 [main] INFO  c.dnikitin.poker.server.PokerServer - Server socket closed.
+2025-12-15 11:20:25.862 [main] INFO  c.dnikitin.poker.server.PokerServer - Shutting down server...
+2025-12-15 11:20:25.863 [main] INFO  c.d.p.server.security.TimeoutManager - TimeoutManager shut down
+2025-12-15 11:20:25.863 [Thread-0] INFO  c.d.p.server.security.TimeoutManager - TimeoutManager shut down
+2025-12-15 11:20:25.863 [Thread-0] INFO  c.dnikitin.poker.server.PokerServer - Server stopped successfully.
+2025-12-15 11:20:25.863 [main] INFO  c.dnikitin.poker.server.PokerServer - Server stopped successfully.

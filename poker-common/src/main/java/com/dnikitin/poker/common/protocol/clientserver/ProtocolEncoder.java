@@ -19,33 +19,26 @@ public class ProtocolEncoder {
      */
     public String encode(GameEvent event) {
         return switch (event) {
-            case GameEvent.PlayerJoined pj ->
-                String.format("LOBBY PLAYER=%s CHIPS=%d NAME=%s",
+            case GameEvent.PlayerJoined pj -> String.format("LOBBY PLAYER=%s CHIPS=%d NAME=%s",
                     pj.playerId(), pj.chips(), pj.name());
 
-            case GameEvent.GameStarted gs ->
-                String.format("STARTED GAME=%s", gs.gameId());
+            case GameEvent.GameStarted gs -> String.format("STARTED GAME=%s", gs.gameId());
 
-            case GameEvent.StateChanged sc ->
-                String.format("STATE PHASE=%s", sc.newState());
+            case GameEvent.StateChanged sc -> String.format("STATE PHASE=%s", sc.newState());
 
             case GameEvent.TurnChanged tc ->
-                String.format("TURN PLAYER=%s", tc.activePlayerId());
+                    encodeTurn(tc.activePlayerId(), "UNKNOWN", tc.amountToCall(), tc.minRaise());
 
-            case GameEvent.PlayerAction pa ->
-                String.format("ACTION PLAYER=%s TYPE=%s AMOUNT=%d MSG=%s",
+            case GameEvent.PlayerAction pa -> String.format("ACTION PLAYER=%s TYPE=%s AMOUNT=%d MSG=%s",
                     pa.playerId(), pa.actionType(), pa.amount(), pa.message());
 
-            case GameEvent.CardsDealt cd ->
-                String.format("DEAL PLAYER=%s CARDS=%s",
+            case GameEvent.CardsDealt cd -> String.format("DEAL PLAYER=%s CARDS=%s",
                     cd.playerId(), formatCards(cd.cards()));
 
-            case GameEvent.GameFinished gf ->
-                String.format("WINNER PLAYER=%s POT=%d RANK=%s",
+            case GameEvent.GameFinished gf -> String.format("WINNER PLAYER=%s POT=%d RANK=%s",
                     gf.winnerId(), gf.potAmount(), gf.handRank());
 
-            case GameEvent.RoundInfo ri ->
-                    encodeRound(ri.potAmount(), ri.highestBet());
+            case GameEvent.RoundInfo ri -> encodeRound(ri.potAmount(), ri.highestBet());
 
             default -> null;
         };
@@ -93,10 +86,10 @@ public class ProtocolEncoder {
     public String encodeCardsDealt(String playerId, List<Card> cards, boolean mask) {
         if (mask) {
             return String.format("DEAL PLAYER=%s CARDS=HIDDEN COUNT=%d",
-                playerId, cards.size());
+                    playerId, cards.size());
         }
         return String.format("DEAL PLAYER=%s CARDS=%s",
-            playerId, formatCards(cards));
+                playerId, formatCards(cards));
     }
 
     /**
@@ -104,7 +97,7 @@ public class ProtocolEncoder {
      */
     public String encodeTurn(String playerId, String phase, int callAmount, int minRaise) {
         return String.format("TURN PLAYER=%s PHASE=%s CALL=%d MINRAISE=%d",
-            playerId, phase, callAmount, minRaise);
+                playerId, phase, callAmount, minRaise);
     }
 
     /**
@@ -119,7 +112,7 @@ public class ProtocolEncoder {
      */
     public String encodeShowdown(String playerId, List<Card> hand, String rank) {
         return String.format("SHOWDOWN PLAYER=%s HAND=%s RANK=%s",
-            playerId, formatCards(hand), rank);
+                playerId, formatCards(hand), rank);
     }
 
     /**
@@ -127,7 +120,7 @@ public class ProtocolEncoder {
      */
     public String encodePayout(String playerId, int amount, int stackLeft) {
         return String.format("PAYOUT PLAYER=%s AMOUNT=%d STACK=%d",
-            playerId, amount, stackLeft);
+                playerId, amount, stackLeft);
     }
 
     private String formatCards(List<Card> cards) {
@@ -146,6 +139,6 @@ public class ProtocolEncoder {
         if (text == null) return "";
         // Replace spaces with underscores and remove special characters
         return text.replaceAll("\\s+", "_")
-                   .replaceAll("[^a-zA-Z0-9_-]", "");
+                .replaceAll("[^a-zA-Z0-9_-]", "");
     }
 }

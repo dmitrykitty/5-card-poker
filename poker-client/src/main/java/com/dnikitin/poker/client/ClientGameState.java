@@ -28,6 +28,10 @@ public class ClientGameState {
         if (chips >= 0) playerChips.put(id, chips);
     }
 
+    public void updateTurnInfo(int toCall) {
+        this.amountToCall = toCall;
+    }
+
     public void deductChips(String id, int amount) {
         playerChips.computeIfPresent(id, (key, current) -> current - amount);
     }
@@ -41,8 +45,13 @@ public class ClientGameState {
         this.playerId = playerId;
     }
 
-    public void updateRoundInfo(int pot) {
+    public void updateRoundInfo(int pot, int highestBet) {
         this.currentPot = pot;
+        }
+
+    public void updatePhase(String phase) {
+        // Nie musimy już resetować żadnych map zakładów!
+        this.currentPhase = phase;
     }
 
     public void updateTurn(String phase, int toCall) {
