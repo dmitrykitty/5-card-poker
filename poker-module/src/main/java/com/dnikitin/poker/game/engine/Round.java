@@ -16,7 +16,7 @@ public class Round {
     private int currentBet;
     private int actionsInRound;
     private int lastAggressorIndex;
-    private final GameState phase;
+    private GameState phase;
 
     public Round(GameState phase) {
         this.phase = phase;
@@ -58,7 +58,6 @@ public class Round {
         if (activePlayers < 2) {
             return true; // Only one player left
         }
-
         // All active players must have acted
         return actionsInRound >= activePlayers;
     }
@@ -66,7 +65,8 @@ public class Round {
     /**
      * Resets the round for a new betting phase.
      */
-    public void reset() {
+    public void reset(GameState newPhase) {
+        phase = newPhase;
         currentBet = 0;
         actionsInRound = 0;
         lastAggressorIndex = -1;

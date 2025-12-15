@@ -314,7 +314,7 @@ public class Table {
 
     private void advanceGamePhase() {
         collectBetsIntoPot(); // Move chips from players to PotManager
-        currentRound.reset(); // Reset round stats for next phase
+        currentRound.reset(currentState); // Reset round stats for next phase
 
         switch (currentState) {
             case BETTING_1 -> changeState(GameState.DRAWING);
@@ -465,7 +465,7 @@ public class Table {
         log.info("State transition: {} -> {}", currentState, newState);
         currentState = newState;
         if (currentRound != null) {
-            currentRound.reset();
+            currentRound.reset(currentState);
         }
         notifyObservers(new GameEvent.StateChanged(currentState.name()));
     }

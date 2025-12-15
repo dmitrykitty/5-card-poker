@@ -203,25 +203,4 @@ public class PotManager {
     public int getPotCount() {
         return pots.size();
     }
-
-    /**
-     * Validates that pot calculations are consistent.
-     * Used for debugging and security.
-     *
-     * @return true if valid, false otherwise
-     */
-    public boolean validate() {
-        int total = getTotalPot();
-        if (total < 0) {
-            log.error("Invalid pot total: {}", total);
-            return false;
-        }
-        for (Pot pot : pots) {
-            if (pot.getAmount() < 0) {
-                log.error("Invalid pot amount: {}", pot.getAmount());
-                return false;
-            }
-        }
-        return true;
-    }
 }
