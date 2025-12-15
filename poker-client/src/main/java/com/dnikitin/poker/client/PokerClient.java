@@ -1,5 +1,7 @@
 package com.dnikitin.poker.client;
 
+import com.dnikitin.poker.common.protocol.serverclient.ServerMessage;
+import com.dnikitin.poker.common.protocol.serverclient.ServerMessageParser;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
@@ -17,17 +19,22 @@ import java.util.Scanner;
 public class PokerClient {
     private final String host;
     private final int port;
+
+    private final ClientGameState gameState;
+    private final ConsoleUI ui;
+    private final ServerMessageParser parser;
+
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
     private volatile boolean running;
 
-    private String playerId;
-    private String gameId;
-
     public PokerClient(String host, int port) {
         this.host = host;
         this.port = port;
+        this.gameState = new ClientGameState();
+        this.ui = new ConsoleUI();
+        this.parser = new ServerMessageParser();
         this.running = false;
     }
 
@@ -43,20 +50,20 @@ public class PokerClient {
             log.info("Connected to server at {}:{}", host, port);
             running = true;
 
-            // Start thread to listen for server messages
+            // Start listener thread
             Thread listenerThread = Thread.ofVirtual()
-                .name("ServerListener")
-                .start(this::listenToServer);
+                    .name("ServerListener")
+                    .start(this::listenToServer);
 
-            // Main thread handles user input
+            // Handle user input in main thread
             handleUserInput();
 
             listenerThread.join();
 
         } catch (IOException e) {
-            log.error("Failed to connect to server: {}", e.getMessage());
+            log.error("Failed to connect: {}", e.getMessage());
         } catch (InterruptedException e) {
-            log.error("Client interrupted", e);
+            log.error("Interrupted", e);
             Thread.currentThread().interrupt();
         } finally {
             disconnect();
@@ -84,83 +91,134 @@ public class PokerClient {
     /**
      * Handles messages received from the server.
      */
-    private void handleServerMessage(String message) {
-        log.debug("Server: {}", message);
+    private void handleServerMessage(String line) {
+        log.debug("Server: {}", line);
+        ServerMessage msg = parser.parse(line);
 
-        String[] parts = message.split("\\s+");
-        if (parts.length == 0) return;
+        boolean shouldRepaint = false;
 
-        String command = parts[0];
+        switch (msg.type()) {
+            case HELLO -> ui.printMessage("✓ Connected to server.");
 
-        switch (command) {
-            case "HELLO" -> System.out.println("✓ Connected to poker server");
+            case WELCOME -> {
+                String gId = msg.get("GAME").orElse(null);
+                String pId = msg.get("PLAYER").orElse(null);
 
-            case "WELCOME" -> {
-                extractParam(parts, "PLAYER").ifPresent(id -> {
-                    playerId = id;
-                    System.out.println("✓ Joined game! Your Player ID: " + id);
-                });
-                extractParam(parts, "GAME").ifPresent(id -> gameId = id);
+                if (gId != null && pId != null) {
+                    gameState.setConnectionInfo(gId, pId);
+                    ui.printMessage("✓ Joined game successfully.");
+                }
             }
 
-            case "LOBBY" -> {
-                System.out.println("═══ LOBBY ═══");
-                extractParam(parts, "PLAYER").ifPresent(name ->
-                    System.out.println("  Player: " + name));
-                extractParam(parts, "CHIPS").ifPresent(chips ->
-                    System.out.println("  Chips: " + chips));
+            case LOBBY -> {
+                // Zapamiętujemy imię i żetony gracza (siebie i innych)
+                String pId = msg.get("PLAYER").orElse(null); // Serwer musi wysyłać ID w LOBBY!
+                // Uwaga: Jeśli Twój obecny serwer wysyła "LOBBY PLAYER=Name", a nie ID,
+                // to trzeba poprawić serwer lub zgadywać.
+                // Zakładam, że protokół to: LOBBY PLAYER=<uuid> CHIPS=<n> NAME=<name>
+
+                String name = msg.get("NAME").orElse("Unknown");
+                int chips = msg.getInt("CHIPS", -1);
+
+                // Jeśli serwer w PLAYER wysyła imię zamiast ID (stara wersja), to mapowanie może nie działać idealnie,
+                // ale zakładając poprawny protokół:
+                if (pId != null) {
+                    gameState.updatePlayerInfo(pId, name, chips);
+                }
+
+                ui.printMessage(" [LOBBY] " + name + " (" + chips + " chips)");
             }
 
-            case "STARTED" -> System.out.println("\n▶ GAME STARTED!\n");
+            case STARTED -> {
+                gameState.setLastMessage("Game Started!");
+                shouldRepaint = true;
+            }
 
-            case "STATE" -> extractParam(parts, "PHASE").ifPresent(phase ->
-                System.out.println("═══ Phase: " + phase + " ═══"));
+            case STATE -> {
+                String phase = msg.get("PHASE").orElse(gameState.getCurrentPhase());
+                gameState.updateTurn(phase, gameState.getAmountToCall());
+                shouldRepaint = true;
+            }
 
-            case "TURN" -> extractParam(parts, "PLAYER").ifPresent(player -> {
-                if (player.equals(playerId)) {
-                    System.out.println("\n>>> YOUR TURN! <<<");
-                    extractParam(parts, "PHASE").ifPresent(phase ->
-                        System.out.println("Phase: " + phase));
-                    extractParam(parts, "CALL").ifPresent(call ->
-                        System.out.println("To call: " + call));
+            case ROUND -> {
+                int pot = msg.getInt("POT", gameState.getCurrentPot());
+                gameState.updateRoundInfo(pot);
+                shouldRepaint = true;
+            }
+
+            case TURN -> {
+                String activePlayerId = msg.get("PLAYER").orElse("");
+                String phase = msg.get("PHASE").orElse(gameState.getCurrentPhase());
+                int toCall = msg.getInt("CALL", 0);
+
+                gameState.updateTurn(phase, toCall);
+
+                if (isMe(activePlayerId)) {
+                    gameState.setLastMessage(">>> YOUR TURN! <<<");
+                    ui.printDashboard(gameState);
+                    shouldRepaint = false;
                 } else {
-                    System.out.println("Waiting for player " + player + "...");
+                    // Wyświetlamy imię zamiast ID
+                    String opponentName = gameState.getPlayerName(activePlayerId);
+                    gameState.setLastMessage("Waiting for " + opponentName + "...");
+                    shouldRepaint = true;
                 }
-            });
-
-            case "ACTION" -> {
-                String player = extractParam(parts, "PLAYER").orElse("?");
-                String type = extractParam(parts, "TYPE").orElse("?");
-                String msg = extractParam(parts, "MSG").orElse("");
-                System.out.println("  → " + player + ": " + type + " " + msg);
             }
 
-            case "DEAL" -> extractParam(parts, "CARDS").ifPresent(cards -> {
-                if (!cards.equals("HIDDEN")) {
-                    System.out.println("\n┌─ YOUR CARDS ─┐");
-                    System.out.println("│ " + cards + " │");
-                    System.out.println("└──────────────┘");
+            case ACTION -> {
+                String pId = msg.get("PLAYER").orElse("?");
+                String type = msg.get("TYPE").orElse("?");
+                String text = msg.get("MSG").orElse("");
+                int amount = msg.getInt("AMOUNT", 0);
+
+                // --- POPRAWKA 1: Logika Żetonów ---
+                // Jeśli akcja wiąże się z wydaniem kasy, aktualizujemy stan lokalny
+                if (amount > 0 && (type.equals("ANTE") || type.equals("BET") || type.equals("RAISE") || type.equals("CALL"))) {
+                    gameState.deductChips(pId, amount);
+                    // Jeśli to ja, musimy przerysować dashboard
+                    if (isMe(pId)) shouldRepaint = true;
                 }
-            });
 
-            case "WINNER" -> {
-                String winner = extractParam(parts, "PLAYER").orElse("?");
-                String pot = extractParam(parts, "POT").orElse("?");
-                String rank = extractParam(parts, "RANK").orElse("?");
-                System.out.println("\n★ WINNER: " + winner + " ★");
-                System.out.println("  Pot: " + pot + " | Hand: " + rank);
+                // --- POPRAWKA 2: Wyświetlanie Imienia ---
+                String displayName = gameState.getPlayerName(pId);
+                ui.printMessage(" > " + displayName + ": " + type + " (" + text + ")");
             }
 
-            case "OK" -> extractParam(parts, "MESSAGE").ifPresent(msg ->
-                System.out.println("✓ " + msg));
-
-            case "ERR" -> {
-                String code = extractParam(parts, "CODE").orElse("ERROR");
-                String reason = extractParam(parts, "REASON").orElse("Unknown");
-                System.out.println("✗ Error [" + code + "]: " + reason);
+            case DEAL -> {
+                if (isMe(msg.get("PLAYER").orElse(""))) {
+                    msg.get("CARDS").ifPresent(gameState::updateMyHand);
+                    shouldRepaint = true;
+                }
             }
 
-            default -> System.out.println("Server: " + message);
+            case WINNER -> {
+                String winnerId = msg.get("PLAYER").orElse("?");
+                String rank = msg.get("RANK").orElse("?");
+                String pot = msg.get("POT").orElse("0");
+
+                String winnerName = gameState.getPlayerName(winnerId);
+
+                // --- POPRAWKA 3: Formatowanie ---
+                // Zamiana podkreśleń na spacje w rankingu (np. Opponents_Folded -> Opponents Folded)
+                String displayRank = rank.replace("_", " ");
+
+                ui.printMessage("\n ★ WINNER: " + winnerName +
+                        " | " + displayRank + " | Pot: " + pot + "\n");
+
+                // Zwycięzca zgarnia pulę (opcjonalna aktualizacja lokalna dla efektu)
+                gameState.addChips(winnerId, Integer.parseInt(pot));
+
+                gameState.setLastMessage("Hand Finished. Winner: " + winnerName);
+                shouldRepaint = true;
+            }
+
+            case OK -> msg.get("MESSAGE").ifPresent(m -> ui.printMessage("✓ " + m));
+
+            case ERR -> ui.printError(msg.get("REASON").orElse("Unknown Error"));
+        }
+
+        if (shouldRepaint) {
+            ui.printDashboard(gameState);
         }
     }
 
@@ -169,7 +227,7 @@ public class PokerClient {
      */
     private void handleUserInput() {
         try (Scanner scanner = new Scanner(System.in)) {
-            printHelp();
+            ui.printHelp(gameState);
 
             while (running) {
                 System.out.print("\n> ");
@@ -185,7 +243,7 @@ public class PokerClient {
                 }
 
                 if (input.equalsIgnoreCase("help")) {
-                    printHelp();
+                    ui.printHelp(gameState);
                     continue;
                 }
 
@@ -201,34 +259,48 @@ public class PokerClient {
         String[] parts = input.split("\\s+");
         String cmd = parts[0].toUpperCase();
 
-        switch (cmd) {
-            case "CREATE" -> sendCommand("CREATE ANTE=10 BET=10 LIMIT=FIXED");
-            case "JOIN" -> {
-                if (parts.length < 3) {
-                    System.out.println("Usage: join <gameId> <name>");
-                    return;
-                }
-                sendCommand("JOIN GAME=" + parts[1] + " NAME=" + parts[2]);
+        // Commands that don't need game/player ID
+        if (cmd.equals("CREATE")) {
+            sendCommand("CREATE ANTE=10 BET=10 LIMIT=FIXED");
+            return;
+        }
+        if (cmd.equals("JOIN")) {
+            if (parts.length < 3) {
+                ui.printError("Usage: join <gameId> <name>");
+                return;
             }
-            case "START" -> sendCommand(gameId + " " + playerId + " START");
-            case "CALL" -> sendCommand(gameId + " " + playerId + " CALL");
-            case "CHECK" -> sendCommand(gameId + " " + playerId + " CHECK");
-            case "FOLD" -> sendCommand(gameId + " " + playerId + " FOLD");
+            sendCommand("JOIN GAME=" + parts[1] + " NAME=" + parts[2]);
+            return;
+        }
+
+        // --- In-Game Commands Validation ---
+        if (gameState.getGameId() == null || gameState.getPlayerId() == null) {
+            ui.printError("You must join a game first.");
+            return;
+        }
+
+        String prefix = gameState.getGameId() + " " + gameState.getPlayerId() + " ";
+
+        switch (cmd) {
+            case "START" -> sendCommand(prefix + "START");
+            case "CALL" -> sendCommand(prefix + "CALL");
+            case "CHECK" -> sendCommand(prefix + "CHECK");
+            case "FOLD" -> sendCommand(prefix + "FOLD");
             case "RAISE" -> {
                 if (parts.length < 2) {
-                    System.out.println("Usage: raise <amount>");
+                    ui.printError("Usage: raise <amount>");
                     return;
                 }
-                sendCommand(gameId + " " + playerId + " RAISE AMOUNT=" + parts[1]);
+                sendCommand(prefix + "RAISE AMOUNT=" + parts[1]);
             }
             case "DRAW" -> {
                 if (parts.length < 2) {
-                    System.out.println("Usage: draw <indexes> (e.g., draw 0,2,4 or draw NONE)");
+                    ui.printError("Usage: draw <indexes> (e.g., 0,2,4 or NONE)");
                     return;
                 }
-                sendCommand(gameId + " " + playerId + " DRAW CARDS=" + parts[1]);
+                sendCommand(prefix + "DRAW CARDS=" + parts[1]);
             }
-            default -> System.out.println("Unknown command. Type 'help' for available commands.");
+            default -> ui.printError("Unknown command. Type 'help'.");
         }
     }
 
@@ -242,6 +314,10 @@ public class PokerClient {
         }
     }
 
+    private boolean isMe(String pId) {
+        return pId != null && pId.equals(gameState.getPlayerId());
+    }
+
     /**
      * Extracts a parameter value from server message.
      */
@@ -253,27 +329,6 @@ public class PokerClient {
             }
         }
         return java.util.Optional.empty();
-    }
-
-    /**
-     * Prints help information.
-     */
-    private void printHelp() {
-        System.out.println("\n═══════════════════════════════════════");
-        System.out.println("       5-CARD DRAW POKER CLIENT");
-        System.out.println("═══════════════════════════════════════");
-        System.out.println("Commands:");
-        System.out.println("  create              - Create a new game");
-        System.out.println("  join <id> <name>    - Join game with name");
-        System.out.println("  start               - Start the game");
-        System.out.println("  call                - Call current bet");
-        System.out.println("  check               - Check (no bet)");
-        System.out.println("  fold                - Fold hand");
-        System.out.println("  raise <amount>      - Raise bet");
-        System.out.println("  draw <indexes>      - Exchange cards (0-4)");
-        System.out.println("  help                - Show this help");
-        System.out.println("  quit                - Disconnect");
-        System.out.println("═══════════════════════════════════════\n");
     }
 
     /**
@@ -292,10 +347,6 @@ public class PokerClient {
     }
 
     public static void main(String[] args) {
-        String host = args.length > 0 ? args[0] : "localhost";
-        int port = args.length > 1 ? Integer.parseInt(args[1]) : 7777;
-
-        PokerClient client = new PokerClient(host, port);
-        client.start();
+        new PokerClient("localhost", 7777).start();
     }
 }

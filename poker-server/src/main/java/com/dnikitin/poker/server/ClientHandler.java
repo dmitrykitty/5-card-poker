@@ -4,10 +4,10 @@ import com.dnikitin.poker.common.exceptions.PokerSecurityException;
 import com.dnikitin.poker.common.exceptions.ProtocolException;
 import com.dnikitin.poker.common.model.events.GameEvent;
 import com.dnikitin.poker.common.model.events.GameObserver;
-import com.dnikitin.poker.common.protocol.Command;
-import com.dnikitin.poker.common.protocol.ProtocolEncoder;
-import com.dnikitin.poker.common.protocol.ProtocolParser;
-import com.dnikitin.poker.common.protocol.commands.*;
+import com.dnikitin.poker.common.protocol.clientserver.Command;
+import com.dnikitin.poker.common.protocol.clientserver.ProtocolEncoder;
+import com.dnikitin.poker.common.protocol.clientserver.ProtocolParser;
+import com.dnikitin.poker.common.protocol.clientserver.commands.*;
 import com.dnikitin.poker.exceptions.PokerGameException;
 import com.dnikitin.poker.game.GameManager;
 import com.dnikitin.poker.game.Player;
@@ -242,7 +242,6 @@ public class ClientHandler implements Runnable, GameObserver {
             return;
         }
 
-        // Może rzucić StateMismatchException lub IllegalDrawException (brak kart w talii)
         table.playerExchangeCards(player, command.getCardIndexes());
         sendMessage(encoder.encodeOk());
     }

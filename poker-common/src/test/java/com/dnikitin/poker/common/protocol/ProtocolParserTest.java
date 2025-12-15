@@ -1,7 +1,9 @@
 package com.dnikitin.poker.common.protocol;
 
 import com.dnikitin.poker.common.exceptions.ProtocolException;
-import com.dnikitin.poker.common.protocol.commands.*;
+import com.dnikitin.poker.common.protocol.clientserver.Command;
+import com.dnikitin.poker.common.protocol.clientserver.ProtocolParser;
+import com.dnikitin.poker.common.protocol.clientserver.commands.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

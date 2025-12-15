@@ -4,6 +4,7 @@ import com.dnikitin.poker.common.model.events.GameEvent;
 import com.dnikitin.poker.common.model.game.Card;
 import com.dnikitin.poker.common.model.game.Rank;
 import com.dnikitin.poker.common.model.game.Suit;
+import com.dnikitin.poker.common.protocol.clientserver.ProtocolEncoder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

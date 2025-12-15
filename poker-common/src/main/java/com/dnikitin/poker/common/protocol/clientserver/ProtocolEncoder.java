@@ -1,4 +1,4 @@
-package com.dnikitin.poker.common.protocol;
+package com.dnikitin.poker.common.protocol.clientserver;
 
 import com.dnikitin.poker.common.model.events.GameEvent;
 import com.dnikitin.poker.common.model.game.Card;

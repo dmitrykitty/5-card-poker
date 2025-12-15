@@ -1,6 +1,6 @@
-package com.dnikitin.poker.common.protocol.commands;
+package com.dnikitin.poker.common.protocol.clientserver.commands;
 
-import com.dnikitin.poker.common.protocol.Command;
+import com.dnikitin.poker.common.protocol.clientserver.Command;
 import lombok.Getter;
 
 /**

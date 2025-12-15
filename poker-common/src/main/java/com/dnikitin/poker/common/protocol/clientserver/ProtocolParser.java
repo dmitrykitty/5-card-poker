@@ -1,7 +1,7 @@
-package com.dnikitin.poker.common.protocol;
+package com.dnikitin.poker.common.protocol.clientserver;
 
 import com.dnikitin.poker.common.exceptions.ProtocolException;
-import com.dnikitin.poker.common.protocol.commands.*;
+import com.dnikitin.poker.common.protocol.clientserver.commands.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package com.dnikitin.poker.common.protocol;
+package com.dnikitin.poker.common.protocol.clientserver;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
