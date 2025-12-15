@@ -1,13 +1,11 @@
 package com.dnikitin.poker.game.engine;
 
 import com.dnikitin.poker.game.state.GameState;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class RoundTest {
 
@@ -60,14 +58,5 @@ class RoundTest {
         round.recordAction(); // Call
         round.recordAction(); // Call
         assertThat(round.isComplete(activePlayers)).isTrue();
-
-        round.reset(GameState.BETTING_2); //BETTING 2
-        assertAll(
-                () -> assertThat(round.getPhase()).isEqualTo(GameState.BETTING_2),
-                () -> assertThat(round.getCurrentBet()).isZero(),
-                () -> assertThat(round.getActionsInRound()).isZero(),
-                () -> assertThat(round.getLastAggressorIndex()).isEqualTo(-1),
-                () -> assertThat(round.isComplete(activePlayers)).isFalse()
-        );
     }
 }

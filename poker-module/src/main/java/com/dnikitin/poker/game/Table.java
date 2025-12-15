@@ -42,7 +42,7 @@ public class Table {
     private final Dealer dealer;
     private final PotManager potManager;
     private final TurnOrder turnOrder;
-    private final Round currentRound;
+    private Round currentRound;
 
     private final List<Player> players = new ArrayList<>();
     private final List<GameObserver> observers = new ArrayList<>();
@@ -314,7 +314,7 @@ public class Table {
 
     private void advanceGamePhase() {
         collectBetsIntoPot(); // Move chips from players to PotManager
-        currentRound.reset(currentState); // Reset round stats for next phase
+        currentRound = new Round(currentState);
 
         switch (currentState) {
             case BETTING_1 -> changeState(GameState.DRAWING);
@@ -464,9 +464,7 @@ public class Table {
     private void changeState(GameState newState) {
         log.info("State transition: {} -> {}", currentState, newState);
         currentState = newState;
-        if (currentRound != null) {
-            currentRound.reset(currentState);
-        }
+        currentRound = new Round(newState);
         notifyObservers(new GameEvent.StateChanged(currentState.name()));
     }
 

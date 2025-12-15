@@ -62,17 +62,6 @@ public class Round {
         return actionsInRound >= activePlayers;
     }
 
-    /**
-     * Resets the round for a new betting phase.
-     */
-    public void reset(GameState newPhase) {
-        phase = newPhase;
-        currentBet = 0;
-        actionsInRound = 0;
-        lastAggressorIndex = -1;
-        log.debug("Round reset for phase: {}", phase);
-    }
-
     @Override
     public String toString() {
         return String.format("Round{phase=%s, bet=%d, actions=%d}",
