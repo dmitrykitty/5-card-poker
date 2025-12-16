@@ -171,7 +171,33 @@ class PotManagerTest {
 
         int eligibleAward = potManager.awardPot(0, p3);
         assertThat(eligibleAward).isEqualTo(300);
-        assertThat(p3.getChips()).isEqualTo(p3InitialChips +  eligibleAward);
+        assertThat(p3.getChips()).isEqualTo(p3InitialChips + eligibleAward);
 
+    }
+
+    @Test
+    @DisplayName("Should split pot among 3 players handling remainder correctly")
+    void testThreeWaySplitWithRemainder() {
+        // given
+        potManager.addToMainPot(100);
+
+        List<Player> winners = List.of(p1, p2, p3);
+
+        int p1Start = p1.getChips(); // 1000
+        int p2Start = p2.getChips(); // 1000
+        int p3Start = p3.getChips(); // 100
+
+        // when
+        potManager.splitPot(0, winners);
+
+        assertAll(
+                () -> assertThat(p1.getChips()).isEqualTo(p1Start + 34),
+                () -> assertThat(p2.getChips()).isEqualTo(p2Start + 33),
+                () -> assertThat(p3.getChips()).isEqualTo(p3Start + 33),
+                // (34 + 33 + 33 = 100)
+                () -> assertThat((p1.getChips() - p1Start) +
+                        (p2.getChips() - p2Start) +
+                        (p3.getChips() - p3Start)).isEqualTo(100)
+        );
     }
 }

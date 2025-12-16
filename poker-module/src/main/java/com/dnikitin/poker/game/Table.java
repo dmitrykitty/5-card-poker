@@ -159,6 +159,10 @@ public class Table {
             validateTurn(player);
             int toCall = currentRound.getCurrentBet() - player.getCurrentBet();
 
+            if (toCall > player.getChips()) {
+                toCall = player.getChips();
+            }
+
             if (toCall <= 0) {
                 playerCheck(player); // If nothing to call, it's a check
                 return;
@@ -246,7 +250,7 @@ public class Table {
 
             // Check if everyone has drawn
             if (drawsCompletedCount >= turnOrder.countActivePlayers()) {
-                changeState(GameState.BETTING_2);
+                advanceGamePhase();
             } else {
                 advanceTurn();
             }
@@ -261,24 +265,23 @@ public class Table {
         try {
             if (currentState == GameState.LOBBY) {
                 players.remove(player);
-                notifyObservers(new GameEvent.PlayerAction(player.getId(), "LEAVE", 0, "Disconnected"));
+                log.info("Player {} left table {} (Lobby). Total players: {}", player.getName(), id, players.size());
+                notifyObservers(new GameEvent.PlayerAction(
+                        player.getId(), "LEAVE", 0, "Disconnected"));
             } else if (currentState != GameState.FINISHED) {
                 log.info("Player {} disconnected during game. Auto-folding.", player.getName());
-                player.setSittingOut();
-
                 if (player.canAct()) {
                     player.fold();
-                    notifyObservers(new GameEvent.PlayerAction(player.getId(), "FOLD", 0, "Disconnected (Auto-Fold)"));
-
-                    // If it was this player's turn, move to next
+                    notifyObservers(new GameEvent.PlayerAction(
+                            player.getId(), "FOLD", 0, "Disconnected (Auto-Fold)"));
                     if (turnOrder.isCurrentPlayerIndex(players.indexOf(player))) {
                         advanceTurn();
                     }
-
                     if (turnOrder.countActivePlayers() < 2) {
                         endGamePrematurely();
                     }
                 }
+                player.setSittingOut();
             }
         } finally {
             lock.unlock();
@@ -319,15 +322,20 @@ public class Table {
     }
 
     private void advanceGamePhase() {
-        collectBetsIntoPot(); // Move chips from players to PotManager
-        currentRound = new Round(currentState);
+        collectBetsIntoPot();
 
         switch (currentState) {
-            case BETTING_1 -> changeState(GameState.DRAWING);
-            case DRAWING -> changeState(GameState.BETTING_2);
+            case BETTING_1, DRAWING -> {
+                GameState nextState = (currentState == GameState.BETTING_1) ? GameState.DRAWING : GameState.BETTING_2;
+                changeState(nextState);
+                turnOrder.startFromLeftOfDealer();
+                notifyObservers(new GameEvent.TurnChanged(getCurrentPlayer().getId(), 0, 0));
+            }
             case BETTING_2 -> resolveShowdown();
             default -> log.error("Unexpected state transition from {}", currentState);
         }
+
+        currentRound = new Round(currentState);
     }
 
     private void collectBetsIntoPot() {

@@ -12,6 +12,10 @@ public record Card(Rank rank, Suit suit) implements Comparable<Card> {
         return compare != 0 ? compare : suit.compareTo(other.suit);
     }
 
+    public int compareByPowerOnly(@NonNull Card other){
+        return Integer.compare(rank.getPower(), other.rank.getPower());
+    }
+
     @Override
     @NonNull
     public String toString() {

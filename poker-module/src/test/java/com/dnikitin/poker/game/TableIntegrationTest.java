@@ -1,14 +1,20 @@
 package com.dnikitin.poker.game;
 
+import com.dnikitin.poker.common.model.game.Card;
+import com.dnikitin.poker.common.model.game.Rank;
+import com.dnikitin.poker.common.model.game.Suit;
 import com.dnikitin.poker.exceptions.moves.InvalidMoveException;
 import com.dnikitin.poker.exceptions.moves.OutOfTurnException;
 import com.dnikitin.poker.exceptions.moves.StateMismatchException;
 import com.dnikitin.poker.exceptions.rules.IllegalPlayerAmountException;
 import com.dnikitin.poker.game.setup.FiveCardDrawFactory;
+import com.dnikitin.poker.game.setup.GameConfig;
 import com.dnikitin.poker.game.setup.GameFactory;
 import com.dnikitin.poker.game.state.GameState;
+import com.dnikitin.poker.gamelogic.HandEvaluator;
+import com.dnikitin.poker.gamelogic.StandardFiveCardHandEvaluator;
+import com.dnikitin.poker.model.Deck;
 import com.dnikitin.poker.model.Player;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +24,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class TableIntegrationTest {
 
@@ -227,6 +235,25 @@ class TableIntegrationTest {
     }
 
     @Test
+    @DisplayName("LOBBY: Should remove player completely on disconnect in Lobby")
+    void testDisconnectInLobby() {
+        // given
+        table.addPlayer(p1);
+        table.addPlayer(p2);
+
+        assertThat(table.getCurrentState()).isEqualTo(GameState.LOBBY);
+        assertThat(table.getPlayers()).hasSize(2);
+
+        // when
+        table.playerDisconnect(p1);
+
+        // then
+        assertThat(table.getPlayers()).hasSize(1);
+        assertThat(table.getPlayers()).containsExactly(p2);
+        assertThat(table.getPlayers()).doesNotContain(p1);
+    }
+
+    @Test
     @DisplayName("SIDE POT: Should handle All-In correctly")
     void testAllInSidePotIntegration() {
         Player rich1 = new Player("R1", "Rich1", 1000);
@@ -237,31 +264,32 @@ class TableIntegrationTest {
         table.addPlayer(rich2);
         table.addPlayer(poor);
 
-        table.startGame(); // Ante 10 taken. Poor has 40 left.
+        table.startGame(); // poor has 40 left.
 
         // Betting Round 1
         // Active player logic handles dealer rotation, we just need to follow current
         while (table.getCurrentState() == GameState.BETTING_1) {
-            Player p = table.getCurrentPlayer();
-            if (p == poor) {
+            Player player = table.getCurrentPlayer();
+            if (player == poor) {
                 // Poor goes All-In (40 chips)
-                try {
-                    table.playerRaise(p, 40);
-                } catch (Exception e) {
-                    // If raise not allowed (e.g. min raise), call/check
-                    // In this test setup, we force the scenario
-                    // If already bet, call.
-                    if (table.getCurrentRoundHighestBet() > p.getCurrentBet())
-                        table.playerCall(p);
-                    else
-                        table.playerCheck(p);
+                int chips = player.getChips();
+                int toCall = table.getCurrentRoundHighestBet() - player.getCurrentBet();
+
+                if (toCall >= chips) {
+                    assertThatThrownBy(() -> table.playerCheck(player))
+                            .isInstanceOf(InvalidMoveException.class)
+                            .hasMessageContaining("Cannot CHECK, you must CALL");
+
+                    table.playerCall(player);
+                } else {
+                    table.playerRaise(player, chips);
                 }
             } else {
                 // Rich players bet huge
                 if (table.getCurrentRoundHighestBet() < 200) {
-                    table.playerRaise(p, 200);
+                    table.playerRaise(player, 200);
                 } else {
-                    table.playerCall(p);
+                    table.playerCall(player);
                 }
             }
         }
@@ -269,5 +297,86 @@ class TableIntegrationTest {
         // Verify PotManager created side pots
         assertThat(table.getPotManager().getPotCount()).isGreaterThanOrEqualTo(2);
         assertThat(poor.isAllIn()).isTrue();
+    }
+
+    @Test
+    @DisplayName("SPLIT POT: Should split pot 3-ways (Mockito Version)")
+    void testThreeWaySplitWithMocks() {
+        // 1. CREATE MOCKS
+        GameFactory mockFactory = mock(GameFactory.class);
+        Deck mockDeck = mock(Deck.class);
+
+        // 2. CARD SETUP (Royal Flush for everyone)
+        Card[] p2Cards = {
+                new Card(Rank.ACE, Suit.HEARTS), new Card(Rank.KING, Suit.HEARTS),
+                new Card(Rank.QUEEN, Suit.HEARTS), new Card(Rank.JACK, Suit.HEARTS), new Card(Rank.TEN, Suit.HEARTS)
+        };
+
+        // Cards for Player 3
+        Card[] p3Cards = {
+                new Card(Rank.ACE, Suit.DIAMONDS), new Card(Rank.KING, Suit.DIAMONDS),
+                new Card(Rank.QUEEN, Suit.DIAMONDS), new Card(Rank.JACK, Suit.DIAMONDS), new Card(Rank.TEN, Suit.DIAMONDS)
+        };
+
+        // Cards for Player 1 (Dealer)
+        Card[] p1Cards = {
+                new Card(Rank.ACE, Suit.SPADES), new Card(Rank.KING, Suit.SPADES),
+                new Card(Rank.QUEEN, Suit.SPADES), new Card(Rank.JACK, Suit.SPADES), new Card(Rank.TEN, Suit.SPADES)
+        };
+
+        // 3. CONFIGURE MOCK BEHAVIOR
+
+        // When Table requests a deck -> return our mock
+        when(mockFactory.createDeck()).thenReturn(mockDeck);
+
+        // When Table requests config -> return a real object (easier than mocking getters)
+        when(mockFactory.createGameConfig()).thenReturn(
+                new GameConfig(4, 2, 1000, 10, 0));
+
+        // When Table requests evaluator -> return real one (we want actual hand evaluation logic!)
+        when(mockFactory.createHandEvaluator()).thenReturn(new StandardFiveCardHandEvaluator());
+
+        // the exact order of cards returned by Deck.deal()
+        // thenReturn accepts varargs, so we list all cards sequentially
+        when(mockDeck.deal()).thenReturn(
+                p2Cards[0], p2Cards[1], p2Cards[2], p2Cards[3], p2Cards[4], // For P2
+                p3Cards[0], p3Cards[1], p3Cards[2], p3Cards[3], p3Cards[4], // For P3
+                p1Cards[0], p1Cards[1], p1Cards[2], p1Cards[3], p1Cards[4]  // For P1
+        );
+
+        // 4. INITIALIZE TABLE WITH MOCKED FACTORY
+        Table table = new Table(mockFactory);
+
+        Player p1 = new Player("p1", "Player 1", 1000);
+        Player p2 = new Player("p2", "Player 2", 1000);
+        Player p3 = new Player("p3", "Player 3", 1000);
+
+        table.addPlayer(p1);
+        table.addPlayer(p2);
+        table.addPlayer(p3);
+
+        // GAME START
+        table.startGame();
+
+        // Betting Round 1: Everyone Checks
+        table.playerCheck(p2);
+        table.playerCheck(p3);
+        table.playerCheck(p1);
+
+        // Drawing Phase: Stand Pat (no one exchanges cards)
+        table.playerExchangeCards(p2, List.of());
+        table.playerExchangeCards(p3, List.of());
+        table.playerExchangeCards(p1, List.of());
+
+        // Betting Round 2
+        table.playerRaise(p2, 90);
+        table.playerCall(p3);
+        table.playerCall(p1);
+
+        // Verification
+        assertThat(table.getPot()).isEqualTo(0); // Pot should be empty (distributed)
+        assertThat(p1.getChips()).isEqualTo(1000); // Back to start (1000)
+        assertThat(p2.getChips()).isEqualTo(1000); // Back to start (1000)
+        assertThat(p3.getChips()).isEqualTo(1000); // Back to start (1000)
     }
 }

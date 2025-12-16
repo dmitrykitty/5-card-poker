@@ -53,7 +53,7 @@ public class HandResult implements Comparable<HandResult> {
         int result = 0;
 
         for (int i = 0; i < size; i++) {
-            result = mainCards.get(i).compareTo(otherCards.get(i));
+            result = mainCards.get(i).compareByPowerOnly(otherCards.get(i));
             if (result != 0) {
                 return result;
             }

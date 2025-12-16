@@ -34,6 +34,10 @@ public class PotManager {
             amount += chips;
         }
 
+        public void clear() {
+            amount = 0;
+        }
+
         @Override
         public String toString() {
             return String.format("Pot{amount=%d, eligible=%d players}", amount, eligiblePlayerIds.size());
@@ -168,6 +172,9 @@ public class PotManager {
 
         int amount = pot.getAmount();
         winner.winChips(amount);
+
+        pot.clear();
+
         log.info("Awarded {} from pot {} to player {}", amount, potIndex, winner.getName());
         return amount;
     }
@@ -193,6 +200,7 @@ public class PotManager {
             winner.winChips(amount);
             log.info("Split pot: awarded {} to player {}", amount, winner.getName());
         }
+        pot.clear();
     }
 
     /**
