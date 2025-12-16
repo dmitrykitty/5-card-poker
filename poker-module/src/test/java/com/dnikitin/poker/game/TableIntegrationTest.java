@@ -11,7 +11,6 @@ import com.dnikitin.poker.game.setup.FiveCardDrawFactory;
 import com.dnikitin.poker.game.setup.GameConfig;
 import com.dnikitin.poker.game.setup.GameFactory;
 import com.dnikitin.poker.game.state.GameState;
-import com.dnikitin.poker.gamelogic.HandEvaluator;
 import com.dnikitin.poker.gamelogic.StandardFiveCardHandEvaluator;
 import com.dnikitin.poker.model.Deck;
 import com.dnikitin.poker.model.Player;
