@@ -1,11 +1,20 @@
 package com.dnikitin.poker.server;
 
+import com.dnikitin.poker.common.exceptions.PokerSecurityException;
+import com.dnikitin.poker.common.exceptions.ProtocolException;
 import com.dnikitin.poker.common.model.events.GameEvent;
 import com.dnikitin.poker.common.model.events.GameObserver;
+import com.dnikitin.poker.common.protocol.clientserver.Command;
+import com.dnikitin.poker.common.protocol.clientserver.ProtocolEncoder;
+import com.dnikitin.poker.common.protocol.clientserver.ProtocolParser;
+import com.dnikitin.poker.common.protocol.clientserver.commands.*;
+import com.dnikitin.poker.exceptions.PokerGameException;
 import com.dnikitin.poker.game.GameManager;
-import com.dnikitin.poker.game.Player;
+import com.dnikitin.poker.model.Player;
 import com.dnikitin.poker.game.Table;
-import lombok.RequiredArgsConstructor;
+import com.dnikitin.poker.server.security.ConnectionValidator;
+import com.dnikitin.poker.server.security.RateLimiter;
+import com.dnikitin.poker.server.security.TimeoutManager;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
@@ -14,208 +23,322 @@ import java.io.PrintWriter;
 import java.nio.channels.Channels;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
+/**
+ * Handles a single client connection with protocol parsing and security.
+ */
 @Slf4j
-@RequiredArgsConstructor
 public class ClientHandler implements Runnable, GameObserver {
 
     private final SocketChannel socketChannel;
-    private PrintWriter out;
+    private final ProtocolParser parser;
+    private final ProtocolEncoder encoder;
+    private final ConnectionValidator validator;
+    private final RateLimiter rateLimiter;
+    private final TimeoutManager timeoutManager;
+    private final String clientId;
 
+    private PrintWriter out;
     private Player player;
     private Table table;
 
+    public ClientHandler(SocketChannel socketChannel, RateLimiter rateLimiter, TimeoutManager timeoutManager) {
+        this.socketChannel = socketChannel;
+        this.parser = new ProtocolParser();
+        this.encoder = new ProtocolEncoder();
+        this.validator = new ConnectionValidator();
+        this.rateLimiter = rateLimiter;
+        this.timeoutManager = timeoutManager;
+        this.clientId = UUID.randomUUID().toString();
+    }
 
     @Override
     public void run() {
         try (BufferedReader in = new BufferedReader(Channels.newReader(socketChannel, StandardCharsets.UTF_8));
-             PrintWriter printWriter = new PrintWriter(Channels.newWriter(socketChannel, StandardCharsets.UTF_8),
-                     true)) {
-            out = printWriter;
-            out.println("HELLO VERSION=1.0");
+             PrintWriter printWriter = new PrintWriter(Channels.newWriter(socketChannel, StandardCharsets.UTF_8), true)) {
 
-            for (String line; (line = in.readLine()) != null; ) {
-                handleCommand(line.trim());
+            out = printWriter;
+            sendMessage(encoder.encodeHello("1.0"));
+            log.info("Client {} connected", clientId);
+
+            String line;
+            while ((line = in.readLine()) != null) {
+                try {
+                    // Rate limiting check
+                    if (!rateLimiter.allowMessage(clientId)) {
+                        sendError("RATE_LIMIT", "Too many messages, slow down");
+                        continue;
+                    }
+
+                    // Validate message security
+                    validator.validateMessage(line);
+
+                    // Parse and handle command
+                    handleCommand(line.trim());
+
+                } catch (PokerSecurityException e) {
+                    log.warn("Security violation from client {}: {}", clientId, e.getMessage());
+                    sendError(e.getCode(), e.getMessage());
+                    break;
+
+                } catch (ProtocolException e) {
+                    log.warn("Protocol error from client {}: {}", clientId, e.getMessage());
+                    sendError(e.getCode(), e.getMessage());
+
+                } catch (PokerGameException e) {
+                    log.debug("Game error [{}]: {}", e.getCode(), e.getMessage());
+                    sendError(e.getCode(), e.getMessage());
+
+                } catch (Exception e) {
+                    log.error("Unexpected error from client {}", clientId, e);
+                    sendError("INTERNAL_ERROR", "An error occurred");
+                }
             }
+
         } catch (IOException e) {
-            log.info("Client disconnected: {}", e.getMessage());
+            log.info("Client {} disconnected: {}", clientId, e.getMessage());
         } finally {
             handleDisconnect();
         }
-
     }
 
     @Override
     public void onGameEvent(GameEvent event) {
-        String messageToSend = convertEventProtocol(event);
-        if (messageToSend != null) {
-            out.println(messageToSend);
-        }
-    }
+        String message = encoder.encode(event);
+        if (message != null) {
+            // Special handling for CardsDealt - mask other players' cards
+            if (event instanceof GameEvent.CardsDealt cd) {
+                boolean isMyCards = player != null && cd.playerId().equals(player.getId());
+                message = encoder.encodeCardsDealt(cd.playerId(), cd.cards(), !isMyCards);
+            }
 
-    private String convertEventProtocol(GameEvent event) {
-        return switch (event) {
-            case GameEvent.PlayerJoined pj -> "LOBBY_UPDATE PLAYER=" + pj.name() + " CHIPS=" + pj.chips();
-            case GameEvent.GameStarted gs -> "STARTED GAME=" + gs.gameId();
-            case GameEvent.TurnChanged tc -> "TURN PLAYER=" + tc.activePlayerId();
-            case GameEvent.PlayerAction pa ->
-                    "ACTION PLAYER=" + pa.playerId() + " TYPE=" + pa.actionType() + " MSG=" + pa.message();
-            case GameEvent.GameFinished gf ->
-                    "WINNER PLAYER=" + gf.winnerId() + " POT=" + gf.potAmount() + " RANK=" + gf.handRank();
-            case GameEvent.StateChanged sc -> "STATE NEW=" + sc.newState();
-            case GameEvent.CardsDealt cd -> {
-                if (player != null && cd.playerId().equals(player.getId())) {
-                    yield "DEAL CARDS=" + cd.cards();
-                } else {
-                    yield "DEAL PLAYER=" + cd.playerId() + " CARDS=HIDDEN";
+            // Special handling for TurnChanged - start timeout if it's our turn
+            if (event instanceof GameEvent.TurnChanged tc) {
+                if (player != null && tc.activePlayerId().equals(player.getId())) {
+                    startTimeout();
+                    log.debug("Started timeout for player {}", player.getName());
                 }
             }
-            default -> null;
-        };
-    }
 
-    private void handleCommand(String line) {
-        log.debug("Received: {}", line);
-        String[] parts = line.split("\\s+");
-        String command = parts[0].toUpperCase();
-
-        try {
-            switch (command) {
-                case "CREATE" -> handleCreate();
-                case "JOIN" -> handleJoin(parts);
-                case "START" -> handleStart();
-                case "FOLD" -> handleFold();
-                case "CHECK" -> handleCheck();
-                case "CALL" -> handleCall();
-                case "RAISE" -> handleRaise(parts);
-                case "DRAW" -> handleDraw(parts);
-                case "QUIT" -> throw new IOException("Client requested quit");
-                default -> out.println("ERR REASON=UNKNOWN_COMMAND");
-            }
-        } catch (Exception e) {
-            log.error("Error processing command", e);
-            out.println("ERR REASON=" + e.getMessage());
+            sendMessage(message);
         }
     }
 
-    private void handleCreate() {
+    private void handleCommand(String line) throws IOException {
+        log.debug("Client {}: {}", clientId, line);
+
+        Command command = parser.parse(line);
+
+        // Dispatch command to appropriate handler
+        switch (command.getType()) {
+            case HELLO -> handleHello((HelloCommand) command);
+            case CREATE -> handleCreate((CreateCommand) command);
+            case JOIN -> handleJoin((JoinCommand) command);
+            case START -> handleStart((SimpleCommand) command);
+            case CALL -> handleCall((SimpleCommand) command);
+            case CHECK -> handleCheck((SimpleCommand) command);
+            case FOLD -> handleFold((SimpleCommand) command);
+            case RAISE -> handleRaise((BetCommand) command);
+            case DRAW -> handleDraw((DrawCommand) command);
+            case STATUS -> handleStatus((SimpleCommand) command);
+            case QUIT -> throw new IOException("Client requested quit");
+            default -> sendError("UNKNOWN_COMMAND", "Command not supported: " + command.getType());
+        }
+    }
+
+    private void handleHello(HelloCommand command) {
+        log.info("Client {} hello: version {}", clientId, command.getVersion());
+        sendMessage(encoder.encodeOk("Connected to poker server v1.0"));
+    }
+
+    private void handleCreate(CreateCommand command) {
         String gameId = GameManager.getInstance().createGame();
-        out.println("OK GAME_ID=" + gameId);
+        sendMessage(encoder.encodeOk("GAME_ID=" + gameId));
+        log.info("Client {} created game {}", clientId, gameId);
     }
 
-    private void handleJoin(String[] parts) {
-        try {
-            String gameId = parseParam(parts, "GAME");
-            String name = parseParam(parts, "NAME");
-
-            GameManager.getInstance().findGame(gameId).ifPresentOrElse(foundTable -> {
-                this.table = foundTable;
-                this.player = new Player(java.util.UUID.randomUUID().toString(), name, 1000);
-
-                table.addObserver(this);
-                table.addPlayer(player);
-
-                out.println("WELCOME PLAYER_ID=" + player.getId());
-
-            }, () -> out.println("ERR REASON=GAME_NOT_FOUND"));
-
-        } catch (Exception e) {
-            out.println("ERR REASON=INVALID_PARAMS");
+    private void handleJoin(JoinCommand command) {
+        if (!validator.isValidPlayerName(command.getName())) {
+            sendError("INVALID_NAME", "Player name must be 2-20 alphanumeric characters");
+            return;
         }
-    }
 
-    private void handleStart() {
-        if (table != null) {
-            table.startGame();
+        if (!validator.isValidGameId(command.getGameId())) {
+            sendError("INVALID_GAME_ID", "Invalid game ID format");
+            return;
         }
+
+        GameManager.getInstance().findGame(command.getGameId()).ifPresentOrElse(foundTable -> {
+
+            this.table = foundTable;
+            this.player = new Player(UUID.randomUUID().toString(), command.getName(), 1000);
+
+            table.addObserver(this);
+            table.addPlayer(player); // Może rzucić błąd (np. Full table)
+
+            sendMessage(encoder.encodeWelcome(command.getGameId(), player.getId()));
+            log.info("Client {} joined game {} as {}", clientId, command.getGameId(), player.getName());
+
+        }, () -> sendError("GAME_NOT_FOUND", "Game does not exist"));
     }
 
-    private void handleFold() {
-        if (table != null && player != null) {
-            table.playerFold(player);
-            out.println("OK");
+    private void handleStart(SimpleCommand command) {
+        validatePlayerAndTable();
+        table.startGame(); // Może rzucić IllegalPlayerAmountException -> obsłużone w run()
+        sendMessage(encoder.encodeOk("Game started"));
+        log.info("Client {} started game", clientId);
+    }
+
+    private void handleCall(SimpleCommand command) {
+        validatePlayerAndTable();
+        cancelTimeout();
+        table.playerCall(player); // Może rzucić OutOfTurnException -> obsłużone w run()
+        sendMessage(encoder.encodeOk());
+    }
+
+    private void handleCheck(SimpleCommand command) {
+        validatePlayerAndTable();
+        cancelTimeout();
+        table.playerCheck(player);
+        sendMessage(encoder.encodeOk());
+    }
+
+    private void handleFold(SimpleCommand command) {
+        validatePlayerAndTable();
+        cancelTimeout();
+        table.playerFold(player);
+        sendMessage(encoder.encodeOk());
+    }
+
+    private void handleRaise(BetCommand command) {
+        validatePlayerAndTable();
+        cancelTimeout();
+
+        if (command.getAmount() <= 0) {
+            sendError("INVALID_AMOUNT", "Raise amount must be positive");
+            return;
         }
+
+        // Może rzucić NotEnoughChipsException -> obsłużone w run()
+        table.playerRaise(player, command.getAmount());
+        sendMessage(encoder.encodeOk());
     }
 
-    private void handleCheck() {
-        if (table != null && player != null) {
-            table.playerCheck(player);
-            out.println("OK");
+    private void handleDraw(DrawCommand command) {
+        validatePlayerAndTable();
+        cancelTimeout();
+
+        // Podstawowa walidacja wejścia zostaje tutaj (szybki fail)
+        for (int index : command.getCardIndexes()) {
+            if (index < 0 || index > 4) {
+                sendError("INVALID_CARD_INDEX", "Card index must be 0-4");
+                return;
+            }
         }
-    }
 
-    private void handleCall() {
-        if (table != null && player != null) {
-            table.playerCall(player);
-            out.println("OK");
+        if (command.getCardIndexes().size() > 3) {
+            sendError("TOO_MANY_CARDS", "Cannot draw more than 3 cards");
+            return;
         }
+
+        table.playerExchangeCards(player, command.getCardIndexes());
+        sendMessage(encoder.encodeOk());
     }
 
-    private void handleRaise(String[] parts) {
-        int amount = Integer.parseInt(parseParam(parts, "AMOUNT"));
-        if (table != null && player != null) {
-            table.playerRaise(player, amount);
-            out.println("OK");
+    private void handleStatus(SimpleCommand command) {
+        validatePlayerAndTable();
+        sendMessage(encoder.encodeRound(table.getPot(), table.getCurrentRoundHighestBet()));
+
+        if (table.getCurrentPlayer() != null) {
+            sendMessage(encoder.encodeTurn(
+                    table.getCurrentPlayer().getId(),
+                    table.getCurrentState().name(),
+                    table.getCurrentRoundHighestBet() - player.getCurrentBet(),
+                    10
+            ));
         }
     }
 
     private void handleDisconnect() {
+        cancelTimeout();
+        rateLimiter.removeClient(clientId);
+
         try {
             if (socketChannel != null && socketChannel.isOpen()) {
                 socketChannel.close();
             }
         } catch (IOException e) {
-            log.warn("Error closing socket during disconnect: {}", e.getMessage());
+            log.warn("Error closing socket: {}", e.getMessage());
         }
 
         if (table != null && player != null) {
             try {
                 table.playerDisconnect(player);
+                log.info("Player {} disconnected from game", player.getName());
             } catch (Exception e) {
-                log.error("Error handling player disconnect logic", e);
+                log.error("Error handling player disconnect", e);
             }
         }
-
-        log.info("Client handler resources released for player: {}",
-                (player != null ? player.getName() : "Unknown"));
+        log.info("Client {} disconnected", clientId);
     }
 
+    private void handleTimeout(String timeoutPlayerId) {
+        // Opcjonalne zabezpieczenie: upewniamy się, że timeout dotyczy tego gracza
+        if (player == null || !player.getId().equals(timeoutPlayerId)) {
+            return;
+        }
 
-    private void handleDraw(String[] parts) {
-        // DRAW CARDS=0,2,4
-        try {
-            String cardsParam = parseParam(parts, "CARDS");
-            List<Integer> indexes = new ArrayList<>();
+        log.warn("Player {} timed out, auto-folding", player.getName());
 
-            if (!cardsParam.equalsIgnoreCase("NONE")) {
-                String[] split = cardsParam.split(",");
-                for (String s : split) {
-                    indexes.add(Integer.parseInt(s.trim()));
-                }
+        if (table != null) {
+            try {
+                // Table.playerFold jest thread-safe (ma ReentrantLock),
+                // więc bezpiecznie możemy to wywołać z wątku TimeoutManagera
+                table.playerFold(player);
+            } catch (Exception e) {
+                log.error("Error auto-folding timed out player", e);
             }
-
-            if (table != null && player != null) {
-                table.playerExchangeCards(player, indexes);
-                out.println("OK");
-            }
-        } catch (NumberFormatException e) {
-            out.println("ERR REASON=INVALID_CARD_INDEXES");
-        } catch (Exception e) {
-            out.println("ERR REASON=" + e.getMessage());
         }
     }
 
-
-    private String parseParam(String[] parts, String key) {
-        String prefix = key + "=";
-        for (String part : parts) {
-            if (part.startsWith(prefix)) {
-                return part.substring(prefix.length());
-            }
+    private void startTimeout() {
+        if (player != null && timeoutManager != null) {
+            timeoutManager.startTimeout(player.getId(), this::handleTimeout);
         }
-        throw new IllegalArgumentException("Missing parameter: " + key);
+    }
+
+    private void cancelTimeout() {
+        if (player != null && timeoutManager != null) {
+            timeoutManager.cancelTimeout(player.getId());
+        }
+    }
+
+    private void validatePlayerAndTable() {
+        // Ten wyjątek (InvalidMoveException) dziedziczy po PokerGameException,
+        // więc też zostanie złapany przez nowy blok catch w run()!
+        if (table == null || player == null) {
+            throw new com.dnikitin.poker.exceptions.moves.InvalidMoveException("Not in a game");
+        }
+    }
+
+    private void sendMessage(String message) {
+        if (out != null) {
+            out.println(message);
+            log.debug("To client {}: {}", clientId, message);
+        }
+    }
+
+    private void sendError(String code, String reason) {
+        sendMessage(encoder.encodeError(code, reason));
+    }
+
+    // Package-private for testing
+    String getClientId() {
+        return clientId;
+    }
+
+    Player getPlayer() {
+        return player;
     }
 }
-

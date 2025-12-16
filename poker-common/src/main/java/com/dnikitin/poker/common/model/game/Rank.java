@@ -6,7 +6,6 @@ import lombok.ToString;
 
 @Getter
 @RequiredArgsConstructor
-@ToString(of = {"label"}, includeFieldNames = false)
 public enum Rank {
     TWO(2, "2"),
     THREE(3, "3"),
@@ -24,4 +23,9 @@ public enum Rank {
 
     private final int power;
     private final String label;
+
+    @Override
+    public String toString() {
+        return label;
+    }
 }

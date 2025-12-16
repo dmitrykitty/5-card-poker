@@ -1,4 +1,4 @@
-package com.dnikitin.poker.game;
+package com.dnikitin.poker.game.state;
 /**
  * Represents the lifecycle of a single Poker Hand (Round).
  * The server moves strictly from top to bottom (looping back from FINISHED to ANTE).

@@ -26,7 +26,7 @@ public sealed interface GameEvent {
     }
 
     // Zdarzenie: Zmiana tury (czyja kolej)
-    record TurnChanged(String activePlayerId) implements GameEvent {
+    record TurnChanged(String activePlayerId, int amountToCall, int minRaise) implements GameEvent {
     }
 
     // Zdarzenie: Koniec gry/rozdania - wynik
@@ -35,5 +35,8 @@ public sealed interface GameEvent {
 
     // Zdarzenie: Błąd (np. nielegalny ruch)
     record ErrorOccurred(String playerId, String errorMessage) implements GameEvent {
+    }
+
+    record RoundInfo(int potAmount, int highestBet) implements GameEvent {
     }
 }

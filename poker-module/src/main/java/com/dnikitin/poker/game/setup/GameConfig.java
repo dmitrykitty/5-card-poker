@@ -1,4 +1,4 @@
-package com.dnikitin.poker.game;
+package com.dnikitin.poker.game.setup;
 
 import lombok.Builder;
 

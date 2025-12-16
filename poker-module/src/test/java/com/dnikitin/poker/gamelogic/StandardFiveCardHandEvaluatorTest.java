@@ -4,8 +4,8 @@ import com.dnikitin.poker.common.model.game.Card;
 import com.dnikitin.poker.common.model.game.HandRank;
 import com.dnikitin.poker.common.model.game.Rank;
 import com.dnikitin.poker.common.model.game.Suit;
-import com.dnikitin.poker.exceptions.NoFiveCardsException;
-import com.dnikitin.poker.exceptions.WrongRankException;
+import com.dnikitin.poker.exceptions.rules.NoFiveCardsException;
+import com.dnikitin.poker.exceptions.rules.WrongRankException;
 import com.dnikitin.poker.model.HandResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -277,5 +277,41 @@ public class StandardFiveCardHandEvaluatorTest {
                         )
                 )
         );
+    }
+
+    @Test
+    void testUnsortedInputForStraight() {
+        List<Card> unsortedStraight = List.of(
+                new Card(Rank.FOUR, Suit.SPADES),
+                new Card(Rank.SIX, Suit.HEARTS),
+                new Card(Rank.TWO, Suit.CLUBS),
+                new Card(Rank.FIVE, Suit.DIAMONDS),
+                new Card(Rank.THREE, Suit.SPADES)
+        );
+
+        HandResult result = evaluator.evaluate(unsortedStraight);
+
+        assertThat(result.getHandRank()).isEqualTo(HandRank.STRAIGHT);
+        assertThat(result.getMainCards().getFirst().rank()).isEqualTo(Rank.SIX);
+        assertThat(result.getMainCards().getLast().rank()).isEqualTo(Rank.TWO);
+    }
+
+    @Test
+    void testUnsortedInputForFullHouse() {
+        // 2, K, 2, K, 2
+        List<Card> unsortedFullHouse = List.of(
+                new Card(Rank.TWO, Suit.SPADES),
+                new Card(Rank.KING, Suit.HEARTS),
+                new Card(Rank.TWO, Suit.CLUBS),
+                new Card(Rank.KING, Suit.DIAMONDS),
+                new Card(Rank.TWO, Suit.HEARTS)
+        );
+
+        HandResult result = evaluator.evaluate(unsortedFullHouse);
+        assertThat(result.getHandRank()).isEqualTo(HandRank.FULL_HOUSE);
+
+        List<Card> mains = result.getMainCards();
+        assertThat(mains.get(0).rank()).isEqualTo(Rank.TWO);
+        assertThat(mains.get(3).rank()).isEqualTo(Rank.KING);
     }
 }

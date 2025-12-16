@@ -6,7 +6,6 @@ import lombok.ToString;
 
 @Getter
 @RequiredArgsConstructor
-@ToString(includeFieldNames = false)
 public enum Suit {
     HEARTS("♥"),   // Red
     DIAMONDS("♦"), // Red
@@ -15,4 +14,9 @@ public enum Suit {
 
 
     private final String symbol;
+
+    @Override
+    public String toString() {
+        return symbol;
+    }
 }
