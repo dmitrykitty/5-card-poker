@@ -27,20 +27,19 @@ public class ProtocolEncoder {
             case GameEvent.StateChanged sc -> String.format("STATE PHASE=%s", sc.newState());
 
             case GameEvent.TurnChanged tc ->
-                    encodeTurn(tc.activePlayerId(), "UNKNOWN", tc.amountToCall(), tc.minRaise());
+                    encodeTurn(tc.activePlayerId(), tc.phase(), tc.amountToCall(), tc.minRaise());
 
             case GameEvent.PlayerAction pa -> String.format("ACTION PLAYER=%s TYPE=%s AMOUNT=%d MSG=%s",
-                    pa.playerId(), pa.actionType(), pa.amount(), pa.message());
+                    pa.playerId(), pa.actionType(), pa.amount(), sanitize(pa.message()));
 
             case GameEvent.CardsDealt cd -> String.format("DEAL PLAYER=%s CARDS=%s",
                     cd.playerId(), formatCards(cd.cards()));
 
-            case GameEvent.GameFinished gf -> String.format("WINNER PLAYER=%s POT=%d RANK=%s",
-                    gf.winnerId(), gf.potAmount(), gf.handRank());
+            case GameEvent.GameFinished gf -> String.format("WINNER PLAYER=%s POT=%d RANK=%s CARDS=%s",
+                    gf.winnerId(), gf.potAmount(), gf.handRank(), formatCards(gf.cards()));
 
             case GameEvent.RoundInfo ri -> encodeRound(ri.potAmount(), ri.highestBet());
 
-            default -> null;
         };
     }
 
@@ -55,7 +54,7 @@ public class ProtocolEncoder {
      * Encodes an OK response with a message.
      */
     public String encodeOk(String message) {
-        return String.format("OK MESSAGE=%s", message);
+        return String.format("OK MESSAGE=%s", sanitize(message));
     }
 
     /**
@@ -105,22 +104,6 @@ public class ProtocolEncoder {
      */
     public String encodeRound(int pot, int highestBet) {
         return String.format("ROUND POT=%d HIGHESTBET=%d", pot, highestBet);
-    }
-
-    /**
-     * Encodes showdown information.
-     */
-    public String encodeShowdown(String playerId, List<Card> hand, String rank) {
-        return String.format("SHOWDOWN PLAYER=%s HAND=%s RANK=%s",
-                playerId, formatCards(hand), rank);
-    }
-
-    /**
-     * Encodes payout information.
-     */
-    public String encodePayout(String playerId, int amount, int stackLeft) {
-        return String.format("PAYOUT PLAYER=%s AMOUNT=%d STACK=%d",
-                playerId, amount, stackLeft);
     }
 
     private String formatCards(List<Card> cards) {

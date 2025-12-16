@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -185,6 +186,12 @@ public class Table {
         try {
             validateBettingPhase();
             validateTurn(player);
+
+            int minRaise = config.ante();
+            if (raiseAmount < minRaise) {
+                throw new InvalidMoveException("Raise amount too small. Minimum raise is " + minRaise);
+            }
+
             int toCall = currentRound.getCurrentBet() - player.getCurrentBet();
             int totalAmount = toCall + raiseAmount;
 
@@ -312,13 +319,12 @@ public class Table {
         int amountToCall = currentRound.getCurrentBet() - current.getCurrentBet();
         if (amountToCall < 0) amountToCall = 0;
 
-        // Minimalne przebicie to zazwyczaj Big Blind lub wysokość poprzedniego przebicia
-        // Tutaj dla uproszczenia przyjmijmy np. wartość ANTE lub ostatni raise
+        // to simplify = minRaise = ante
         int minRaise = config.ante();
 
         log.debug("Turn passed to: {}. To call: {}", current.getName(), amountToCall);
 
-        notifyObservers(new GameEvent.TurnChanged(current.getId(), amountToCall, minRaise));
+        notifyObservers(new GameEvent.TurnChanged(current.getId(), currentState.name(), amountToCall, minRaise));
     }
 
     private void advanceGamePhase() {
@@ -329,7 +335,20 @@ public class Table {
                 GameState nextState = (currentState == GameState.BETTING_1) ? GameState.DRAWING : GameState.BETTING_2;
                 changeState(nextState);
                 turnOrder.startFromLeftOfDealer();
-                notifyObservers(new GameEvent.TurnChanged(getCurrentPlayer().getId(), 0, 0));
+                Player currentPlayer = getCurrentPlayer();
+
+
+                int amountToCall = currentRound.getCurrentBet() - currentPlayer.getCurrentBet();
+                if (amountToCall < 0) amountToCall = 0;
+
+                int minRaise = config.ante();
+
+                notifyObservers(new GameEvent.TurnChanged(
+                        currentPlayer.getId(),
+                        currentState.name(),
+                        amountToCall,
+                        minRaise
+                ));
             }
             case BETTING_2 -> resolveShowdown();
             default -> log.error("Unexpected state transition from {}", currentState);
@@ -380,12 +399,17 @@ public class Table {
                 Player winner = winners.getFirst();
                 int amount = potManager.awardPot(i, winner);
                 HandResult result = evaluator.evaluate(winner.getHand());
-                notifyObservers(new GameEvent.GameFinished(winner.getId(), amount, result.getHandRank().getLabel()));
+                notifyObservers(new GameEvent.GameFinished(
+                        winner.getId(), amount, result.getHandRank().getLabel(), winner.getHand()));
             } else {
-                potManager.splitPot(i, winners);
+                Map<String, Integer> winnings = potManager.splitPot(i, winners);
                 for (Player w : winners) {
                     HandResult result = evaluator.evaluate(w.getHand());
-                    notifyObservers(new GameEvent.GameFinished(w.getId(), 0, "Split Pot: " + result.getHandRank().getLabel()));
+
+                    int amountWon = winnings.getOrDefault(w.getId(), 0);
+
+                    notifyObservers(new GameEvent.GameFinished(
+                            w.getId(), amountWon, "Split Pot: " + result.getHandRank().getLabel(), w.getHand()));
                 }
             }
         }
@@ -427,12 +451,13 @@ public class Table {
 
         log.info("Game ended prematurely. Player {} won {} (Opponents folded).", winner.getName(), total);
 
-        notifyObservers(new GameEvent.GameFinished(winner.getId(), total, "Opponents Folded"));
+        notifyObservers(new GameEvent.GameFinished(winner.getId(), total, "Opponents Folded", winner.getHand()));
         changeState(GameState.FINISHED);
     }
 
     private void startNewHand() {
         turnOrder.rotateDealer();
+        int minRaise = config.ante();
 
         potManager.reset();
         Deck newDeck = gameFactory.createDeck(); // Fabryka (produkcyjna lub testowa) tworzy deck
@@ -453,7 +478,7 @@ public class Table {
         turnOrder.startFromLeftOfDealer();
 
         changeState(GameState.BETTING_1);
-        notifyObservers(new GameEvent.TurnChanged(getCurrentPlayer().getId(), 0, 0));
+        notifyObservers(new GameEvent.TurnChanged(getCurrentPlayer().getId(), currentState.name(),0, minRaise));
     }
 
     private void collectAnte() {
@@ -475,6 +500,7 @@ public class Table {
         if (players.size() < 2) {
             throw new IllegalPlayerAmountException("Not enough players after Ante collection");
         }
+        notifyObservers(new GameEvent.RoundInfo(potManager.getTotalPot(), 0));
     }
 
     private void validateTurn(Player player) {

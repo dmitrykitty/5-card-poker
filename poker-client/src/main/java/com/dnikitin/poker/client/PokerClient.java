@@ -157,6 +157,23 @@ public class PokerClient {
                 }
             }
 
+            case ROUND -> {
+                // Pobieramy nową wartość Puli
+                int pot = msg.getInt("POT", 0);
+
+                // Opcjonalnie: najwyższy bet (jeśli używasz)
+                int highestBet = msg.getInt("HIGHESTBET", 0);
+
+                // Aktualizujemy stan UI
+                // Możesz wypisać komunikat, albo po prostu odświeżyć dashboard
+                // ui.printMessage(" [INFO] Pot updated: " + pot); // Opcjonalne logowanie
+
+                // Ważne: Gdzieś w UI powinieneś przechowywać "currentPot" i wyświetlać go
+                // Zakładam, że ConsoleUI rysuje stół na nowo przy każdej akcji,
+                // więc warto zapisać tę wartość w ClientGameState
+                gameState.updatePot(pot);
+            }
+
             case ACTION -> {
                 String pId = msg.get("PLAYER").orElse("?");
                 String type = msg.get("TYPE").orElse("?");
@@ -191,16 +208,25 @@ public class PokerClient {
                 String winnerId = msg.get("PLAYER").orElse("?");
                 String rank = msg.get("RANK").orElse("?");
                 String potStr = msg.get("POT").orElse("0");
+                String cardsStr = msg.get("CARDS").orElse("");
+
                 int pot = Integer.parseInt(potStr);
-
                 String winnerName = gameState.getPlayerName(winnerId);
-
-                // Formatowanie "Opponents Folded" -> "Won by Fold"
                 String displayRank = rank.contains("Fold") ? "Won by Fold" : rank.replace("_", " ");
 
-                ui.printMessage("\n 🏆 WINNER: " + winnerName + " | " + displayRank + " | Pot: " + pot + "\n");
+                StringBuilder winMsg = new StringBuilder();
+                winMsg.append("\n 🏆 WINNER: ").append(winnerName)
+                        .append(" | ").append(displayRank)
+                        .append(" | Pot: ").append(pot);
 
-                // Dodaj żetony zwycięzcy, żeby w następnej rundzie (ANTE) było widać poprawną sumę
+                if (!cardsStr.isEmpty() && !cardsStr.equals("NONE")) {
+                    winMsg.append("\n    Winning Hand: ").append(cardsStr);
+                }
+
+                winMsg.append("\n");
+
+                ui.printMessage(winMsg.toString());
+
                 gameState.addChips(winnerId, pot);
                 gameState.setLastMessage("Winner: " + winnerName);
             }

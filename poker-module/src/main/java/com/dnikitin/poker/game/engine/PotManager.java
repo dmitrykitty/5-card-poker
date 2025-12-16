@@ -185,9 +185,11 @@ public class PotManager {
      * @param potIndex The index of the pot to split
      * @param winners  List of winning players
      */
-    public void splitPot(int potIndex, List<Player> winners) {
+    public Map<String, Integer> splitPot(int potIndex, List<Player> winners) {
+        Map<String, Integer> winnings = new HashMap<>();
+
         if (potIndex < 0 || potIndex >= pots.size() || winners.isEmpty()) {
-            return;
+            return winnings;
         }
 
         Pot pot = pots.get(potIndex);
@@ -198,9 +200,14 @@ public class PotManager {
             Player winner = winners.get(i);
             int amount = share + (i < remainder ? 1 : 0); // Distribute remainder
             winner.winChips(amount);
+
+            winnings.put(winner.getId(), amount);
+
             log.info("Split pot: awarded {} to player {}", amount, winner.getName());
         }
         pot.clear();
+
+        return winnings;
     }
 
     /**

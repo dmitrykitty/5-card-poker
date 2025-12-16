@@ -50,7 +50,6 @@ public class ClientGameState {
         }
 
     public void updatePhase(String phase) {
-        // Nie musimy już resetować żadnych map zakładów!
         this.currentPhase = phase;
     }
 
@@ -67,6 +66,10 @@ public class ClientGameState {
                 myHand.add(card.trim());
             }
         }
+    }
+
+    public void updatePot(int pot) {
+        this.currentPot = pot;
     }
 
     public void setLastMessage(String msg) {
