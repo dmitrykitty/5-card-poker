@@ -1,6 +1,6 @@
 package com.dnikitin.poker.game.engine;
 
-import com.dnikitin.poker.game.Player;
+import com.dnikitin.poker.model.Player;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 

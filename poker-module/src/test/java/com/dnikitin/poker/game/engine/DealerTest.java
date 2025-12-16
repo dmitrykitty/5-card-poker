@@ -1,7 +1,8 @@
 package com.dnikitin.poker.game.engine;
 
 import com.dnikitin.poker.common.model.game.Card;
-import com.dnikitin.poker.game.Player;
+import com.dnikitin.poker.model.Deck;
+import com.dnikitin.poker.model.Player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,19 +19,8 @@ class DealerTest {
 
     @BeforeEach
     void setUp() {
-        dealer = new Dealer();
+        dealer = new Dealer(Deck.createDeck());
         player = new Player("1", "Test", 1000);
-    }
-
-    @Test
-    @DisplayName("Should generate a audit seed for deck")
-    void testAuditSeed() {
-        String seed = dealer.getDeckSeedForAudit();
-        assertAll(
-                () -> assertThat(seed).startsWith("DECK_SEED:"),
-                () -> assertThat(dealer.getDeck()).isNotNull()
-        );
-
     }
 
     @Test

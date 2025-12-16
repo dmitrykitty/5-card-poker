@@ -1,7 +1,7 @@
 package com.dnikitin.poker.game.engine;
 
 import com.dnikitin.poker.common.model.game.Card;
-import com.dnikitin.poker.game.Player;
+import com.dnikitin.poker.model.Player;
 import com.dnikitin.poker.model.Deck;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -18,23 +18,18 @@ import java.util.List;
 @Getter
 public class Dealer {
     private Deck deck;
-    private long deckSeed;
-    private final SecureRandom random;
 
-    public Dealer() {
-        this.random = new SecureRandom();
-        resetDeck();
+    public Dealer(Deck startingDeck) {
+        setupNewDeck(startingDeck);
     }
 
     /**
-     * Creates a new shuffled deck for a new hand.
-     * Records the seed for audit purposes.
+     * Gets a new deck and shuffles it.
      */
-    public void resetDeck() {
-        this.deckSeed = random.nextLong();
-        this.deck = Deck.createDeck();
+    public void setupNewDeck(Deck newDeck) {
+        deck = newDeck;
         deck.shuffle();
-        log.info("New deck created and shuffled. Seed: {} (for audit)", deckSeed);
+        log.info("Dealer received new deck and shuffled it. Cards: {}", deck.size());
     }
 
     /**
@@ -108,15 +103,5 @@ public class Dealer {
      */
     public boolean hasEnoughCards(int requiredCards) {
         return deck.size() >= requiredCards;
-    }
-
-    /**
-     * Gets the deck seed for audit logging.
-     * This allows game reconstruction and verification.
-     *
-     * @return The seed used to initialize the deck
-     */
-    public String getDeckSeedForAudit() {
-        return String.format("DECK_SEED:%016X", deckSeed);
     }
 }

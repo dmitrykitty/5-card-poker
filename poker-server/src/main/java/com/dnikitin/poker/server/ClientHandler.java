@@ -10,7 +10,7 @@ import com.dnikitin.poker.common.protocol.clientserver.ProtocolParser;
 import com.dnikitin.poker.common.protocol.clientserver.commands.*;
 import com.dnikitin.poker.exceptions.PokerGameException;
 import com.dnikitin.poker.game.GameManager;
-import com.dnikitin.poker.game.Player;
+import com.dnikitin.poker.model.Player;
 import com.dnikitin.poker.game.Table;
 import com.dnikitin.poker.server.security.ConnectionValidator;
 import com.dnikitin.poker.server.security.RateLimiter;

@@ -1,6 +1,6 @@
 package com.dnikitin.poker.game.engine;
 
-import com.dnikitin.poker.game.Player;
+import com.dnikitin.poker.model.Player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

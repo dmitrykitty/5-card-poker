@@ -1,4 +1,4 @@
-package com.dnikitin.poker.game;
+package com.dnikitin.poker.model;
 
 import com.dnikitin.poker.common.model.game.Card;
 import com.dnikitin.poker.common.model.game.Rank;

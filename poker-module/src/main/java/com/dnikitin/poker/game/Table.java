@@ -13,7 +13,9 @@ import com.dnikitin.poker.game.setup.GameConfig;
 import com.dnikitin.poker.game.setup.GameFactory;
 import com.dnikitin.poker.game.state.GameState;
 import com.dnikitin.poker.gamelogic.HandEvaluator;
+import com.dnikitin.poker.model.Deck;
 import com.dnikitin.poker.model.HandResult;
+import com.dnikitin.poker.model.Player;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,6 +37,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Table {
 
     private final String id;
+    private final GameFactory gameFactory;
+
     private final GameConfig config;
     private final HandEvaluator evaluator;
 
@@ -61,12 +65,14 @@ public class Table {
      * @param gameFactory Factory providing deck, evaluator, and config.
      */
     public Table(GameFactory gameFactory) {
+        this.gameFactory = gameFactory;
+
         this.id = UUID.randomUUID().toString();
         this.config = gameFactory.createGameConfig();
         this.evaluator = gameFactory.createHandEvaluator();
 
         // Initialization of helper classes
-        this.dealer = new Dealer();
+        this.dealer = new Dealer(gameFactory.createDeck());
         this.potManager = new PotManager();
 
         // List 'players' is empty here, but TurnOrder holds the reference to it
@@ -356,6 +362,11 @@ public class Table {
             if (eligiblePlayers.isEmpty()) continue;
 
             List<Player> winners = findWinners(eligiblePlayers);
+            for (Player p : eligiblePlayers) {
+                HandResult result = evaluator.evaluate(p.getHand());
+                String cards = result.getMainCards().toString();
+                log.info("SHOWDOWN: Player {} has {}{}", p.getName(), result.getHandRank().getLabel(), cards);
+            }
 
             if (winners.size() == 1) {
                 Player winner = winners.getFirst();
@@ -405,6 +416,9 @@ public class Table {
         int total = potManager.getTotalPot();
         winner.winChips(total);
 
+
+        log.info("Game ended prematurely. Player {} won {} (Opponents folded).", winner.getName(), total);
+
         notifyObservers(new GameEvent.GameFinished(winner.getId(), total, "Opponents Folded"));
         changeState(GameState.FINISHED);
     }
@@ -413,10 +427,9 @@ public class Table {
         turnOrder.rotateDealer();
 
         potManager.reset();
-        dealer.resetDeck();
-        // LOG AUDIT SEED
-        log.info("Hand started. Dealer: {}. Deck Seed: {}",
-                turnOrder.getDealer().getName(), dealer.getDeckSeedForAudit());
+        Deck newDeck = gameFactory.createDeck(); // Fabryka (produkcyjna lub testowa) tworzy deck
+        dealer.setupNewDeck(newDeck);
+        log.info("Hand started. Dealer: {}", turnOrder.getDealer().getName());
 
         players.forEach(Player::clearHand);
         players.forEach(Player::resetRoundBet);
@@ -443,6 +456,7 @@ public class Table {
             try {
                 player.bet(ante);
                 potManager.addToMainPot(ante);
+                player.resetRoundBet(); //to avoid double ante sum
                 notifyObservers(new GameEvent.PlayerAction(player.getId(), "ANTE", ante, "Paid Ante"));
             } catch (NotEnoughChipsException e) {
                 bankrupts.add(player);
