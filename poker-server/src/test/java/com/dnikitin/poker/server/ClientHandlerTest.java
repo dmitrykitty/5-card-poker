@@ -32,7 +32,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ClientHandlerTest {
 
-    //mocking
     @Mock
     private SocketChannel socketChannel;
     @Mock
@@ -46,18 +45,15 @@ class ClientHandlerTest {
 
     private MockedStatic<GameManager> mockedGameManagerStatic;
     private ClientHandler clientHandler;
-    private StringWriter responseWriter; // response from server - HERE
+    private StringWriter responseWriter;
 
     @BeforeEach
     void setUp() throws Exception {
-        // mocking singleton behavior
         mockedGameManagerStatic = mockStatic(GameManager.class);
         mockedGameManagerStatic.when(GameManager::getInstance).thenReturn(gameManager);
 
         clientHandler = new ClientHandler(socketChannel, rateLimiter, timeoutManager);
 
-        // inject PrintWriter via reflection to capture what the handler sends to the client
-        // (Because the 'out' field is private and normally initialized in run())
         responseWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(responseWriter, true);
 
@@ -71,32 +67,23 @@ class ClientHandlerTest {
         mockedGameManagerStatic.close();
     }
 
-    // Commands from client to SERVER
+    // --- Client -> SERVER ---
 
     @Test
     @DisplayName("Should handle HELLO command")
     void testHandleHello() throws Exception {
-        // given
-        String command = "HELLO VERSION=1.0";
-
-        // when
-        invokeHandleCommand(command);
-
-        // then
+        invokeHandleCommand("HELLO VERSION=1.0");
         assertThat(responseWriter.toString()).contains("OK MESSAGE=Connected_to_poker_server");
     }
 
     @Test
     @DisplayName("Should handle CREATE command")
     void testHandleCreate() throws Exception {
-        // given
         String newGameId = "game-123";
         when(gameManager.createGame()).thenReturn(newGameId);
 
-        // when
         invokeHandleCommand("CREATE ANTE=10 BET=10");
 
-        // then
         verify(gameManager).createGame();
         assertThat(responseWriter.toString()).contains("OK MESSAGE=GAME_ID=" + newGameId);
     }
@@ -104,62 +91,65 @@ class ClientHandlerTest {
     @Test
     @DisplayName("Should handle JOIN command successfully")
     void testHandleJoinSuccess() throws Exception {
-        // given
         String gameId = "game-123";
         String playerName = "Alice";
-
         when(gameManager.findGame(gameId)).thenReturn(Optional.of(table));
 
-        // when
         invokeHandleCommand("JOIN GAME=" + gameId + " NAME=" + playerName);
 
-        // then
-        // Weryfikujemy, że dodano gracza do stołu
         verify(table).addPlayer(any(Player.class));
         verify(table).addObserver(clientHandler);
-
-        // Sprawdzamy odpowiedź WELCOME
-        assertThat(responseWriter.toString()).contains("WELCOME GAME=" + gameId);
+        assertThat(responseWriter.toString())
+                .contains("WELCOME GAME=" + gameId)
+                .contains("NAME=" + playerName);
     }
 
     @Test
-    @DisplayName("Should return error when JOINing non-existent game")
+    @DisplayName("Should return error when JOINing fails (Validation or No Game)")
     void testHandleJoinFail() throws Exception {
-        // given
+        // 1. Invalid Name
+        invokeHandleCommand("JOIN GAME=valid-id NAME=Bob!");
+        assertThat(responseWriter.toString()).contains("ERR CODE=INVALID_NAME");
+        verify(gameManager, never()).findGame(any());
+
+        // Reset buffer
+        responseWriter.getBuffer().setLength(0);
+
+        // 2. Invalid Game ID
+        invokeHandleCommand("JOIN GAME=short NAME=Bob");
+        assertThat(responseWriter.toString()).contains("ERR CODE=INVALID_GAME_ID");
+        verify(gameManager, never()).findGame(any());
+
+        responseWriter.getBuffer().setLength(0);
+
+        // 3. Game Not Found
         when(gameManager.findGame("invalid-id")).thenReturn(Optional.empty());
-
-        // when
         invokeHandleCommand("JOIN GAME=invalid-id NAME=Bob");
-
-        // then
-        verify(table, never()).addPlayer(any());
         assertThat(responseWriter.toString()).contains("ERR CODE=GAME_NOT_FOUND");
+        verify(table, never()).addPlayer(any());
     }
 
     @Test
     @DisplayName("Should handle START command")
     void testHandleStart() throws Exception {
-        // given - musimy najpierw dołączyć do gry, aby ustawić pole 'table' w handlerze
-        joinGameHelper();
+        Player player = joinGameHelper();
+        String gameId = "game-123";
 
-        // when
-        invokeHandleCommand("game-id player-id START");
+        // ProtocolParser wymaga formatu: GAME_ID PLAYER_ID ACTION [PARAMS]
+        invokeHandleCommand(gameId + " " + player.getId() + " START");
 
-        // then
         verify(table).startGame();
         assertThat(responseWriter.toString()).contains("OK MESSAGE=Game_started");
     }
 
     @Test
-    @DisplayName("Should handle BET/RAISE command")
+    @DisplayName("Should handle RAISE command")
     void testHandleRaise() throws Exception {
-        // given
-        joinGameHelper();
+        Player player = joinGameHelper();
+        String gameId = "game-123";
 
-        // when
-        invokeHandleCommand("game-id player-id RAISE AMOUNT=100");
+        invokeHandleCommand(gameId + " " + player.getId() + " RAISE AMOUNT=100");
 
-        // then
         verify(table).playerRaise(any(Player.class), eq(100));
         assertThat(responseWriter.toString()).contains("OK");
     }
@@ -167,29 +157,86 @@ class ClientHandlerTest {
     @Test
     @DisplayName("Should handle FOLD command")
     void testHandleFold() throws Exception {
-        // given
-        joinGameHelper();
+        Player player = joinGameHelper();
+        String gameId = "game-123";
 
-        // when
-        invokeHandleCommand("game-id player-id FOLD");
+        invokeHandleCommand(gameId + " " + player.getId() + " FOLD");
 
-        // then
         verify(table).playerFold(any(Player.class));
         assertThat(responseWriter.toString()).contains("OK");
     }
 
-    // --- TESTY OBSERWERA (Serwer -> Klient) ---
+    @Test
+    @DisplayName("Should handle CALL command")
+    void testHandleCall() throws Exception {
+        // given
+        String gId = "game-1234"; //
+        when(gameManager.findGame(gId)).thenReturn(Optional.of(table));
+
+        // 1. JOIN
+        invokeHandleCommand("JOIN GAME=" + gId + " NAME=Alice");
+        responseWriter.getBuffer().setLength(0); // czyścimy bufor po welcome
+
+        // 2. Get ID using reflection
+        String pId = getPlayer().getId();
+
+        // when
+        invokeHandleCommand(gId + " " + pId + " CALL");
+
+        // then
+        verify(table).playerCall(any());
+        assertThat(responseWriter.toString()).contains("OK");
+    }
+
+    @Test
+    @DisplayName("Should handle CHECK command")
+    void testHandleCheck() throws Exception {
+        // given
+        String gId = "game-1234"; // ZMIANA
+        when(gameManager.findGame(gId)).thenReturn(Optional.of(table));
+
+        invokeHandleCommand("JOIN GAME=" + gId + " NAME=Bob");
+        responseWriter.getBuffer().setLength(0);
+
+        String pId = getPlayer().getId();
+
+        // when
+        invokeHandleCommand(gId + " " + pId + " CHECK");
+
+        // then
+        verify(table).playerCheck(any());
+        assertThat(responseWriter.toString()).contains("OK");
+    }
+
+    @Test
+    @DisplayName("Should handle DRAW command with valid cards")
+    void testHandleDraw() throws Exception {
+        // given
+        String gId = "game-1234"; // ZMIANA
+        when(gameManager.findGame(gId)).thenReturn(Optional.of(table));
+
+        invokeHandleCommand("JOIN GAME=" + gId + " NAME=Charlie");
+        responseWriter.getBuffer().setLength(0);
+
+        String pId = getPlayer().getId();
+
+        // when
+        invokeHandleCommand(gId + " " + pId + " DRAW CARDS=0,2,4");
+
+        // then
+        verify(table).playerExchangeCards(any(), eq(List.of(0, 2, 4)));
+        assertThat(responseWriter.toString()).contains("OK");
+    }
+
+    // --- Server -> Client Events ---
 
     @Test
     @DisplayName("Should send PlayerJoined event to client")
     void testOnPlayerJoined() {
-        // given
         GameEvent event = new GameEvent.PlayerJoined("p-1", "Bob", 1000);
 
-        // when
         clientHandler.onGameEvent(event);
 
-        // then
         assertThat(responseWriter.toString())
                 .contains("LOBBY PLAYER=p-1 CHIPS=1000 NAME=Bob");
     }
@@ -197,20 +244,14 @@ class ClientHandlerTest {
     @Test
     @DisplayName("Should send CardsDealt event (HIDDEN for others)")
     void testOnCardsDealtOthers() throws Exception {
-        // given
-        // Ustawiamy gracza w handlerze (poprzez JOIN)
         joinGameHelper();
-        // Gracz w handlerze to "Alice" (stworzona w joinGameHelper)
+        responseWriter.getBuffer().setLength(0);
 
-        // Zdarzenie dotyczy INNEGO gracza
         List<Card> cards = List.of(new Card(Rank.ACE, Suit.SPADES));
         GameEvent event = new GameEvent.CardsDealt("other-player-id", cards);
 
-        // when
         clientHandler.onGameEvent(event);
 
-        // then
-        // Powinniśmy dostać HIDDEN, bo to nie nasze karty
         assertThat(responseWriter.toString())
                 .contains("DEAL PLAYER=other-player-id CARDS=HIDDEN");
     }
@@ -218,47 +259,38 @@ class ClientHandlerTest {
     @Test
     @DisplayName("Should send CardsDealt event (VISIBLE for me)")
     void testOnCardsDealtMe() throws Exception {
-        // given
         Player myPlayer = joinGameHelper();
+        responseWriter.getBuffer().setLength(0);
 
         List<Card> cards = List.of(new Card(Rank.ACE, Suit.SPADES));
         GameEvent event = new GameEvent.CardsDealt(myPlayer.getId(), cards);
 
-        // when
         clientHandler.onGameEvent(event);
 
-        // then
-        // Powinniśmy widzieć karty
         assertThat(responseWriter.toString())
                 .contains("DEAL PLAYER=" + myPlayer.getId() + " CARDS=A♠");
     }
 
-    // --- HELPERY ---
+    // --- HELPERS ---
 
-    /**
-     * Symuluje dołączenie do gry, aby ustawić wewnętrzne pola 'table' i 'player' w ClientHandler.
-     */
     private Player joinGameHelper() throws Exception {
         String gameId = "game-123";
+        // Upewniamy się, że mockowanie jest ustawione tylko jeśli jeszcze nie było (w przypadku wielokrotnego użycia w teście)
+        // Ale tutaj każdy test jest izolowany, więc jest OK.
         when(gameManager.findGame(gameId)).thenReturn(Optional.of(table));
 
-        // Wywołujemy prawdziwą logikę JOIN
         invokeHandleCommand("JOIN GAME=" + gameId + " NAME=Alice");
 
-        // Resetujemy bufor odpowiedzi, żeby testy właściwe miały czysto
         responseWriter.getBuffer().setLength(0);
+        return getPlayer();
+    }
 
-        // Pobieramy gracza, który został utworzony wewnątrz handlera (przez refleksję lub getter package-private)
+    private Player getPlayer() throws Exception {
         Field playerField = ClientHandler.class.getDeclaredField("player");
         playerField.setAccessible(true);
         return (Player) playerField.get(clientHandler);
     }
 
-    /**
-     * Wywołuje prywatną/package-private metodę handleCommand przez refleksję.
-     * Jeśli zmieniłeś widoczność metody na package-private, możesz to wywołać bezpośrednio:
-     * clientHandler.handleCommand(line);
-     */
     private void invokeHandleCommand(String line) throws Exception {
         clientHandler.handleCommand(line);
     }

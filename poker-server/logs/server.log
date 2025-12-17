@@ -1,3 +1,5 @@
-2025-12-17 02:28:13.552 [main] DEBUG c.d.poker.server.ClientHandler - Client 95e4631e-e721-4a34-82f0-cbe5d356dd0b: CREATE ANTE=10 BET=10
-2025-12-17 02:28:13.559 [main] DEBUG c.d.poker.server.ClientHandler - To client 95e4631e-e721-4a34-82f0-cbe5d356dd0b: OK MESSAGE=GAME_IDgame-123
-2025-12-17 02:28:13.559 [main] INFO  c.d.poker.server.ClientHandler - Client 95e4631e-e721-4a34-82f0-cbe5d356dd0b created game game-123
+2025-12-17 03:32:02.400 [main] DEBUG c.d.poker.server.ClientHandler - Client 4e01528d-3c45-4dca-83dc-a3fdf9e18955: JOIN GAME=game-1234 NAME=Charlie
+2025-12-17 03:32:02.416 [main] DEBUG c.d.poker.server.ClientHandler - To client 4e01528d-3c45-4dca-83dc-a3fdf9e18955: WELCOME GAME=game-1234 PLAYER=71cec630-84f7-4c35-ab13-d782daddd970 NAME=Charlie
+2025-12-17 03:32:02.416 [main] INFO  c.d.poker.server.ClientHandler - Client 4e01528d-3c45-4dca-83dc-a3fdf9e18955 joined game game-1234 as Charlie
+2025-12-17 03:32:02.416 [main] DEBUG c.d.poker.server.ClientHandler - Client 4e01528d-3c45-4dca-83dc-a3fdf9e18955: game-1234 71cec630-84f7-4c35-ab13-d782daddd970 DRAW CARDS=0,2,4
+2025-12-17 03:32:02.418 [main] DEBUG c.d.poker.server.ClientHandler - To client 4e01528d-3c45-4dca-83dc-a3fdf9e18955: OK

@@ -176,9 +176,9 @@ public class ClientHandler implements Runnable, GameObserver {
                 this.player = new Player(UUID.randomUUID().toString(), command.getName(), 1000);
 
                 table.addObserver(this);
-                table.addPlayer(player); // Może rzucić błąd (np. Full table)
+                table.addPlayer(player);
 
-                sendMessage(encoder.encodeWelcome(command.getGameId(), player.getId()));
+                sendMessage(encoder.encodeWelcome(command.getGameId(), player.getId(), player.getName()));
                 log.info("Client {} joined game {} as {}", clientId, command.getGameId(), player.getName());
             } catch (PokerGameException e) {
                 log.warn("Game error during join from client {}: {}", clientId, e.getMessage());

@@ -104,15 +104,16 @@ public class PokerClient {
             case WELCOME -> {
                 String gId = msg.get("GAME").orElse(null);
                 String pId = msg.get("PLAYER").orElse(null);
+                String name = msg.get("NAME").orElse("player");
 
                 if (gId != null && pId != null) {
                     gameState.setConnectionInfo(gId, pId);
-                    ui.printMessage("✓ Joined game successfully.");
+                    gameState.updatePlayerInfo(pId, name, -1);
+                    ui.printMessage("✓ Joined game successfully as " + name);
                 }
             }
 
             case LOBBY -> {
-                // Użycie getInt jest bezpieczne
                 String pId = msg.get("PLAYER").orElse(null);
                 String name = msg.get("NAME").orElse("Unknown");
                 int chips = msg.getInt("CHIPS", -1);

@@ -67,8 +67,8 @@ public class ProtocolEncoder {
     /**
      * Encodes a WELCOME message after successful join.
      */
-    public String encodeWelcome(String gameId, String playerId) {
-        return String.format("WELCOME GAME=%s PLAYER=%s", gameId, playerId);
+    public String encodeWelcome(String gameId, String playerId, String playerName) {
+        return String.format("WELCOME GAME=%s PLAYER=%s NAME=%s", gameId, playerId, sanitize(playerName));
     }
 
     /**
@@ -122,6 +122,6 @@ public class ProtocolEncoder {
         if (text == null) return "";
         // Replace spaces with underscores and remove special characters
         return text.replaceAll("\\s+", "_")
-                .replaceAll("[^a-zA-Z0-9_-]", "");
+                .replaceAll("[^a-zA-Z0-9_=-]", "");
     }
 }
