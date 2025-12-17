@@ -133,8 +133,6 @@ public class PokerClient {
                 String phase = msg.get("PHASE").orElse("UNKNOWN");
                 gameState.updatePhase(phase);
 
-                // Jeśli faza to DRAWING i to my, chcemy widzieć dashboard żeby wiedzieć co wymienić
-                // Ale serwer wyśle też TURN lub DEAL, więc tu wystarczy log
                 ui.printMessage(" --- PHASE: " + phase + " ---");
             }
 
@@ -147,7 +145,6 @@ public class PokerClient {
             case TURN -> {
                 String activePlayer = msg.get("PLAYER").orElse("");
 
-                // Jeśli to moja kolej - OBOWIĄZKOWO dashboard
                 if (isMe(activePlayer)) {
                     gameState.setLastMessage(">>> YOUR TURN! <<<");
                     showDashboard = true;
@@ -155,23 +152,6 @@ public class PokerClient {
                     String opponent = gameState.getPlayerName(activePlayer);
                     ui.printMessage(" Waiting for " + opponent + "...");
                 }
-            }
-
-            case ROUND -> {
-                // Pobieramy nową wartość Puli
-                int pot = msg.getInt("POT", 0);
-
-                // Opcjonalnie: najwyższy bet (jeśli używasz)
-                int highestBet = msg.getInt("HIGHESTBET", 0);
-
-                // Aktualizujemy stan UI
-                // Możesz wypisać komunikat, albo po prostu odświeżyć dashboard
-                // ui.printMessage(" [INFO] Pot updated: " + pot); // Opcjonalne logowanie
-
-                // Ważne: Gdzieś w UI powinieneś przechowywać "currentPot" i wyświetlać go
-                // Zakładam, że ConsoleUI rysuje stół na nowo przy każdej akcji,
-                // więc warto zapisać tę wartość w ClientGameState
-                gameState.updatePot(pot);
             }
 
             case ACTION -> {

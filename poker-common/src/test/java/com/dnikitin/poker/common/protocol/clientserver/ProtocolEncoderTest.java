@@ -91,7 +91,7 @@ class ProtocolEncoderTest {
     }
 
     @Test
-    @DisplayName("Should encode TurnChanged event")
+    @DisplayName("Should encode TurnChanged event with correct Phase")
     void testEncodeTurnChanged() {
         GameEvent event = new GameEvent.TurnChanged("p-next", "BETTING_1", 100, 20);
         String result = encoder.encode(event);

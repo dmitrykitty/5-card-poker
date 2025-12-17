@@ -1,9 +1,9 @@
 package com.dnikitin.poker.common.protocol.serverclient;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ServerMessageParser {
+
     public ServerMessage parse(String line) {
         if (line == null || line.isBlank()) {
             return new ServerMessage(ServerMessage.Type.UNKNOWN, Map.of());
@@ -25,6 +25,7 @@ public class ServerMessageParser {
         Map<String, String> params = getParams(parts);
         return new ServerMessage(type, params);
     }
+
 
     private static Map<String, String> getParams(String[] parts) {
         Map<String, String> params = new HashMap<>();

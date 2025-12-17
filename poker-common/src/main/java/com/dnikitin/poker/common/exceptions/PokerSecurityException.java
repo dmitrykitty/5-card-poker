@@ -1,12 +1,10 @@
 package com.dnikitin.poker.common.exceptions;
 
-import lombok.Getter;
 
 /**
  * Thrown when security violations or fraud attempts are detected.
  * Examples: player impersonation, invalid authentication, rate limit exceeded.
  */
-@Getter
 public class PokerSecurityException extends RuntimeException {
     private final String code;
 
@@ -17,6 +15,10 @@ public class PokerSecurityException extends RuntimeException {
 
     public PokerSecurityException(String message) {
         this("SECURITY_VIOLATION", message);
+    }
+
+    public String getCode() {
+        return code;
     }
 
 }
