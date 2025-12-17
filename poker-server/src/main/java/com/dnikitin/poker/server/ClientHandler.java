@@ -125,7 +125,7 @@ public class ClientHandler implements Runnable, GameObserver {
         }
     }
 
-    private void handleCommand(String line) throws IOException {
+    void handleCommand(String line) throws IOException {
         log.debug("Client {}: {}", clientId, line);
 
         Command command = parser.parse(line);
@@ -147,18 +147,18 @@ public class ClientHandler implements Runnable, GameObserver {
         }
     }
 
-    private void handleHello(HelloCommand command) {
+    void handleHello(HelloCommand command) {
         log.info("Client {} hello: version {}", clientId, command.getVersion());
         sendMessage(encoder.encodeOk("Connected to poker server v1.0"));
     }
 
-    private void handleCreate(CreateCommand command) {
+    void handleCreate(CreateCommand command) {
         String gameId = GameManager.getInstance().createGame();
         sendMessage(encoder.encodeOk("GAME_ID=" + gameId));
         log.info("Client {} created game {}", clientId, gameId);
     }
 
-    private void handleJoin(JoinCommand command) {
+    void handleJoin(JoinCommand command) {
         if (!validator.isValidPlayerName(command.getName())) {
             sendError("INVALID_NAME", "Player name must be 2-20 alphanumeric characters");
             return;
@@ -170,48 +170,53 @@ public class ClientHandler implements Runnable, GameObserver {
         }
 
         GameManager.getInstance().findGame(command.getGameId()).ifPresentOrElse(foundTable -> {
+            try {
 
-            this.table = foundTable;
-            this.player = new Player(UUID.randomUUID().toString(), command.getName(), 1000);
+                this.table = foundTable;
+                this.player = new Player(UUID.randomUUID().toString(), command.getName(), 1000);
 
-            table.addObserver(this);
-            table.addPlayer(player); // Może rzucić błąd (np. Full table)
+                table.addObserver(this);
+                table.addPlayer(player); // Może rzucić błąd (np. Full table)
 
-            sendMessage(encoder.encodeWelcome(command.getGameId(), player.getId()));
-            log.info("Client {} joined game {} as {}", clientId, command.getGameId(), player.getName());
+                sendMessage(encoder.encodeWelcome(command.getGameId(), player.getId()));
+                log.info("Client {} joined game {} as {}", clientId, command.getGameId(), player.getName());
+            } catch (PokerGameException e) {
+                log.warn("Game error during join from client {}: {}", clientId, e.getMessage());
+                sendError(e.getCode(), e.getMessage());
+            }
 
         }, () -> sendError("GAME_NOT_FOUND", "Game does not exist"));
     }
 
-    private void handleStart(SimpleCommand command) {
+    void handleStart(SimpleCommand command) {
         validatePlayerAndTable();
         table.startGame(); // Może rzucić IllegalPlayerAmountException -> obsłużone w run()
         sendMessage(encoder.encodeOk("Game started"));
         log.info("Client {} started game", clientId);
     }
 
-    private void handleCall(SimpleCommand command) {
+    void handleCall(SimpleCommand command) {
         validatePlayerAndTable();
         cancelTimeout();
         table.playerCall(player); // Może rzucić OutOfTurnException -> obsłużone w run()
         sendMessage(encoder.encodeOk());
     }
 
-    private void handleCheck(SimpleCommand command) {
+    void handleCheck(SimpleCommand command) {
         validatePlayerAndTable();
         cancelTimeout();
         table.playerCheck(player);
         sendMessage(encoder.encodeOk());
     }
 
-    private void handleFold(SimpleCommand command) {
+    void handleFold(SimpleCommand command) {
         validatePlayerAndTable();
         cancelTimeout();
         table.playerFold(player);
         sendMessage(encoder.encodeOk());
     }
 
-    private void handleRaise(BetCommand command) {
+    void handleRaise(BetCommand command) {
         validatePlayerAndTable();
         cancelTimeout();
 
@@ -225,7 +230,7 @@ public class ClientHandler implements Runnable, GameObserver {
         sendMessage(encoder.encodeOk());
     }
 
-    private void handleDraw(DrawCommand command) {
+    void handleDraw(DrawCommand command) {
         validatePlayerAndTable();
         cancelTimeout();
 
@@ -246,21 +251,22 @@ public class ClientHandler implements Runnable, GameObserver {
         sendMessage(encoder.encodeOk());
     }
 
-    private void handleStatus(SimpleCommand command) {
+    void handleStatus(SimpleCommand command) {
         validatePlayerAndTable();
         sendMessage(encoder.encodeRound(table.getPot(), table.getCurrentRoundHighestBet()));
 
         if (table.getCurrentPlayer() != null) {
+            int minRaise = table.getConfig().ante();
             sendMessage(encoder.encodeTurn(
                     table.getCurrentPlayer().getId(),
                     table.getCurrentState().name(),
                     table.getCurrentRoundHighestBet() - player.getCurrentBet(),
-                    10
+                    minRaise
             ));
         }
     }
 
-    private void handleDisconnect() {
+    void handleDisconnect() {
         cancelTimeout();
         rateLimiter.removeClient(clientId);
 
@@ -283,7 +289,7 @@ public class ClientHandler implements Runnable, GameObserver {
         log.info("Client {} disconnected", clientId);
     }
 
-    private void handleTimeout(String timeoutPlayerId) {
+    void handleTimeout(String timeoutPlayerId) {
         // Opcjonalne zabezpieczenie: upewniamy się, że timeout dotyczy tego gracza
         if (player == null || !player.getId().equals(timeoutPlayerId)) {
             return;
@@ -302,19 +308,19 @@ public class ClientHandler implements Runnable, GameObserver {
         }
     }
 
-    private void startTimeout() {
+    void startTimeout() {
         if (player != null && timeoutManager != null) {
             timeoutManager.startTimeout(player.getId(), this::handleTimeout);
         }
     }
 
-    private void cancelTimeout() {
+    void cancelTimeout() {
         if (player != null && timeoutManager != null) {
             timeoutManager.cancelTimeout(player.getId());
         }
     }
 
-    private void validatePlayerAndTable() {
+    void validatePlayerAndTable() {
         // Ten wyjątek (InvalidMoveException) dziedziczy po PokerGameException,
         // więc też zostanie złapany przez nowy blok catch w run()!
         if (table == null || player == null) {
@@ -322,14 +328,14 @@ public class ClientHandler implements Runnable, GameObserver {
         }
     }
 
-    private void sendMessage(String message) {
+    void sendMessage(String message) {
         if (out != null) {
             out.println(message);
             log.debug("To client {}: {}", clientId, message);
         }
     }
 
-    private void sendError(String code, String reason) {
+    void sendError(String code, String reason) {
         sendMessage(encoder.encodeError(code, reason));
     }
 

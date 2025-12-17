@@ -34,6 +34,12 @@ public record ServerMessage(Type type, Map<String, String> params) {
                 .orElse("");
     }
 
+    public String getDecoded(String key, String defaultValue) {
+        return get(key)
+                .map(s -> s.replace("_", " "))
+                .orElse(defaultValue);
+    }
+
     public List<String> getList(String key) {
         return get(key)
                 .filter(s -> !s.equals("NONE") && !s.isEmpty())

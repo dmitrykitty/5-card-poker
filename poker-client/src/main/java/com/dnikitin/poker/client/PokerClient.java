@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -111,18 +112,16 @@ public class PokerClient {
             }
 
             case LOBBY -> {
-                // Zapamiętujemy imię i żetony gracza (siebie i innych)
+                // Użycie getInt jest bezpieczne
                 String pId = msg.get("PLAYER").orElse(null);
                 String name = msg.get("NAME").orElse("Unknown");
                 int chips = msg.getInt("CHIPS", -1);
 
-                // Jeśli serwer w PLAYER wysyła imię zamiast ID (stara wersja), to mapowanie może nie działać idealnie,
-                // ale zakładając poprawny protokół:
                 if (pId != null) {
                     gameState.updatePlayerInfo(pId, name, chips);
                 }
 
-                ui.printMessage(" [LOBBY] " + name + (chips >= 0 ? " (" + chips + " chips)" : ""));;
+                ui.printMessage(" [LOBBY] " + name + (chips >= 0 ? " (" + chips + " chips)" : ""));
             }
 
             case STARTED -> {
@@ -137,6 +136,7 @@ public class PokerClient {
             }
 
             case ROUND -> {
+                // Użycie getInt jest bezpieczne
                 int pot = msg.getInt("POT", gameState.getCurrentPot());
                 int highest = msg.getInt("HIGHESTBET", 0);
                 gameState.updateRoundInfo(pot, highest);
@@ -146,7 +146,11 @@ public class PokerClient {
                 String activePlayer = msg.get("PLAYER").orElse("");
 
                 if (isMe(activePlayer)) {
-                    gameState.setLastMessage(">>> YOUR TURN! <<<");
+                    // Tutaj możesz odczytać CALL i MINRAISE, które są bezpiecznymi intami
+                    int call = msg.getInt("CALL");
+                    int minRaise = msg.getInt("MINRAISE");
+
+                    gameState.setLastMessage(String.format(">>> YOUR TURN! (Call: %d, MinRaise: %d) <<<", call, minRaise));
                     showDashboard = true;
                 } else {
                     String opponent = gameState.getPlayerName(activePlayer);
@@ -157,50 +161,49 @@ public class PokerClient {
             case ACTION -> {
                 String pId = msg.get("PLAYER").orElse("?");
                 String type = msg.get("TYPE").orElse("?");
-                String text = msg.get("MSG").orElse("");
+
+                // Użycie getDecoded() do wyczyszczenia wiadomości z '_'
+                String text = msg.getDecoded("MSG");
                 int amount = msg.getInt("AMOUNT", 0);
 
                 // Aktualizujemy lokalnie żetony i zakłady
                 if (amount > 0) {
                     gameState.deductChips(pId, amount);
                 }
-                // Jeśli fold, to fold
 
                 String name = gameState.getPlayerName(pId);
-                ui.printMessage(" > " + name + ": " + type + (amount > 0 ? " " + amount : "") + " (" + text + ")");
-
-                // Jeśli to JA wykonałem akcję (np. CALL/CHECK), pokaż dashboard na chwilę jako potwierdzenie stanu
-                if (isMe(pId)) {
-                    // showDashboard = true; // Opcjonalne: wyłączam, żebyś nie widział go 2 razy (raz przy akcji, raz przy nastepnej turze)
-                }
+                ui.printMessage(" > " + name + ": " + type + (amount > 0 ? " " + amount : "") + (!text.isEmpty() ? " (" + text + ")" : ""));
             }
 
             case DEAL -> {
                 // Aktualizujemy rękę po cichu
                 if (isMe(msg.get("PLAYER").orElse(""))) {
                     msg.get("CARDS").ifPresent(gameState::updateMyHand);
-                    // Tutaj MOŻNA narysować dashboard, bo dostałeś karty
                     showDashboard = true;
                 }
             }
 
             case WINNER -> {
                 String winnerId = msg.get("PLAYER").orElse("?");
-                String rank = msg.get("RANK").orElse("?");
-                String potStr = msg.get("POT").orElse("0");
-                String cardsStr = msg.get("CARDS").orElse("");
+                // Użycie getDecoded() dla czystego rankingu
+                String rank = msg.getDecoded("RANK", "?");
+                // Użycie getInt() dla bezpiecznego potu
+                int pot = msg.getInt("POT");
+                // Użycie getList() dla czystej listy kart
+                List<String> cards = msg.getList("CARDS");
 
-                int pot = Integer.parseInt(potStr);
                 String winnerName = gameState.getPlayerName(winnerId);
-                String displayRank = rank.contains("Fold") ? "Won by Fold" : rank.replace("_", " ");
+                // getDecoded już usunął _, więc wystarczy tylko obsłużyć "Fold"
+                String displayRank = rank.contains("Fold") ? "Won by Fold" : rank;
 
                 StringBuilder winMsg = new StringBuilder();
                 winMsg.append("\n 🏆 WINNER: ").append(winnerName)
                         .append(" | ").append(displayRank)
                         .append(" | Pot: ").append(pot);
 
-                if (!cardsStr.isEmpty() && !cardsStr.equals("NONE")) {
-                    winMsg.append("\n    Winning Hand: ").append(cardsStr);
+                // Sprawdzamy, czy lista kart nie jest pusta
+                if (!cards.isEmpty()) {
+                    winMsg.append("\n    Winning Hand: ").append(String.join(", ", cards));
                 }
 
                 winMsg.append("\n");
@@ -211,9 +214,18 @@ public class PokerClient {
                 gameState.setLastMessage("Winner: " + winnerName);
             }
 
-            case OK -> msg.get("MESSAGE").ifPresent(m -> ui.printMessage("✓ " + m));
+            case OK -> {
+                // Użycie getDecoded() dla czystego komunikatu
+                String message = msg.getDecoded("MESSAGE");
+                if (!message.isEmpty()) {
+                    ui.printMessage("✓ " + message);
+                }
+            }
 
-            case ERR -> ui.printError(msg.get("REASON").orElse("Unknown Error"));
+            case ERR -> {
+                // Użycie getDecoded() dla czystego komunikatu o błędzie
+                ui.printError(msg.getDecoded("REASON", "Unknown Error"));
+            }
         }
 
         if (showDashboard) {
@@ -315,19 +327,6 @@ public class PokerClient {
 
     private boolean isMe(String pId) {
         return pId != null && pId.equals(gameState.getPlayerId());
-    }
-
-    /**
-     * Extracts a parameter value from server message.
-     */
-    private java.util.Optional<String> extractParam(String[] parts, String key) {
-        String prefix = key + "=";
-        for (String part : parts) {
-            if (part.startsWith(prefix)) {
-                return java.util.Optional.of(part.substring(prefix.length()));
-            }
-        }
-        return java.util.Optional.empty();
     }
 
     /**
