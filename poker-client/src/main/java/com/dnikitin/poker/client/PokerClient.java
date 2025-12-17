@@ -9,33 +9,66 @@ import java.io.*;
 import java.net.Socket;
 import java.util.List;
 
+/**
+ * Main entry point for the Poker Client application.
+ * <p>
+ * This class handles the TCP connection to the server, processes incoming protocol messages,
+ * and delegates user commands to the network stream. It uses a separate virtual thread
+ * to listen for asynchronous server messages while the main thread handles user input.
+ * </p>
+ */
 @Slf4j
 public class PokerClient {
     private final String host;
     private final int port;
 
-    // Getter potrzebny do asercji w testach
+    /**
+     * The game state object, exposed via getter for testing assertions.
+     */
     @Getter
     private final ClientGameState gameState;
     private final ConsoleUI ui;
     private final ServerMessageParser parser;
 
     private Socket socket;
-    // Setter (package-private) dla testów, aby wstrzyknąć mocka PrintWritera
+
+    // Setter (package-private) for testing, allows injecting a mock PrintWriter
     private PrintWriter out;
     private BufferedReader in;
     private volatile boolean running;
 
-    // Główny konstruktor (produkcyjny)
+    /**
+     * Constructs a production PokerClient with custom I/O streams.
+     *
+     * @param host   Server hostname.
+     * @param port   Server port.
+     * @param input  Source for user input.
+     * @param output Destination for user output.
+     */
     public PokerClient(String host, int port, InputStream input, PrintStream output) {
         this(host, port, new ClientGameState(), new ConsoleUI(input, output), new ServerMessageParser());
     }
 
+    /**
+     * Constructs a production PokerClient using standard System I/O.
+     *
+     * @param host Server hostname.
+     * @param port Server port.
+     */
     public PokerClient(String host, int port) {
         this(host, port, System.in, System.out);
     }
 
-    // Konstruktor "do testów" - wstrzykiwanie zależności
+    /**
+     * Dependency Injection constructor for testing purposes.
+     * Allows injecting mock GameState, UI, or Parser components.
+     *
+     * @param host      Server hostname.
+     * @param port      Server port.
+     * @param gameState The shared game state object.
+     * @param ui        The UI handler.
+     * @param parser    The protocol parser.
+     */
     public PokerClient(String host, int port, ClientGameState gameState, ConsoleUI ui, ServerMessageParser parser) {
         this.host = host;
         this.port = port;
@@ -45,9 +78,16 @@ public class PokerClient {
         this.running = false;
     }
 
+    /**
+     * Starts the client: connects to the server, spawns the listener thread,
+     * and enters the main user input loop.
+     * <p>
+     * Blocks until the user types 'quit' or the connection is lost.
+     * </p>
+     */
     public void start() {
         try {
-            // Używamy metody factory, którą można nadpisać w testach
+            // Uses a factory method that can be overridden in tests
             socket = createSocket(host, port);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -55,6 +95,7 @@ public class PokerClient {
             log.info("Connected to server at {}:{}", host, port);
             running = true;
 
+            // Use virtual thread for lightweight I/O blocking
             Thread listenerThread = Thread.ofVirtual()
                     .name("ServerListener")
                     .start(this::listenToServer);
@@ -74,11 +115,22 @@ public class PokerClient {
         }
     }
 
-    // Metoda factory dla Socketa - kluczowa dla testowania connection
+    /**
+     * Factory method for creating the socket. Override this to mock the connection.
+     *
+     * @param host Hostname.
+     * @param port Port number.
+     * @return A connected Socket.
+     * @throws IOException If connection fails.
+     */
     protected Socket createSocket(String host, int port) throws IOException {
         return new Socket(host, port);
     }
 
+    /**
+     * Continuously reads lines from the server input stream.
+     * Runs on a separate thread.
+     */
     private void listenToServer() {
         try {
             String line;
@@ -95,7 +147,14 @@ public class PokerClient {
         }
     }
 
-    // Zmiana widoczności na package-private dla testów jednostkowych
+    /**
+     * Parses a raw server message and updates the game state or UI.
+     * <p>
+     * Visibility is package-private to facilitate unit testing without reflection.
+     * </p>
+     *
+     * @param line The raw protocol string received from the server.
+     */
     void handleServerMessage(String line) {
         log.debug("Server: {}", line);
         ServerMessage msg = parser.parse(line);
@@ -152,7 +211,7 @@ public class PokerClient {
                 if (isMe(activePlayer)) {
                     int call = msg.getInt("CALL");
                     int minRaise = msg.getInt("MINRAISE");
-                    // Aktualizacja stanu przed wyświetleniem
+                    // Update state before display
                     gameState.updateTurnInfo(call);
                     gameState.setLastMessage(String.format(">>> YOUR TURN! (Call: %d, MinRaise: %d) <<<", call, minRaise));
                     showDashboard = true;
@@ -215,6 +274,9 @@ public class PokerClient {
         }
     }
 
+    /**
+     * Main loop for processing user console input.
+     */
     private void handleUserInput() {
         ui.printHelp(gameState);
         ui.printPrompt();
@@ -242,7 +304,12 @@ public class PokerClient {
         }
     }
 
-    // Package-private dla testów
+    /**
+     * Translates user commands (e.g., "call", "raise 50") into protocol messages.
+     * Package-private for testing command parsing logic.
+     *
+     * @param input The raw user input line.
+     */
     void processCommand(String input) {
         String[] parts = input.split("\\s+");
         String cmd = parts[0].toUpperCase();
@@ -303,6 +370,9 @@ public class PokerClient {
         return pId != null && pId.equals(gameState.getPlayerId());
     }
 
+    /**
+     * Closes network resources and stops the client.
+     */
     private void disconnect() {
         running = false;
         try {
@@ -315,7 +385,11 @@ public class PokerClient {
         }
     }
 
-    // Setter dla testów
+    /**
+     * Setter for the output writer, used to inject mocks during testing.
+     *
+     * @param out The PrintWriter mock.
+     */
     void setOut(PrintWriter out) {
         this.out = out;
     }

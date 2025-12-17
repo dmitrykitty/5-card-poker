@@ -5,7 +5,15 @@ import com.dnikitin.poker.common.exceptions.PokerSecurityException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Validates incoming connections and messages for security.
+ * Provides security validation for incoming network traffic.
+ * <p>
+ * This class implements a defense-in-depth strategy to protect the server from common attacks:
+ * <ul>
+ * <li><b>Buffer Overflow / Memory Exhaustion:</b> Limits message size and complexity.</li>
+ * <li><b>Injection Attacks:</b> Scans for suspicious patterns (e.g., null bytes, script tags).</li>
+ * <li><b>Protocol Compliance:</b> Ensures IDs and names match expected formats (regex).</li>
+ * </ul>
+ * </p>
  */
 @Slf4j
 public class ConnectionValidator {
@@ -13,53 +21,53 @@ public class ConnectionValidator {
     private static final int MAX_COMMAND_PARTS = 20;
 
     /**
-     * Validates a message before processing.
+     * Validates a raw protocol message string before it is parsed.
      *
-     * @param message The message to validate
-     * @throws PokerSecurityException if message fails security checks
-     * @throws ProtocolException if message is malformed
+     * @param message The raw message received from the socket.
+     * @throws PokerSecurityException if the message violates security policies (e.g., too long, contains null bytes).
+     * @throws ProtocolException if the message is structurally invalid (e.g., null).
      */
     public void validateMessage(String message) {
         if (message == null) {
             throw new ProtocolException("NULL_MESSAGE", "Message is null");
         }
 
-        // Check message size
+        // Check message size to prevent memory exhaustion
         if (message.length() > MAX_MESSAGE_SIZE) {
             log.warn("Message too large: {} bytes", message.length());
             throw new PokerSecurityException("MESSAGE_TOO_LARGE",
-                String.format("Message exceeds %d bytes", MAX_MESSAGE_SIZE));
+                    String.format("Message exceeds %d bytes", MAX_MESSAGE_SIZE));
         }
 
-        // Check for suspicious patterns
+        // Check for suspicious characters often used in binary injection
         if (message.contains("\0") || message.contains("\r\n")) {
             log.warn("Suspicious characters in message");
             throw new PokerSecurityException("INVALID_CHARACTERS",
-                "Message contains invalid characters");
+                    "Message contains invalid characters");
         }
 
-        // Check number of parts (prevent DOS via excessive parsing)
+        // Check number of parts to prevent CPU exhaustion during parsing (Regex DoS)
         String[] parts = message.split("\\s+");
         if (parts.length > MAX_COMMAND_PARTS) {
             log.warn("Too many command parts: {}", parts.length);
             throw new PokerSecurityException("TOO_MANY_PARTS",
-                "Message has too many components");
+                    "Message has too many components");
         }
 
-        // Check for common injection attempts
+        // Simple heuristic to block common command injection keywords
         String upper = message.toUpperCase();
         if (upper.contains("SCRIPT") || upper.contains("EXEC")) {
             log.warn("Potential injection attempt detected");
             throw new PokerSecurityException("INJECTION_ATTEMPT",
-                "Suspicious message content");
+                    "Suspicious message content");
         }
     }
 
     /**
-     * Validates game ID format.
+     * Validates the format of a game ID (e.g., UUID or structured string).
      *
-     * @param gameId Game ID to validate
-     * @return true if valid
+     * @param gameId The Game ID to check.
+     * @return {@code true} if valid (alphanumeric, dashes, length 8-64), {@code false} otherwise.
      */
     public boolean isValidGameId(String gameId) {
         if (gameId == null || gameId.isEmpty()) {
@@ -70,10 +78,10 @@ public class ConnectionValidator {
     }
 
     /**
-     * Validates player name.
+     * Validates a player name against strict rules to prevent UI spoofing or formatting issues.
      *
-     * @param name Player name
-     * @return true if valid
+     * @param name The player name.
+     * @return {@code true} if valid (2-20 chars, alphanumeric/underscore), {@code false} otherwise.
      */
     public boolean isValidPlayerName(String name) {
         if (name == null || name.isEmpty()) {

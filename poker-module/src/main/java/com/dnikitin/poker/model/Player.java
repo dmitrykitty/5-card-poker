@@ -11,12 +11,15 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Represents a participant in the poker game.
+ * Represents the mutable state of a participant in the game session.
  * <p>
- * This class maintains the state of a single player, including their
- * hand of cards, chip balance, and current status (active, folded, betting).
- * It does not contain game rules logic but ensures the internal consistency
- * of the player's state (e.g., preventing betting more chips than owned).
+ * <b>Domain Model:</b>
+ * This class ensures internal consistency of the player state, such as:
+ * <ul>
+ * <li>Chips cannot be negative.</li>
+ * <li>Status transitions (e.g., ACTIVE -> ALL_IN).</li>
+ * <li>Hand management.</li>
+ * </ul>
  * </p>
  */
 @Getter

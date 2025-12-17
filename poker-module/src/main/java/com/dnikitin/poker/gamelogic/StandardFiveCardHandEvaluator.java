@@ -11,9 +11,30 @@ import com.dnikitin.poker.model.HandResult;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
+/**
+ * Implements the standard ranking rules for Five-Card Draw Poker.
+ * <p>
+ * <b>Algorithm:</b>
+ * The evaluation strategy relies on:
+ * <ol>
+ * <li>Sorting cards by rank (descending).</li>
+ * <li>Checking for structure-based hands (Flush, Straight).</li>
+ * <li>Grouping cards by Rank to find frequency-based hands (Pairs, Full House).</li>
+ * </ol>
+ * </p>
+ * <p>
+ * Uses Java Streams  Collectors#groupingBy(Function)} to efficiently categorize cards.
+ * </p>
+ */
 public class StandardFiveCardHandEvaluator implements HandEvaluator {
 
+    /**
+     * Evaluates a list of exactly 5 cards and returns their rank.
+     *
+     * @param cardsFromPlayer The cards to evaluate.
+     * @return A {@link HandResult} containing the rank (e.g., FLUSH) and the relevant cards (for tie-breaking).
+     * @throws NoFiveCardsException if the input list size is not 5.
+     */
     @Override
     public HandResult evaluate(List<Card> cardsFromPlayer) {
         ArrayList<Card> cards = new ArrayList<>(cardsFromPlayer);

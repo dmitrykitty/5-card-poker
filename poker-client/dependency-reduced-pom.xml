@@ -13,6 +13,7 @@
         <artifactId>maven-shade-plugin</artifactId>
         <configuration>
           <transformers>
+            <transformer />
             <transformer>
               <mainClass>com.dnikitin.poker.client.PokerClient</mainClass>
             </transformer>

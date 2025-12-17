@@ -7,8 +7,19 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 
 /**
- * Manages turn order and dealer button rotation.
- * Ensures players act in the correct sequence.
+ * Encapsulates the logic for circular turn rotation.
+ * <p>
+ * Responsibilities:
+ * <ul>
+ * <li>Tracking the Dealer button position.</li>
+ * <li>Calculating the next active player.</li>
+ * <li>Skipping players who have FOLDED or are SITTING_OUT.</li>
+ * </ul>
+ * </p>
+ * <p>
+ * This simplifies the {@link com.dnikitin.poker.game.Table} logic by hiding the
+ * complexity of "finding the next valid index" in a list.
+ * </p>
  */
 @Slf4j
 @Getter

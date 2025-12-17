@@ -9,9 +9,17 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Manages the lifecycle of multiple game tables.
- * Acts as a registry where the Server can look up games by ID.
- * Thread-safe implementation using ConcurrentHashMap.
+ * A central registry for managing the lifecycle of all active game tables on the server.
+ * <p>
+ * <b>Design Pattern (Singleton):</b>
+ * Ensures only one instance of the manager exists to provide a global point of access
+ * for game lookups. Implements thread-safe eager initialization.
+ * </p>
+ * <p>
+ * <b>Concurrency:</b>
+ * Uses {@link ConcurrentHashMap} to allow multiple threads (clients) to create or join games
+ * simultaneously without blocking the entire registry.
+ * </p>
  */
 @Slf4j
 public class GameManager {
@@ -31,9 +39,9 @@ public class GameManager {
     }
 
     /**
-     * Creates a new game table and registers it.
+     * Creates a new poker table and registers it in the system.
      *
-     * @return The ID of the newly created game.
+     * @return The unique UUID of the newly created game.
      */
     public String createGame() {
         Table table = new Table(defaultFactory);

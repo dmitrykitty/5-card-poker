@@ -15,8 +15,23 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Main poker server with security features.
- * Uses java.nio for network I/O and virtual threads for scalability.
+ * The core TCP server implementation for the Poker game.
+ * <p>
+ * <b>Concurrency Model:</b>
+ * This server utilizes Java 21+ <b>Virtual Threads</b> (via {@link Executors#newVirtualThreadPerTaskExecutor()}).
+ * Unlike traditional thread pools, virtual threads are lightweight entities managed by the JVM, allowing
+ * the server to handle thousands of concurrent connections with a simple "thread-per-client" model.
+ * Even though the socket is configured in blocking mode, blocking operations (like I/O) unmount the
+ * virtual thread from the OS carrier thread, ensuring high throughput.
+ * </p>
+ * <p>
+ * <b>Responsibilities:</b>
+ * <ul>
+ * <li>Accepting incoming TCP connections.</li>
+ * <li>Managing the lifecycle of connection handlers.</li>
+ * <li>Initializing security components (Rate Limiting, Timeouts).</li>
+ * </ul>
+ * </p>
  */
 @Slf4j
 public class PokerServer {
@@ -26,26 +41,39 @@ public class PokerServer {
     private static final int CLEANUP_INTERVAL_MINUTES = 5;
 
     /**
-     * -- GETTER --
-     *  Gets the port the server is running on.
+     * The port number this server is bound to.
      */
     @Getter
     private final int port;
+
+    /**
+     * Executor service responsible for spawning a new virtual thread for each connected client.
+     */
     private final ExecutorService executor;
+
+    /**
+     * Scheduler for background maintenance tasks (e.g., clearing rate limiter caches).
+     */
     private final ScheduledExecutorService scheduledExecutor;
+
     private final RateLimiter rateLimiter;
     private final TimeoutManager timeoutManager;
 
     /**
-     * -- GETTER --
-     *  Checks if the server is running.
+     * Indicates whether the server's main accept loop is currently active.
      */
     @Getter
     private volatile boolean running = false;
     private ServerSocketChannel serverSocket;
 
+    /**
+     * Initializes the server configuration and security subsystems.
+     *
+     * @param port The port to bind to (e.g., 9999).
+     */
     public PokerServer(int port) {
         this.port = port;
+        // Use virtual threads to handle high concurrency with blocking I/O simplicity
         this.executor = Executors.newVirtualThreadPerTaskExecutor();
         this.scheduledExecutor = Executors.newScheduledThreadPool(1, Thread.ofVirtual().factory());
         this.rateLimiter = new RateLimiter(MAX_MESSAGES_PER_SECOND, RATE_LIMIT_WINDOW_MS);
@@ -56,35 +84,48 @@ public class PokerServer {
         log.info("  - Turn timeout: {} seconds", TURN_TIMEOUT_SECONDS);
     }
 
+    /**
+     * Starts the server loop.
+     * <p>
+     * This method binds the server socket and enters a blocking loop that accepts incoming connections.
+     * For each connection, a new {@link ClientHandler} is instantiated and submitted to the virtual thread executor.
+     * </p>
+     * <p>
+     * <b>Note:</b> This method blocks the calling thread until {@link #stop()} is called or a critical error occurs.
+     * </p>
+     */
     public void start() {
         try {
             serverSocket = ServerSocketChannel.open();
             serverSocket.bind(new InetSocketAddress(port));
+            // Blocking mode is used intentionally because Virtual Threads handle blocking efficiently
             serverSocket.configureBlocking(true);
 
             running = true;
             log.info("Poker Server started on port: {}", port);
             log.info("Using virtual threads for client handling");
 
-            // Schedule periodic cleanup of rate limiter
+            // Schedule periodic cleanup of rate limiter to prevent memory leaks
             scheduledExecutor.scheduleAtFixedRate(
-                rateLimiter::cleanup,
-                CLEANUP_INTERVAL_MINUTES,
-                CLEANUP_INTERVAL_MINUTES,
-                TimeUnit.MINUTES
+                    rateLimiter::cleanup,
+                    CLEANUP_INTERVAL_MINUTES,
+                    CLEANUP_INTERVAL_MINUTES,
+                    TimeUnit.MINUTES
             );
 
             while (running) {
                 try {
+                    // Blocks until a new client connects
                     SocketChannel clientSocket = serverSocket.accept();
                     log.info("New connection accepted: {}", clientSocket.getRemoteAddress());
 
-                    // Create handler with security components
+                    // Create handler with injected security components
                     ClientHandler handler = new ClientHandler(
-                        clientSocket,
-                        rateLimiter,
-                        timeoutManager
+                            clientSocket,
+                            rateLimiter,
+                            timeoutManager
                     );
+                    // Pass processing to a virtual thread
                     executor.submit(handler);
 
                 } catch (IOException e) {
@@ -103,6 +144,14 @@ public class PokerServer {
         }
     }
 
+    /**
+     * Stops the server gracefully.
+     * <p>
+     * Closes the server socket to stop accepting new connections, shuts down the executors,
+     * and cleans up resources. Active client handlers might be terminated abruptly if they
+     * do not exit within the timeout period.
+     * </p>
+     */
     public void stop() {
         running = false;
         log.info("Shutting down server...");
@@ -134,5 +183,4 @@ public class PokerServer {
             Thread.currentThread().interrupt();
         }
     }
-
 }

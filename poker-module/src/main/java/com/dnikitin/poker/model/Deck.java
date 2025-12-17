@@ -13,6 +13,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.random.RandomGenerator;
 
+/**
+ * Represents a standard 52-card deck.
+ * <p>
+ * <b>Data Structure:</b>
+ * Uses a {@link LinkedList} to function as a Stack (LIFO) or Queue (FIFO), allowing efficient
+ * removal of cards from the "top" of the deck via {@link LinkedList#removeFirst()}.
+ * </p>
+ * <p>
+ * <b>Security:</b>
+ * Uses {@link SecureRandom} (CSPRNG) instead of standard {@link java.util.Random} to ensure
+ * the shuffle permutation is unpredictable, preventing card prediction attacks.
+ * </p>
+ */
 @Slf4j
 @ToString(onlyExplicitlyIncluded = true)
 public class Deck {

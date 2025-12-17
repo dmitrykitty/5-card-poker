@@ -6,8 +6,15 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Represents a single betting round state.
- * Tracks the current bet level, actions taken, and who raised last.
+ * Tracks the state of a specific betting round (e.g., the first betting round).
+ * <p>
+ * It maintains:
+ * <ul>
+ * <li>The current highest bet on the table (to validate calls).</li>
+ * <li>The count of actions taken (to determine when the round ends).</li>
+ * <li>Who was the last aggressor (to re-open betting if raised).</li>
+ * </ul>
+ * </p>
  */
 @Slf4j
 @Getter

@@ -1,9 +1,16 @@
 package com.dnikitin.poker.common.exceptions;
 
-
 /**
- * Thrown when protocol parsing or validation fails.
- * Examples: malformed messages, unknown commands, invalid parameters.
+ * Thrown when an incoming message fails structural validation.
+ * <p>
+ * Indicates a "Bad Request" (Client Error 400 equivalent).
+ * Causes:
+ * <ul>
+ * <li>Malformed syntax (missing parameters).</li>
+ * <li>Unknown command verb.</li>
+ * <li>Data type mismatch (expected int, got string).</li>
+ * </ul>
+ * </p>
  */
 public class ProtocolException extends RuntimeException {
     private final String code;
@@ -20,5 +27,4 @@ public class ProtocolException extends RuntimeException {
     public String getCode() {
         return code;
     }
-
 }

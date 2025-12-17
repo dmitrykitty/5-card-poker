@@ -10,15 +10,27 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Manages the main pot and side pots for all-in scenarios.
- * Ensures pot calculations are correct and handles complex split scenarios.
+ * Handles the logic for chip accumulation and distribution, including complex Side Pot scenarios.
+ * <p>
+ * <b>The Problem of All-In:</b>
+ * If Player A goes All-In for 100 chips, but Players B and C bet 500 chips, Player A
+ * cannot win the excess 800 chips.
+ * </p>
+ * <p>
+ * <b>Solution (Side Pots):</b>
+ * This manager creates discrete pots based on bet levels:
+ * <ul>
+ * <li><b>Main Pot:</b> Contested by everyone (up to the smallest stack).</li>
+ * <li><b>Side Pot(s):</b> Contested only by players with sufficient chips.</li>
+ * </ul>
+ * </p>
  */
 @Slf4j
 @Getter
 public class PotManager {
 
     /**
-     * Represents a single pot (main or side pot).
+     * Inner class representing a single bucket of chips and the players eligible to win it.
      */
     @Getter
     public static class Pot {
@@ -81,10 +93,10 @@ public class PotManager {
     }
 
     /**
-     * Distributes bets from all players, creating side pots if necessary.
-     * This method handles all-in scenarios where players have different bet amounts.
+     * Analyzes all player bets and restructures them into the Main Pot and necessary Side Pots.
+     * This algorithm sorts bet levels to "slice" the bets horizontally.
      *
-     * @param players List of all players in the hand
+     * @param players The list of players involved in the hand.
      */
     public void distributeBets(List<Player> players) {
         int currentMainPotAmount = mainPot.getAmount();

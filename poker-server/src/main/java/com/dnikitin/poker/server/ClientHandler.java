@@ -25,6 +25,22 @@ import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+/**
+ * Handles the interaction with a single connected client.
+ * <p>
+ * This class acts as a bridge between the Networking layer (TCP Sockets) and the Game Logic layer.
+ * It implements two key interfaces:
+ * <ul>
+ * <li>{@link Runnable}: Executes the main loop for reading incoming commands from the client.</li>
+ * <li>{@link GameObserver}: Receives asynchronous updates from the {@link Table} (e.g., moves made by opponents)
+ * and pushes them to the client via the socket.</li>
+ * </ul>
+ * </p>
+ * <p>
+ * <b>Protocol Handling:</b>
+ * Uses {@link ProtocolParser} to interpret raw strings and {@link ProtocolEncoder} to format responses.
+ * </p>
+ */
 @Slf4j
 public class ClientHandler implements Runnable, GameObserver {
 
@@ -40,6 +56,13 @@ public class ClientHandler implements Runnable, GameObserver {
     private Player player;
     private Table table;
 
+    /**
+     * Constructs a new handler for a given socket connection.
+     *
+     * @param socketChannel  The connected client socket.
+     * @param rateLimiter    Shared rate limiter instance.
+     * @param timeoutManager Shared timeout manager instance.
+     */
     public ClientHandler(SocketChannel socketChannel, RateLimiter rateLimiter, TimeoutManager timeoutManager) {
         this.socketChannel = socketChannel;
         this.parser = new ProtocolParser();
@@ -50,6 +73,16 @@ public class ClientHandler implements Runnable, GameObserver {
         this.clientId = UUID.randomUUID().toString();
     }
 
+    /**
+     * The main execution loop for the client thread.
+     * <p>
+     * 1. Initializes input/output streams.<br>
+     * 2. Performs the protocol handshake (HELLO).<br>
+     * 3. Enters a loop reading lines from the socket until disconnection.<br>
+     * 4. Validates, parses, and executes commands.<br>
+     * 5. Handles exceptions and ensures proper resource cleanup on exit.
+     * </p>
+     */
     @Override
     public void run() {
         try (BufferedReader in = new BufferedReader(Channels.newReader(socketChannel, StandardCharsets.UTF_8));
@@ -60,6 +93,7 @@ public class ClientHandler implements Runnable, GameObserver {
             log.info("Client {} connected", clientId);
 
             String line;
+            // Blocking read - effectively managed by Virtual Threads
             while ((line = in.readLine()) != null) {
                 try {
                     if (!rateLimiter.allowMessage(clientId)) {
@@ -71,11 +105,12 @@ public class ClientHandler implements Runnable, GameObserver {
                 } catch (PokerSecurityException e) {
                     log.warn("Security violation from client {}: {}", clientId, e.getMessage());
                     sendError(e.getCode(), e.getMessage());
-                    break;
+                    break; // Disconnect on security violation
                 } catch (ProtocolException e) {
                     log.warn("Protocol error from client {}: {}", clientId, e.getMessage());
                     sendError(e.getCode(), e.getMessage());
                 } catch (PokerGameException e) {
+                    // Logic errors (e.g., betting more than you have) are not fatal connection errors
                     log.debug("Game error [{}]: {}", e.getCode(), e.getMessage());
                     sendError(e.getCode(), e.getMessage());
                 } catch (Exception e) {
@@ -90,14 +125,25 @@ public class ClientHandler implements Runnable, GameObserver {
         }
     }
 
+    /**
+     * Callback method triggered by the Game Engine when a state change occurs.
+     * <p>
+     * This method translates internal {@link GameEvent} objects into protocol string messages
+     * and sends them to the client. It also manages turn-based timeouts.
+     * </p>
+     *
+     * @param event The event that occurred in the game (e.g., DEAL, TURN_CHANGED).
+     */
     @Override
     public void onGameEvent(GameEvent event) {
         String message = encoder.encode(event);
         if (message != null) {
+            // Special handling for CardsDealt to mask opponent cards
             if (event instanceof GameEvent.CardsDealt cd) {
                 boolean isMyCards = player != null && cd.playerId().equals(player.getId());
                 message = encoder.encodeCardsDealt(cd.playerId(), cd.cards(), !isMyCards);
             }
+            // Detect if it is this player's turn to start the countdown timer
             if (event instanceof GameEvent.TurnChanged tc) {
                 if (player != null && tc.activePlayerId().equals(player.getId())) {
                     startTimeout();
@@ -108,6 +154,9 @@ public class ClientHandler implements Runnable, GameObserver {
         }
     }
 
+    /**
+     * Dispatches the parsed command to the appropriate handler method.
+     */
     void handleCommand(String line) throws IOException {
         log.debug("Client {}: {}", clientId, line);
         Command command = parser.parse(line);
@@ -153,12 +202,13 @@ public class ClientHandler implements Runnable, GameObserver {
                 this.table = foundTable;
                 this.player = new Player(UUID.randomUUID().toString(), command.getName(), 1000);
 
+                // Subscribe to game events before adding the player
                 table.addObserver(this);
                 table.addPlayer(player);
 
                 sendMessage(encoder.encodeWelcome(command.getGameId(), player.getId(), player.getName()));
 
-                // --- NEW FIX: Send list of existing players to the new player ---
+                // Send list of existing players to the new player (Lobby Sync)
                 for (Player existing : table.getPlayers()) {
                     if (!existing.getId().equals(player.getId())) {
                         String lobbyMsg = String.format("LOBBY PLAYER=%s CHIPS=%d NAME=%s",
@@ -166,7 +216,6 @@ public class ClientHandler implements Runnable, GameObserver {
                         sendMessage(lobbyMsg);
                     }
                 }
-                // ----------------------------------------------------------------
 
                 log.info("Client {} joined game {} as {}", clientId, command.getGameId(), player.getName());
             } catch (PokerGameException e) {
@@ -175,6 +224,8 @@ public class ClientHandler implements Runnable, GameObserver {
             }
         }, () -> sendError("GAME_NOT_FOUND", "Game does not exist"));
     }
+
+    // ... (rest of the command handlers: handleStart, handleCall, etc. follow standard logic)
 
     private void handleStart(SimpleCommand command) {
         validatePlayerAndTable();
@@ -246,6 +297,13 @@ public class ClientHandler implements Runnable, GameObserver {
         }
     }
 
+    /**
+     * Cleans up resources when the client disconnects.
+     * <p>
+     * Removes the player from the game table (if joined), cancels any active timeouts,
+     * and closes the socket connection.
+     * </p>
+     */
     private void handleDisconnect() {
         cancelTimeout();
         rateLimiter.removeClient(clientId);

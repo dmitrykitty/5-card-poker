@@ -10,9 +10,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Parses text-based protocol messages into Command objects.
- * Format: GAME_ID PLAYER_ID ACTION [PARAMS...]
- * or for initial commands: ACTION [PARAMS...]
+ * Responsible for parsing raw text-based network messages into typed {@link Command} objects.
+ * <p>
+ * <b>Protocol Format:</b>
+ * The protocol uses a space-delimited format with Key-Value pairs for parameters.
+ * <br>
+ * Standard format: <code>GAME_ID PLAYER_ID ACTION [PARAM=VALUE]...</code>
+ * <br>
+ * Initial format: <code>ACTION [PARAM=VALUE]...</code> (e.g., HELLO, CREATE, JOIN)
+ * </p>
+ * <p>
+ * This class implements strict validation to ensure messages conform to size limits
+ * and expected formats before they reach the game logic.
+ * </p>
  */
 public class ProtocolParser {
 
@@ -23,20 +33,21 @@ public class ProtocolParser {
     private static final String PARAM_NAME = "NAME";
 
     /**
-     * Parses a protocol line into a Command object.
+     * Parses a raw protocol string into a specific Command implementation.
      *
-     * @param line The protocol line to parse
-     * @return Parsed Command object
-     * @throws ProtocolException if parsing fails
+     * @param line The raw string received from the socket (excluding newline characters).
+     * @return A concrete {@link Command} object (e.g., {@link BetCommand}, {@link JoinCommand}).
+     * @throws ProtocolException If the message is empty, too large, malformed, or contains unknown commands.
      */
     public Command parse(String line) {
         if (line == null || line.isBlank()) {
             throw new ProtocolException("EMPTY_MESSAGE", "Message is empty");
         }
 
+        // Security: Fail fast if message exceeds buffer limits
         if (line.length() > MAX_MESSAGE_SIZE) {
             throw new ProtocolException("MESSAGE_TOO_LARGE",
-                "Message exceeds maximum size of " + MAX_MESSAGE_SIZE + " bytes");
+                    "Message exceeds maximum size of " + MAX_MESSAGE_SIZE + " bytes");
         }
 
         String[] parts = line.trim().split("\\s+");
@@ -46,6 +57,7 @@ public class ProtocolParser {
 
         String firstToken = parts[0].toUpperCase();
 
+        // Switch expression handles both initial handshake commands and in-game commands
         return switch (firstToken) {
             case "HELLO" -> parseHello(parts);
             case "CREATE" -> parseCreate(parts);
@@ -86,9 +98,10 @@ public class ProtocolParser {
     }
 
     private Command parseStandardCommand(String[] parts) {
+        // Standard commands must have context: GameID and PlayerID
         if (parts.length < 3) {
             throw new ProtocolException("INVALID_FORMAT",
-                "Standard command requires: GAME_ID PLAYER_ID ACTION [PARAMS]");
+                    "Standard command requires: GAME_ID PLAYER_ID ACTION [PARAMS]");
         }
 
         String gameId = parts[0];
@@ -120,13 +133,17 @@ public class ProtocolParser {
                 List<Integer> indexes = parseCardIndexes(cardsStr);
                 yield new DrawCommand(gameId, playerId, indexes);
             }
+            // Simple commands carry no extra parameters
             case CALL, CHECK, FOLD, START, LEAVE, STATUS, SHOW, QUIT ->
-                new SimpleCommand(gameId, playerId, commandType);
+                    new SimpleCommand(gameId, playerId, commandType);
             default -> throw new ProtocolException("UNSUPPORTED_COMMAND",
-                "Command not implemented: " + commandType);
+                    "Command not implemented: " + commandType);
         };
     }
 
+    /**
+     * Helper to extract Key=Value pairs from the command string parts.
+     */
     private Map<String, String> extractParams(String[] parts, int startIndex) {
         Map<String, String> params = new HashMap<>();
         for (int i = startIndex; i < parts.length; i++) {
@@ -150,7 +167,7 @@ public class ProtocolParser {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
             throw new ProtocolException("INVALID_PARAM",
-                "Invalid integer value for " + key + ": " + value);
+                    "Invalid integer value for " + key + ": " + value);
         }
     }
 
@@ -161,12 +178,12 @@ public class ProtocolParser {
 
         try {
             return Arrays.stream(cardsStr.split(","))
-                .map(String::trim)
-                .map(Integer::parseInt)
-                .toList();
+                    .map(String::trim)
+                    .map(Integer::parseInt)
+                    .toList();
         } catch (NumberFormatException e) {
             throw new ProtocolException("INVALID_PARAM",
-                "Invalid card indexes: " + cardsStr);
+                    "Invalid card indexes: " + cardsStr);
         }
     }
 }

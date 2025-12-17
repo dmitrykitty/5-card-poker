@@ -4,10 +4,22 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.*;
 
+/**
+ * Handles the Text User Interface (TUI) for the Poker Client.
+ * <p>
+ * This class is responsible for rendering the game dashboard, handling user input via Scanner,
+ * and formatting output using ANSI escape codes for colors and frames.
+ * </p>
+ * <p>
+ * Synchronization: Output methods are synchronized to prevent text interleaving
+ * between the server listener thread and the user input thread.
+ * </p>
+ */
 public class ConsoleUI {
     private final Scanner scanner;
     private final PrintStream out;
 
+    // ANSI Escape Codes for coloring output
     private static final String RESET = "\u001B[0m";
     private static final String RED = "\u001B[31m";
     private static final String GREEN = "\u001B[32m";
@@ -18,6 +30,7 @@ public class ConsoleUI {
     private static final String WHITE = "\u001B[37m";
     private static final String BOLD = "\u001B[1m";
 
+    // Frame drawing characters
     private static final String FRAME_COLOR = BLUE;
     private static final String BORDER_HOR = FRAME_COLOR + "═" + RESET;
     private static final String BORDER_VER = FRAME_COLOR + "║" + RESET;
@@ -30,17 +43,30 @@ public class ConsoleUI {
 
     private static final int WIDTH = 50;
 
-    //Test constructor
+    /**
+     * Constructs a UI with custom input and output streams.
+     * Useful for testing or redirecting I/O.
+     *
+     * @param in  The input stream (e.g., System.in).
+     * @param out The output stream (e.g., System.out).
+     */
     public ConsoleUI(InputStream in, PrintStream out) {
         this.scanner = new Scanner(in);
         this.out = out;
     }
 
-    //default
+    /**
+     * Constructs a UI using the standard system streams (stdin/stdout).
+     */
     public ConsoleUI() {
         this(System.in, System.out);
     }
 
+    /**
+     * Reads a line of text from the input stream.
+     *
+     * @return The trimmed string entered by the user, or null if the stream is closed.
+     */
     public String readLine() {
         if (scanner.hasNextLine()) {
             return scanner.nextLine();
@@ -48,52 +74,70 @@ public class ConsoleUI {
         return null;
     }
 
+    /**
+     * Prints a standard message to the console.
+     * Includes basic heuristics for coloring success or lobby messages.
+     *
+     * @param msg The message to print.
+     */
     public synchronized void printMessage(String msg) {
         if (msg.trim().startsWith("✓")) {
             out.println(GREEN + msg + RESET);
-        }
-        else if (msg.contains("[LOBBY]")) {
+        } else if (msg.contains("[LOBBY]")) {
             out.println(CYAN + msg + RESET);
-        }
-        else {
+        } else {
             out.println(msg);
         }
     }
 
+    /**
+     * Prints an error message, prefixed with a red exclamation mark.
+     *
+     * @param msg The error description.
+     */
     public synchronized void printError(String msg) {
         out.println(" " + RED + "[!] " + msg + RESET);
     }
 
+    /**
+     * Renders the complete game dashboard, including the frame,
+     * player stats, pot info, and current hand.
+     *
+     * @param state The current {@link ClientGameState} to render.
+     */
     public synchronized void printDashboard(ClientGameState state) {
         out.println();
         printLine(CORNER_TL, CORNER_TR);
 
-        // Faza gry na żółto
+        // Phase (Yellow)
         printRow(" Phase: " + YELLOW + state.getCurrentPhase() + RESET);
         printRow(" Pot:   " + GREEN + state.getCurrentPot() + RESET);
 
         printLine(SEP_L, SEP_R);
 
-        // Dane gracza
+        // Player Data
         printRow(" Player: " + BOLD + state.getMyName() + RESET);
         printRow(" Chips:  " + YELLOW + state.getMyChips() + RESET);
         printRow(" To Call: " + RED + state.getAmountToCall() + RESET);
 
-
         printLine(SEP_L, SEP_R);
 
-        // Ręka z kolorowaniem kart
+        // Hand
         String handStr = formatHand(state.getMyHand());
         printRow(" HAND: " + handStr);
 
         printLine(CORNER_BL, CORNER_BR);
 
         if (!state.getLastMessage().isEmpty()) {
-            // Systemowe komunikaty (np. Twoja Tura) na fioletowo/jasno
             out.println(" > SYSTEM: " + PURPLE + state.getLastMessage() + RESET);
         }
     }
 
+    /**
+     * Displays contextual help commands based on connection status.
+     *
+     * @param state The current game state.
+     */
     public synchronized void printHelp(ClientGameState state) {
         if (state.getGameId() == null || state.getPlayerId() == null) {
             printStartupHelp();
@@ -102,15 +146,24 @@ public class ConsoleUI {
         }
     }
 
+    /**
+     * Prints the input prompt indicator (e.g. "> ").
+     */
     public synchronized void printPrompt() {
-        out.print("\n" + GREEN + BOLD + "> " + RESET); // Uses the injected stream, not System.out
+        out.print("\n" + GREEN + BOLD + "> " + RESET);
     }
 
-
+    /**
+     * Formats and sorts the player's hand for display.
+     * Sorts cards by value descending (e.g., Ace before King).
+     *
+     * @param hand List of card strings (e.g., "Ah", "Ks").
+     * @return A formatted string representation of the hand.
+     */
     private String formatHand(List<String> hand) {
         if (hand.isEmpty()) return "[ NO CARDS ]";
 
-        // Kopia i sortowanie
+        // Copy and sort
         List<String> sortedHand = new ArrayList<>(hand);
         sortedHand.sort((c1, c2) -> Integer.compare(getCardValue(c2), getCardValue(c1)));
 
@@ -123,21 +176,21 @@ public class ConsoleUI {
 
     private void printLine(String left, String right) {
         out.print(left);
-        // Środek ramki
+        // Middle of the frame
         for (int i = 0; i < WIDTH; i++) out.print(FRAME_COLOR + "═" + RESET);
         out.println(right);
     }
 
-    // Przeciążona metoda printRow, która przyjmuje etykietę i wartość (dla łatwiejszego kolorowania)
+    // Overloaded printRow for easier coloring
     private void printRow(String label, String value) {
-        // Obliczamy faktyczną długość tekstu bez kodów sterujących (żeby ramka się nie rozjechała)
+        // Calculate visible length stripping ANSI codes to align the frame correctly
         int visibleLength = stripAnsi(label + value).length();
         int padding = WIDTH - visibleLength;
 
         out.print(BORDER_VER);
         out.print(label + value);
 
-        // Dopełniamy spacjami
+        // Fill with spaces
         for (int i = 0; i < padding; i++) out.print(" ");
 
         out.println(BORDER_VER);
@@ -163,7 +216,6 @@ public class ConsoleUI {
         printLine(CORNER_BL, CORNER_BR);
     }
 
-
     private void printGameHelp() {
         out.println();
         printLine(CORNER_TL, CORNER_TR);
@@ -181,9 +233,15 @@ public class ConsoleUI {
         printLine(CORNER_BL, CORNER_BR);
     }
 
+    /**
+     * Determines the numerical value of a card for sorting purposes.
+     *
+     * @param card The card string (e.g., "10h", "As").
+     * @return Integer value (2-14), or 0 if invalid.
+     */
     private int getCardValue(String card) {
         if (card == null || card.length() < 2) return 0;
-        // Ostatni znak to kolor, reszta to figura (np. "10" albo "K")
+        // Last char is suit, rest is rank (e.g. "10" or "K")
         String rank = card.substring(0, card.length() - 1);
 
         return switch (rank) {
@@ -200,5 +258,4 @@ public class ConsoleUI {
             }
         };
     }
-
 }

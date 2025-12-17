@@ -4,6 +4,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+/**
+ * Represents the rank (face value) of a playing card.
+ * <p>
+ * Encapsulates the game rule that Ace is the highest card (power 14)
+ * and 2 is the lowest (power 2).
+ * </p>
+ */
 @Getter
 @RequiredArgsConstructor
 public enum Rank {
@@ -21,6 +28,9 @@ public enum Rank {
     KING(13, "K"),
     ACE(14, "A");
 
+    /**
+     * Numerical power for determining high card and pair strength.
+     */
     private final int power;
     private final String label;
 

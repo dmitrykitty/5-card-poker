@@ -26,11 +26,27 @@ import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Represents a single Poker Table instance.
+ * The central engine of a single Poker game instance.
  * <p>
- * This class acts as the central Game Engine. It manages the lifecycle of the game
- * (State Machine), holds the deck and players, and enforces turn order.
- * It connects the "Physics" (Deck, Cards) with the "Rules" (Evaluator, Config).
+ * <b>Architecture (Facade Pattern):</b>
+ * This class acts as a Facade that coordinates lower-level components:
+ * <ul>
+ * <li>{@link com.dnikitin.poker.game.engine.Dealer} - Card distribution.</li>
+ * <li>{@link com.dnikitin.poker.game.engine.PotManager} - Chip management.</li>
+ * <li>{@link com.dnikitin.poker.game.engine.TurnOrder} - Player sequencing.</li>
+ * <li>{@link com.dnikitin.poker.gamelogic.HandEvaluator} - Rule enforcement.</li>
+ * </ul>
+ * </p>
+ * <p>
+ * <b>Concurrency (Thread Safety):</b>
+ * Since multiple com.dnikitin.poker.server.ClientHandler threads interact with the table simultaneously,
+ * all state-mutating methods are protected by a {@link ReentrantLock}. This ensures atomic state transitions
+ * and prevents race conditions (e.g., two players acting out of turn simultaneously).
+ * </p>
+ * <p>
+ * <b>State Machine:</b>
+ * The table transitions through strictly defined phases ({@link GameState}), ensuring valid game flow
+ * (e.g., preventing betting during the dealing phase).
  * </p>
  */
 @Slf4j
@@ -51,6 +67,11 @@ public class Table {
 
     private final List<Player> players = new ArrayList<>();
     private final List<GameObserver> observers = new ArrayList<>();
+
+    /**
+     * Explicit lock used to synchronize access to the game state.
+     * Preferred over 'synchronized' blocks for better control and potential fairness policies.
+     */
     private final ReentrantLock lock = new ReentrantLock();
 
     /**
@@ -63,7 +84,7 @@ public class Table {
     /**
      * Creates a new Table with specific rules provided by the factory.
      *
-     * @param gameFactory Factory providing deck, evaluator, and config.
+     * @param gameFactory Factory providing deck, evaluator, and config (Dependency Injection).
      */
     public Table(GameFactory gameFactory) {
         this.gameFactory = gameFactory;
@@ -82,6 +103,12 @@ public class Table {
         this.currentRound = new Round(GameState.LOBBY);
     }
 
+    /**
+     * Registers a new observer to receive game events.
+     * Thread-safe.
+     *
+     * @param observer The listener (typically a client handler).
+     */
     public void addObserver(GameObserver observer) {
         lock.lock();
         try {
@@ -133,6 +160,18 @@ public class Table {
         return turnOrder.getCurrentPlayer();
     }
 
+    /**
+     * Processes a player's request to CHECK.
+     * <p>
+     * Validation:
+     * 1. Is it the betting phase?
+     * 2. Is it this player's turn?
+     * 3. Does the current bet equal the player's bet? (If not, Check is illegal).
+     * </p>
+     *
+     * @param player The acting player.
+     * @throws InvalidMoveException if the move violates poker rules.
+     */
     public void playerCheck(Player player) {
         lock.lock();
         try {
@@ -230,6 +269,13 @@ public class Table {
         }
     }
 
+    /**
+     * Processes a player's request to EXCHANGE cards (Draw phase).
+     *
+     * @param player           The acting player.
+     * @param indexesToDiscard Indices of cards to remove from hand.
+     * @throws IllegalDrawException if the deck runs out of cards.
+     */
     public void playerExchangeCards(Player player, List<Integer> indexesToDiscard) {
         lock.lock();
         try {

@@ -11,13 +11,23 @@
     <plugins>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <configuration>
-          <transformers>
-            <transformer>
-              <mainClass>com.dnikitin.poker.server.ServerApp</mainClass>
-            </transformer>
-          </transformers>
-        </configuration>
+        <version>3.5.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer />
+                <transformer>
+                  <mainClass>com.dnikitin.poker.server.ServerApp</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
