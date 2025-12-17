@@ -1,8 +1,12 @@
 package com.dnikitin.poker.client;
 
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.*;
 
 public class ConsoleUI {
+    private final Scanner scanner;
+    private final PrintStream out;
 
     private static final String BORDER_HOR = "═";
     private static final String BORDER_VER = "║";
@@ -15,8 +19,34 @@ public class ConsoleUI {
 
     private static final int WIDTH = 50;
 
-    public void printDashboard(ClientGameState state) {
-        System.out.println(); // Odstęp
+    //Test constructor
+    public ConsoleUI(InputStream in, PrintStream out) {
+        this.scanner = new Scanner(in);
+        this.out = out;
+    }
+
+    //default
+    public ConsoleUI() {
+        this(System.in, System.out);
+    }
+
+    public String readLine() {
+        if (scanner.hasNextLine()) {
+            return scanner.nextLine();
+        }
+        return null;
+    }
+
+    public synchronized void printMessage(String msg) {
+        out.println(msg);
+    }
+
+    public synchronized void printError(String msg) {
+        out.println(" [!] " + msg);
+    }
+
+    public synchronized void printDashboard(ClientGameState state) {
+        out.println(); // Odstęp
         printLine(CORNER_TL, CORNER_TR);
 
         printRow(" Phase: " + state.getCurrentPhase());
@@ -46,15 +76,7 @@ public class ConsoleUI {
         }
     }
 
-    public void printMessage(String msg) {
-        System.out.println(msg);
-    }
-
-    public void printError(String msg) {
-        System.err.println(" [!] " + msg);
-    }
-
-    public void printHelp(ClientGameState state) {
+    public synchronized void printHelp(ClientGameState state) {
         if (state.getGameId() == null || state.getPlayerId() == null) {
             printStartupHelp();
         } else {
@@ -62,33 +84,44 @@ public class ConsoleUI {
         }
     }
 
+    public synchronized void printPrompt() {
+        out.print("\n> "); // Uses the injected stream, not System.out
+    }
+
 
     private String formatHand(List<String> hand) {
         if (hand.isEmpty()) return "[ NO CARDS ]";
+
+        // Kopia listy, żeby nie mieszać w oryginale
+        List<String> sortedHand = new ArrayList<>(hand);
+
+        // Sortowanie malejące (v2 porównywane do v1)
+        sortedHand.sort((c1, c2) -> Integer.compare(getCardValue(c2), getCardValue(c1)));
+
         StringBuilder sb = new StringBuilder();
-        for (String card : hand) {
+        for (String card : sortedHand) {
             sb.append("[").append(card).append("] ");
         }
         return sb.toString().trim();
     }
 
     private void printLine(String left, String right) {
-        System.out.print(left);
+        out.print(left);
         for (int i = 0; i < WIDTH; i++) System.out.print(BORDER_HOR);
-        System.out.println(right);
+        out.println(right);
     }
 
     private void printRow(String content) {
-        System.out.print(BORDER_VER);
+        out.print(BORDER_VER);
         String format = "%-" + WIDTH + "s";
 
         if (content.length() > WIDTH) content = content.substring(0, WIDTH);
-        System.out.printf(format, content);
-        System.out.println(BORDER_VER);
+        out.printf(format, content);
+        out.println(BORDER_VER);
     }
 
     private void printStartupHelp() {
-        System.out.println();
+        out.println();
         printLine(CORNER_TL, CORNER_TR);
         printRow("              STARTUP COMMANDS");
         printLine(SEP_L, SEP_R);
@@ -103,7 +136,7 @@ public class ConsoleUI {
 
 
     private void printGameHelp() {
-        System.out.println();
+        out.println();
         printLine(CORNER_TL, CORNER_TR);
         printRow("              AVAILABLE COMMANDS");
 
@@ -118,6 +151,26 @@ public class ConsoleUI {
         printRow(" quit            - Exit game");
 
         printLine(CORNER_BL, CORNER_BR);
+    }
+
+    private int getCardValue(String card) {
+        if (card == null || card.length() < 2) return 0;
+        // Ostatni znak to kolor, reszta to figura (np. "10" albo "K")
+        String rank = card.substring(0, card.length() - 1);
+
+        return switch (rank) {
+            case "A" -> 14;
+            case "K" -> 13;
+            case "Q" -> 12;
+            case "J" -> 11;
+            default -> {
+                try {
+                    yield Integer.parseInt(rank);
+                } catch (NumberFormatException e) {
+                    yield 0;
+                }
+            }
+        };
     }
 
 }

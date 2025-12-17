@@ -25,9 +25,6 @@ import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-/**
- * Handles a single client connection with protocol parsing and security.
- */
 @Slf4j
 public class ClientHandler implements Runnable, GameObserver {
 
@@ -65,37 +62,27 @@ public class ClientHandler implements Runnable, GameObserver {
             String line;
             while ((line = in.readLine()) != null) {
                 try {
-                    // Rate limiting check
                     if (!rateLimiter.allowMessage(clientId)) {
                         sendError("RATE_LIMIT", "Too many messages, slow down");
                         continue;
                     }
-
-                    // Validate message security
                     validator.validateMessage(line);
-
-                    // Parse and handle command
                     handleCommand(line.trim());
-
                 } catch (PokerSecurityException e) {
                     log.warn("Security violation from client {}: {}", clientId, e.getMessage());
                     sendError(e.getCode(), e.getMessage());
                     break;
-
                 } catch (ProtocolException e) {
                     log.warn("Protocol error from client {}: {}", clientId, e.getMessage());
                     sendError(e.getCode(), e.getMessage());
-
                 } catch (PokerGameException e) {
                     log.debug("Game error [{}]: {}", e.getCode(), e.getMessage());
                     sendError(e.getCode(), e.getMessage());
-
                 } catch (Exception e) {
                     log.error("Unexpected error from client {}", clientId, e);
                     sendError("INTERNAL_ERROR", "An error occurred");
                 }
             }
-
         } catch (IOException e) {
             log.info("Client {} disconnected: {}", clientId, e.getMessage());
         } finally {
@@ -107,30 +94,23 @@ public class ClientHandler implements Runnable, GameObserver {
     public void onGameEvent(GameEvent event) {
         String message = encoder.encode(event);
         if (message != null) {
-            // Special handling for CardsDealt - mask other players' cards
             if (event instanceof GameEvent.CardsDealt cd) {
                 boolean isMyCards = player != null && cd.playerId().equals(player.getId());
                 message = encoder.encodeCardsDealt(cd.playerId(), cd.cards(), !isMyCards);
             }
-
-            // Special handling for TurnChanged - start timeout if it's our turn
             if (event instanceof GameEvent.TurnChanged tc) {
                 if (player != null && tc.activePlayerId().equals(player.getId())) {
                     startTimeout();
                     log.debug("Started timeout for player {}", player.getName());
                 }
             }
-
             sendMessage(message);
         }
     }
 
     void handleCommand(String line) throws IOException {
         log.debug("Client {}: {}", clientId, line);
-
         Command command = parser.parse(line);
-
-        // Dispatch command to appropriate handler
         switch (command.getType()) {
             case HELLO -> handleHello((HelloCommand) command);
             case CREATE -> handleCreate((CreateCommand) command);
@@ -163,7 +143,6 @@ public class ClientHandler implements Runnable, GameObserver {
             sendError("INVALID_NAME", "Player name must be 2-20 alphanumeric characters");
             return;
         }
-
         if (!validator.isValidGameId(command.getGameId())) {
             sendError("INVALID_GAME_ID", "Invalid game ID format");
             return;
@@ -171,7 +150,6 @@ public class ClientHandler implements Runnable, GameObserver {
 
         GameManager.getInstance().findGame(command.getGameId()).ifPresentOrElse(foundTable -> {
             try {
-
                 this.table = foundTable;
                 this.player = new Player(UUID.randomUUID().toString(), command.getName(), 1000);
 
@@ -179,18 +157,28 @@ public class ClientHandler implements Runnable, GameObserver {
                 table.addPlayer(player);
 
                 sendMessage(encoder.encodeWelcome(command.getGameId(), player.getId(), player.getName()));
+
+                // --- NEW FIX: Send list of existing players to the new player ---
+                for (Player existing : table.getPlayers()) {
+                    if (!existing.getId().equals(player.getId())) {
+                        String lobbyMsg = String.format("LOBBY PLAYER=%s CHIPS=%d NAME=%s",
+                                existing.getId(), existing.getChips(), existing.getName());
+                        sendMessage(lobbyMsg);
+                    }
+                }
+                // ----------------------------------------------------------------
+
                 log.info("Client {} joined game {} as {}", clientId, command.getGameId(), player.getName());
             } catch (PokerGameException e) {
                 log.warn("Game error during join from client {}: {}", clientId, e.getMessage());
                 sendError(e.getCode(), e.getMessage());
             }
-
         }, () -> sendError("GAME_NOT_FOUND", "Game does not exist"));
     }
 
     private void handleStart(SimpleCommand command) {
         validatePlayerAndTable();
-        table.startGame(); // Może rzucić IllegalPlayerAmountException -> obsłużone w run()
+        table.startGame();
         sendMessage(encoder.encodeOk("Game started"));
         log.info("Client {} started game", clientId);
     }
@@ -198,7 +186,7 @@ public class ClientHandler implements Runnable, GameObserver {
     private void handleCall(SimpleCommand command) {
         validatePlayerAndTable();
         cancelTimeout();
-        table.playerCall(player); // Może rzucić OutOfTurnException -> obsłużone w run()
+        table.playerCall(player);
         sendMessage(encoder.encodeOk());
     }
 
@@ -219,13 +207,10 @@ public class ClientHandler implements Runnable, GameObserver {
     private void handleRaise(BetCommand command) {
         validatePlayerAndTable();
         cancelTimeout();
-
         if (command.getAmount() <= 0) {
             sendError("INVALID_AMOUNT", "Raise amount must be positive");
             return;
         }
-
-        // Może rzucić NotEnoughChipsException -> obsłużone w run()
         table.playerRaise(player, command.getAmount());
         sendMessage(encoder.encodeOk());
     }
@@ -233,20 +218,16 @@ public class ClientHandler implements Runnable, GameObserver {
     private void handleDraw(DrawCommand command) {
         validatePlayerAndTable();
         cancelTimeout();
-
-        // Podstawowa walidacja wejścia zostaje tutaj (szybki fail)
         for (int index : command.getCardIndexes()) {
             if (index < 0 || index > 4) {
                 sendError("INVALID_CARD_INDEX", "Card index must be 0-4");
                 return;
             }
         }
-
         if (command.getCardIndexes().size() > 3) {
             sendError("TOO_MANY_CARDS", "Cannot draw more than 3 cards");
             return;
         }
-
         table.playerExchangeCards(player, command.getCardIndexes());
         sendMessage(encoder.encodeOk());
     }
@@ -254,7 +235,6 @@ public class ClientHandler implements Runnable, GameObserver {
     private void handleStatus(SimpleCommand command) {
         validatePlayerAndTable();
         sendMessage(encoder.encodeRound(table.getPot(), table.getCurrentRoundHighestBet()));
-
         if (table.getCurrentPlayer() != null) {
             int minRaise = table.getConfig().ante();
             sendMessage(encoder.encodeTurn(
@@ -269,7 +249,6 @@ public class ClientHandler implements Runnable, GameObserver {
     private void handleDisconnect() {
         cancelTimeout();
         rateLimiter.removeClient(clientId);
-
         try {
             if (socketChannel != null && socketChannel.isOpen()) {
                 socketChannel.close();
@@ -277,7 +256,6 @@ public class ClientHandler implements Runnable, GameObserver {
         } catch (IOException e) {
             log.warn("Error closing socket: {}", e.getMessage());
         }
-
         if (table != null && player != null) {
             try {
                 table.playerDisconnect(player);
@@ -290,17 +268,12 @@ public class ClientHandler implements Runnable, GameObserver {
     }
 
     private void handleTimeout(String timeoutPlayerId) {
-        // Opcjonalne zabezpieczenie: upewniamy się, że timeout dotyczy tego gracza
         if (player == null || !player.getId().equals(timeoutPlayerId)) {
             return;
         }
-
         log.warn("Player {} timed out, auto-folding", player.getName());
-
         if (table != null) {
             try {
-                // Table.playerFold jest thread-safe (ma ReentrantLock),
-                // więc bezpiecznie możemy to wywołać z wątku TimeoutManagera
                 table.playerFold(player);
             } catch (Exception e) {
                 log.error("Error auto-folding timed out player", e);
@@ -321,8 +294,6 @@ public class ClientHandler implements Runnable, GameObserver {
     }
 
     private void validatePlayerAndTable() {
-        // Ten wyjątek (InvalidMoveException) dziedziczy po PokerGameException,
-        // więc też zostanie złapany przez nowy blok catch w run()!
         if (table == null || player == null) {
             throw new com.dnikitin.poker.exceptions.moves.InvalidMoveException("Not in a game");
         }
@@ -339,7 +310,6 @@ public class ClientHandler implements Runnable, GameObserver {
         sendMessage(encoder.encodeError(code, reason));
     }
 
-    // Package-private for testing
     String getClientId() {
         return clientId;
     }

@@ -4,18 +4,11 @@ import com.dnikitin.poker.common.protocol.serverclient.ServerMessage;
 import com.dnikitin.poker.common.protocol.serverclient.ServerMessageParser;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.List;
 import java.util.Scanner;
 
-/**
- * Console-based poker client.
- * Connects to the poker server and provides a text-based UI.
- */
 @Slf4j
 public class PokerClient {
     private final String host;
@@ -30,18 +23,19 @@ public class PokerClient {
     private BufferedReader in;
     private volatile boolean running;
 
-    public PokerClient(String host, int port) {
+    public PokerClient(String host, int port, InputStream input, PrintStream output) {
         this.host = host;
         this.port = port;
         this.gameState = new ClientGameState();
-        this.ui = new ConsoleUI();
+        this.ui = new ConsoleUI(input, output);
         this.parser = new ServerMessageParser();
         this.running = false;
     }
 
-    /**
-     * Connects to the server and starts the client.
-     */
+    public PokerClient(String host, int port) {
+        this(host, port, System.in, System.out);
+    }
+
     public void start() {
         try {
             socket = new Socket(host, port);
@@ -51,18 +45,17 @@ public class PokerClient {
             log.info("Connected to server at {}:{}", host, port);
             running = true;
 
-            // Start listener thread
             Thread listenerThread = Thread.ofVirtual()
                     .name("ServerListener")
                     .start(this::listenToServer);
 
-            // Handle user input in main thread
             handleUserInput();
 
             listenerThread.join();
 
         } catch (IOException e) {
             log.error("Failed to connect: {}", e.getMessage());
+            ui.printError("Connection error: " + e.getMessage());
         } catch (InterruptedException e) {
             log.error("Interrupted", e);
             Thread.currentThread().interrupt();
@@ -71,9 +64,6 @@ public class PokerClient {
         }
     }
 
-    /**
-     * Listens for messages from the server.
-     */
     private void listenToServer() {
         try {
             String line;
@@ -83,15 +73,13 @@ public class PokerClient {
         } catch (IOException e) {
             if (running) {
                 log.error("Connection to server lost: {}", e.getMessage());
+                ui.printError("Connection to server lost.");
             }
         } finally {
             running = false;
         }
     }
 
-    /**
-     * Handles messages received from the server.
-     */
     private void handleServerMessage(String line) {
         log.debug("Server: {}", line);
         ServerMessage msg = parser.parse(line);
@@ -110,6 +98,8 @@ public class PokerClient {
                     gameState.setConnectionInfo(gId, pId);
                     gameState.updatePlayerInfo(pId, name, -1);
                     ui.printMessage("✓ Joined game successfully as " + name);
+                } else {
+                    ui.printError("Join failed. Server sent WELCOME but IDs are missing. Game: " + gId + ", Player: " + pId);
                 }
             }
 
@@ -121,23 +111,21 @@ public class PokerClient {
                 if (pId != null) {
                     gameState.updatePlayerInfo(pId, name, chips);
                 }
-
                 ui.printMessage(" [LOBBY] " + name + (chips >= 0 ? " (" + chips + " chips)" : ""));
             }
 
             case STARTED -> {
                 gameState.setLastMessage("Game Started!");
+                showDashboard = true;
             }
 
             case STATE -> {
                 String phase = msg.get("PHASE").orElse("UNKNOWN");
                 gameState.updatePhase(phase);
-
                 ui.printMessage(" --- PHASE: " + phase + " ---");
             }
 
             case ROUND -> {
-                // Użycie getInt jest bezpieczne
                 int pot = msg.getInt("POT", gameState.getCurrentPot());
                 int highest = msg.getInt("HIGHESTBET", 0);
                 gameState.updateRoundInfo(pot, highest);
@@ -145,12 +133,9 @@ public class PokerClient {
 
             case TURN -> {
                 String activePlayer = msg.get("PLAYER").orElse("");
-
                 if (isMe(activePlayer)) {
-                    // Tutaj możesz odczytać CALL i MINRAISE, które są bezpiecznymi intami
                     int call = msg.getInt("CALL");
                     int minRaise = msg.getInt("MINRAISE");
-
                     gameState.setLastMessage(String.format(">>> YOUR TURN! (Call: %d, MinRaise: %d) <<<", call, minRaise));
                     showDashboard = true;
                 } else {
@@ -162,22 +147,15 @@ public class PokerClient {
             case ACTION -> {
                 String pId = msg.get("PLAYER").orElse("?");
                 String type = msg.get("TYPE").orElse("?");
-
-                // Użycie getDecoded() do wyczyszczenia wiadomości z '_'
                 String text = msg.getDecoded("MSG");
                 int amount = msg.getInt("AMOUNT", 0);
 
-                // Aktualizujemy lokalnie żetony i zakłady
-                if (amount > 0) {
-                    gameState.deductChips(pId, amount);
-                }
-
+                if (amount > 0) gameState.deductChips(pId, amount);
                 String name = gameState.getPlayerName(pId);
                 ui.printMessage(" > " + name + ": " + type + (amount > 0 ? " " + amount : "") + (!text.isEmpty() ? " (" + text + ")" : ""));
             }
 
             case DEAL -> {
-                // Aktualizujemy rękę po cichu
                 if (isMe(msg.get("PLAYER").orElse(""))) {
                     msg.get("CARDS").ifPresent(gameState::updateMyHand);
                     showDashboard = true;
@@ -186,29 +164,18 @@ public class PokerClient {
 
             case WINNER -> {
                 String winnerId = msg.get("PLAYER").orElse("?");
-                // Użycie getDecoded() dla czystego rankingu
                 String rank = msg.getDecoded("RANK", "?");
-                // Użycie getInt() dla bezpiecznego potu
                 int pot = msg.getInt("POT");
-                // Użycie getList() dla czystej listy kart
                 List<String> cards = msg.getList("CARDS");
-
                 String winnerName = gameState.getPlayerName(winnerId);
-                // getDecoded już usunął _, więc wystarczy tylko obsłużyć "Fold"
                 String displayRank = rank.contains("Fold") ? "Won by Fold" : rank;
 
                 StringBuilder winMsg = new StringBuilder();
                 winMsg.append("\n 🏆 WINNER: ").append(winnerName)
                         .append(" | ").append(displayRank)
                         .append(" | Pot: ").append(pot);
-
-                // Sprawdzamy, czy lista kart nie jest pusta
-                if (!cards.isEmpty()) {
-                    winMsg.append("\n    Winning Hand: ").append(String.join(", ", cards));
-                }
-
+                if (!cards.isEmpty()) winMsg.append("\n    Winning Hand: ").append(String.join(", ", cards));
                 winMsg.append("\n");
-
                 ui.printMessage(winMsg.toString());
 
                 gameState.addChips(winnerId, pot);
@@ -216,62 +183,50 @@ public class PokerClient {
             }
 
             case OK -> {
-                // Użycie getDecoded() dla czystego komunikatu
                 String message = msg.getDecoded("MESSAGE");
-                if (!message.isEmpty()) {
-                    ui.printMessage("✓ " + message);
-                }
+                if (!message.isEmpty()) ui.printMessage("✓ " + message);
             }
 
-            case ERR -> {
-                // Użycie getDecoded() dla czystego komunikatu o błędzie
-                ui.printError(msg.getDecoded("REASON", "Unknown Error"));
-            }
+            case ERR -> ui.printError(msg.getDecoded("REASON", "Unknown Error"));
         }
 
         if (showDashboard) {
             ui.printDashboard(gameState);
+            ui.printPrompt();
         }
     }
 
-    /**
-     * Handles user input from console.
-     */
     private void handleUserInput() {
-        try (Scanner scanner = new Scanner(System.in)) {
-            ui.printHelp(gameState);
+        ui.printHelp(gameState);
+        ui.printPrompt();
 
-            while (running) {
-                System.out.print("\n> ");
-                if (!scanner.hasNextLine()) break;
-
-                String input = scanner.nextLine().trim();
-                if (input.isEmpty()) continue;
-
-                if (input.equalsIgnoreCase("quit") || input.equalsIgnoreCase("exit")) {
-                    sendCommand("QUIT");
-                    running = false;
-                    break;
-                }
-
-                if (input.equalsIgnoreCase("help")) {
-                    ui.printHelp(gameState);
-                    continue;
-                }
-
-                processCommand(input);
+        String input;
+        while (running && (input = ui.readLine()) != null) {
+            input = input.trim();
+            if (input.isEmpty()) {
+                ui.printPrompt();
+                continue;
             }
+
+            if (input.equalsIgnoreCase("quit") || input.equalsIgnoreCase("exit")) {
+                sendCommand("QUIT");
+                running = false;
+                break;
+            }
+            if (input.equalsIgnoreCase("help")) {
+                ui.printHelp(gameState);
+                ui.printPrompt();
+                continue;
+            }
+            processCommand(input);
+            ui.printPrompt();
         }
     }
 
-    /**
-     * Processes user commands.
-     */
     private void processCommand(String input) {
         String[] parts = input.split("\\s+");
         String cmd = parts[0].toUpperCase();
 
-        // Commands that don't need game/player ID
         if (cmd.equals("CREATE")) {
             sendCommand("CREATE ANTE=10 BET=10 LIMIT=FIXED");
             return;
@@ -285,7 +240,6 @@ public class PokerClient {
             return;
         }
 
-        // --- In-Game Commands Validation ---
         if (gameState.getGameId() == null || gameState.getPlayerId() == null) {
             ui.printError("You must join a game first.");
             return;
@@ -298,6 +252,7 @@ public class PokerClient {
             case "CALL" -> sendCommand(prefix + "CALL");
             case "CHECK" -> sendCommand(prefix + "CHECK");
             case "FOLD" -> sendCommand(prefix + "FOLD");
+            case "STATUS" -> sendCommand(prefix + "STATUS");
             case "RAISE" -> {
                 if (parts.length < 2) {
                     ui.printError("Usage: raise <amount>");
@@ -310,15 +265,13 @@ public class PokerClient {
                     ui.printError("Usage: draw <indexes> (e.g., 0,2,4 or NONE)");
                     return;
                 }
-                sendCommand(prefix + "DRAW CARDS=" + parts[1]);
+                String params = input.substring(input.indexOf(' ') + 1).replaceAll("\\s+", "");
+                sendCommand(prefix + "DRAW CARDS=" + params);
             }
             default -> ui.printError("Unknown command. Type 'help'.");
         }
     }
 
-    /**
-     * Sends a command to the server.
-     */
     private void sendCommand(String command) {
         if (out != null) {
             out.println(command);
@@ -330,9 +283,6 @@ public class PokerClient {
         return pId != null && pId.equals(gameState.getPlayerId());
     }
 
-    /**
-     * Disconnects from the server.
-     */
     private void disconnect() {
         running = false;
         try {
@@ -346,6 +296,6 @@ public class PokerClient {
     }
 
     public static void main(String[] args) {
-        new PokerClient("localhost", 7777).start();
+        new PokerClient("localhost", 9999).start();
     }
 }
