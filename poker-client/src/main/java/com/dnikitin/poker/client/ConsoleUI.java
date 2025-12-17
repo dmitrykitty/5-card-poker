@@ -8,14 +8,25 @@ public class ConsoleUI {
     private final Scanner scanner;
     private final PrintStream out;
 
-    private static final String BORDER_HOR = "═";
-    private static final String BORDER_VER = "║";
-    private static final String CORNER_TL = "╔";
-    private static final String CORNER_TR = "╗";
-    private static final String CORNER_BL = "╚";
-    private static final String CORNER_BR = "╝";
-    private static final String SEP_L = "╠";
-    private static final String SEP_R = "╣";
+    private static final String RESET = "\u001B[0m";
+    private static final String RED = "\u001B[31m";
+    private static final String GREEN = "\u001B[32m";
+    private static final String YELLOW = "\u001B[33m"; // Gold/Yellow
+    private static final String BLUE = "\u001B[34m";
+    private static final String PURPLE = "\u001B[35m";
+    private static final String CYAN = "\u001B[36m";
+    private static final String WHITE = "\u001B[37m";
+    private static final String BOLD = "\u001B[1m";
+
+    private static final String FRAME_COLOR = BLUE;
+    private static final String BORDER_HOR = FRAME_COLOR + "═" + RESET;
+    private static final String BORDER_VER = FRAME_COLOR + "║" + RESET;
+    private static final String CORNER_TL = FRAME_COLOR + "╔" + RESET;
+    private static final String CORNER_TR = FRAME_COLOR + "╗" + RESET;
+    private static final String CORNER_BL = FRAME_COLOR + "╚" + RESET;
+    private static final String CORNER_BR = FRAME_COLOR + "╝" + RESET;
+    private static final String SEP_L = FRAME_COLOR + "╠" + RESET;
+    private static final String SEP_R = FRAME_COLOR + "╣" + RESET;
 
     private static final int WIDTH = 50;
 
@@ -38,41 +49,48 @@ public class ConsoleUI {
     }
 
     public synchronized void printMessage(String msg) {
-        out.println(msg);
+        if (msg.trim().startsWith("✓")) {
+            out.println(GREEN + msg + RESET);
+        }
+        else if (msg.contains("[LOBBY]")) {
+            out.println(CYAN + msg + RESET);
+        }
+        else {
+            out.println(msg);
+        }
     }
 
     public synchronized void printError(String msg) {
-        out.println(" [!] " + msg);
+        out.println(" " + RED + "[!] " + msg + RESET);
     }
 
     public synchronized void printDashboard(ClientGameState state) {
-        out.println(); // Odstęp
+        out.println();
         printLine(CORNER_TL, CORNER_TR);
 
-        printRow(" Phase: " + state.getCurrentPhase());
-        printRow(" Pot:   " + state.getCurrentPot());
+        // Faza gry na żółto
+        printRow(" Phase: " + YELLOW + state.getCurrentPhase() + RESET);
+        printRow(" Pot:   " + GREEN + state.getCurrentPot() + RESET);
 
         printLine(SEP_L, SEP_R);
 
-        // ZMIANA: Używamy getMyName() zamiast getName()
-        // Metoda getMyName() sama dba o zwrócenie "Unknown" lub ID w razie braku imienia
-        printRow(" Player: " + state.getMyName());
+        // Dane gracza
+        printRow(" Player: " + BOLD + state.getMyName() + RESET);
+        printRow(" Chips:  " + YELLOW + state.getMyChips() + RESET);
+        printRow(" To Call: " + RED + state.getAmountToCall() + RESET);
 
-        // ZMIANA: Używamy getMyChips() zamiast getChips() (pobiera z mapy)
-        printRow(" Chips:  " + state.getMyChips());
-
-        printRow(" To Call: " + state.getAmountToCall());
 
         printLine(SEP_L, SEP_R);
 
-        // ZMIANA: Używamy getMyHand() zamiast getHand()
+        // Ręka z kolorowaniem kart
         String handStr = formatHand(state.getMyHand());
         printRow(" HAND: " + handStr);
 
         printLine(CORNER_BL, CORNER_BR);
 
         if (!state.getLastMessage().isEmpty()) {
-            System.out.println(" > SYSTEM: " + state.getLastMessage());
+            // Systemowe komunikaty (np. Twoja Tura) na fioletowo/jasno
+            out.println(" > SYSTEM: " + PURPLE + state.getLastMessage() + RESET);
         }
     }
 
@@ -85,52 +103,63 @@ public class ConsoleUI {
     }
 
     public synchronized void printPrompt() {
-        out.print("\n> "); // Uses the injected stream, not System.out
+        out.print("\n" + GREEN + BOLD + "> " + RESET); // Uses the injected stream, not System.out
     }
 
 
     private String formatHand(List<String> hand) {
         if (hand.isEmpty()) return "[ NO CARDS ]";
 
-        // Kopia listy, żeby nie mieszać w oryginale
+        // Kopia i sortowanie
         List<String> sortedHand = new ArrayList<>(hand);
-
-        // Sortowanie malejące (v2 porównywane do v1)
         sortedHand.sort((c1, c2) -> Integer.compare(getCardValue(c2), getCardValue(c1)));
 
         StringBuilder sb = new StringBuilder();
         for (String card : sortedHand) {
-            sb.append("[").append(card).append("] ");
+            sb.append((card)).append(" ");
         }
         return sb.toString().trim();
     }
 
     private void printLine(String left, String right) {
         out.print(left);
-        for (int i = 0; i < WIDTH; i++) System.out.print(BORDER_HOR);
+        // Środek ramki
+        for (int i = 0; i < WIDTH; i++) out.print(FRAME_COLOR + "═" + RESET);
         out.println(right);
     }
 
-    private void printRow(String content) {
-        out.print(BORDER_VER);
-        String format = "%-" + WIDTH + "s";
+    // Przeciążona metoda printRow, która przyjmuje etykietę i wartość (dla łatwiejszego kolorowania)
+    private void printRow(String label, String value) {
+        // Obliczamy faktyczną długość tekstu bez kodów sterujących (żeby ramka się nie rozjechała)
+        int visibleLength = stripAnsi(label + value).length();
+        int padding = WIDTH - visibleLength;
 
-        if (content.length() > WIDTH) content = content.substring(0, WIDTH);
-        out.printf(format, content);
+        out.print(BORDER_VER);
+        out.print(label + value);
+
+        // Dopełniamy spacjami
+        for (int i = 0; i < padding; i++) out.print(" ");
+
         out.println(BORDER_VER);
+    }
+
+    private void printRow(String content) {
+        printRow(content, "");
+    }
+
+    private String stripAnsi(String str) {
+        return str.replaceAll("\u001B\\[[;\\d]*m", "");
     }
 
     private void printStartupHelp() {
         out.println();
         printLine(CORNER_TL, CORNER_TR);
-        printRow("              STARTUP COMMANDS");
+        printRow(BOLD + "              STARTUP COMMANDS" + RESET, "");
         printLine(SEP_L, SEP_R);
-
-        printRow(" create             - Create a new game");
-        printRow(" join <id> <name>   - Join game (e.g. join 123 Alice)");
-        printRow(" help               - Show this menu");
-        printRow(" quit               - Exit application");
-
+        printRow(" create             - Create a new game", "");
+        printRow(" join <id> <name>   - Join game", "");
+        printRow(" help               - Show this menu", "");
+        printRow(" quit               - Exit application", "");
         printLine(CORNER_BL, CORNER_BR);
     }
 
@@ -138,18 +167,17 @@ public class ConsoleUI {
     private void printGameHelp() {
         out.println();
         printLine(CORNER_TL, CORNER_TR);
-        printRow("              AVAILABLE COMMANDS");
-
+        printRow(BOLD + "              AVAILABLE COMMANDS" + RESET, "");
         printLine(SEP_L, SEP_R);
-
-        printRow(" check           - Pass turn (if no bet)");
-        printRow(" call            - Match current bet");
-        printRow(" raise <amount>  - Increase bet (e.g. raise 50)");
-        printRow(" fold            - Give up hand");
-        printRow(" draw <indexes>  - Exchange cards (e.g. draw 0,2)");
-        printRow(" help            - Show this menu");
-        printRow(" quit            - Exit game");
-
+        printRow(" start           - Start game (creator)", "");
+        printRow(" check           - Pass turn", "");
+        printRow(" call            - Match current bet", "");
+        printRow(" raise <amount>  - Increase bet", "");
+        printRow(" fold            - Give up hand", "");
+        printRow(" draw <indexes>  - Exchange cards", "");
+        printRow(" status          - Refresh info", "");
+        printRow(" help            - Show this menu", "");
+        printRow(" quit            - Exit game", "");
         printLine(CORNER_BL, CORNER_BR);
     }
 

@@ -15,7 +15,7 @@ import static org.awaitility.Awaitility.await;
 
 class RealGameIntegrationTest {
 
-    private static final int PORT = 9999;
+    private static final int PORT = 9998;
     private PokerServer server;
     private CompletableFuture<Void> serverThread;
 
@@ -106,23 +106,21 @@ class RealGameIntegrationTest {
     }
 
     private String extractGameId(String log) {
-        // --- KLUCZOWA POPRAWKA ---
-        // Twój klient wypisuje "GAME ID=..." (ze spacją), a nie "GAME_ID=..." (z podkreślnikiem)
-        // Musimy szukać dokładnego ciągu znaków.
+        // Krok 1: Usuwamy wszystkie kody ANSI (kolory) z logów
+        String cleanLog = log.replaceAll("\u001B\\[[;\\d]*m", "");
 
+        // Krok 2: Szukamy ID w czystym tekście
         String marker = "GAME ID=";
-        int idx = log.lastIndexOf(marker);
+        int idx = cleanLog.lastIndexOf(marker);
 
         if (idx == -1) {
-            // Fallback: Spróbujmy znaleźć z podkreślnikiem, na wypadek gdyby coś się zmieniło w kodzie
-            marker = "GAME_ID=";
-            idx = log.lastIndexOf(marker);
+            marker = "GAME_ID="; // Fallback
+            idx = cleanLog.lastIndexOf(marker);
         }
 
         if (idx == -1) return null;
 
-        String temp = log.substring(idx + marker.length());
-        // Bierzemy wszystko do pierwszego białego znaku (spacji, nowej linii itp.)
+        String temp = cleanLog.substring(idx + marker.length());
         return temp.split("\\s+")[0].trim();
     }
 }
