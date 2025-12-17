@@ -2,43 +2,53 @@ package com.dnikitin.poker.client;
 
 import com.dnikitin.poker.common.protocol.serverclient.ServerMessage;
 import com.dnikitin.poker.common.protocol.serverclient.ServerMessageParser;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.List;
-import java.util.Scanner;
 
 @Slf4j
 public class PokerClient {
     private final String host;
     private final int port;
 
+    // Getter potrzebny do asercji w testach
+    @Getter
     private final ClientGameState gameState;
     private final ConsoleUI ui;
     private final ServerMessageParser parser;
 
     private Socket socket;
+    // Setter (package-private) dla testów, aby wstrzyknąć mocka PrintWritera
     private PrintWriter out;
     private BufferedReader in;
     private volatile boolean running;
 
+    // Główny konstruktor (produkcyjny)
     public PokerClient(String host, int port, InputStream input, PrintStream output) {
-        this.host = host;
-        this.port = port;
-        this.gameState = new ClientGameState();
-        this.ui = new ConsoleUI(input, output);
-        this.parser = new ServerMessageParser();
-        this.running = false;
+        this(host, port, new ClientGameState(), new ConsoleUI(input, output), new ServerMessageParser());
     }
 
     public PokerClient(String host, int port) {
         this(host, port, System.in, System.out);
     }
 
+    // Konstruktor "do testów" - wstrzykiwanie zależności
+    public PokerClient(String host, int port, ClientGameState gameState, ConsoleUI ui, ServerMessageParser parser) {
+        this.host = host;
+        this.port = port;
+        this.gameState = gameState;
+        this.ui = ui;
+        this.parser = parser;
+        this.running = false;
+    }
+
     public void start() {
         try {
-            socket = new Socket(host, port);
+            // Używamy metody factory, którą można nadpisać w testach
+            socket = createSocket(host, port);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
@@ -64,6 +74,11 @@ public class PokerClient {
         }
     }
 
+    // Metoda factory dla Socketa - kluczowa dla testowania connection
+    protected Socket createSocket(String host, int port) throws IOException {
+        return new Socket(host, port);
+    }
+
     private void listenToServer() {
         try {
             String line;
@@ -80,7 +95,8 @@ public class PokerClient {
         }
     }
 
-    private void handleServerMessage(String line) {
+    // Zmiana widoczności na package-private dla testów jednostkowych
+    void handleServerMessage(String line) {
         log.debug("Server: {}", line);
         ServerMessage msg = parser.parse(line);
 
@@ -136,10 +152,13 @@ public class PokerClient {
                 if (isMe(activePlayer)) {
                     int call = msg.getInt("CALL");
                     int minRaise = msg.getInt("MINRAISE");
+                    // Aktualizacja stanu przed wyświetleniem
+                    gameState.updateTurnInfo(call);
                     gameState.setLastMessage(String.format(">>> YOUR TURN! (Call: %d, MinRaise: %d) <<<", call, minRaise));
                     showDashboard = true;
                 } else {
                     String opponent = gameState.getPlayerName(activePlayer);
+                    gameState.updateTurnInfo(0);
                     ui.printMessage(" Waiting for " + opponent + "...");
                 }
             }
@@ -223,7 +242,8 @@ public class PokerClient {
         }
     }
 
-    private void processCommand(String input) {
+    // Package-private dla testów
+    void processCommand(String input) {
         String[] parts = input.split("\\s+");
         String cmd = parts[0].toUpperCase();
 
@@ -293,6 +313,11 @@ public class PokerClient {
         } catch (IOException e) {
             log.error("Error during disconnect", e);
         }
+    }
+
+    // Setter dla testów
+    void setOut(PrintWriter out) {
+        this.out = out;
     }
 
     public static void main(String[] args) {

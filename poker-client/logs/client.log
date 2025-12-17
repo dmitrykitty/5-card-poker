@@ -1,0 +1,10 @@
+10:04:27.795 [main] DEBUG c.dnikitin.poker.client.PokerClient - Server: DEAL PLAYER=my-id CARDS=Ah,Kh,Qh,Jh,10h
+10:04:27.959 [main] DEBUG c.dnikitin.poker.client.PokerClient - Server: TURN PLAYER=my-id CALL=50 MINRAISE=100
+10:04:27.976 [main] DEBUG c.dnikitin.poker.client.PokerClient - Sent: JOIN GAME=123 NAME=Alice
+10:04:27.978 [main] DEBUG c.dnikitin.poker.client.PokerClient - Sent: CREATE ANTE=10 BET=10 LIMIT=FIXED
+10:04:27.982 [main] DEBUG c.dnikitin.poker.client.PokerClient - Sent: g1 p1 FOLD
+10:04:27.987 [main] DEBUG c.dnikitin.poker.client.PokerClient - Server: TURN PLAYER=opp-id
+10:04:27.993 [main] DEBUG c.dnikitin.poker.client.PokerClient - Sent: g1 p1 DRAW CARDS=0,1,4
+10:04:28.000 [main] DEBUG c.dnikitin.poker.client.PokerClient - Server: WINNER PLAYER=winner-id RANK=Flush POT=500 CARDS=Ah,Kh,Qh,Jh,10h
+10:04:28.007 [main] DEBUG c.dnikitin.poker.client.PokerClient - Server: WELCOME GAME=g1 PLAYER=p1 NAME=Dmitry
+10:04:28.013 [main] DEBUG c.dnikitin.poker.client.PokerClient - Sent: g1 p1 RAISE AMOUNT=200

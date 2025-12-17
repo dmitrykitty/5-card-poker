@@ -12,24 +12,26 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClientGameState {
     private final Map<String, String> playerNames = new ConcurrentHashMap<>();
     private final Map<String, Integer> playerChips = new ConcurrentHashMap<>();
-    private int currentBet;
+
+    // Pola stanu gry
+    private int currentBet;      // Najwyższy zakład na stole
+    private int currentPot = 0;
+    private int amountToCall = 0; // Ile muszę dołożyć w danej turze
+
     private final List<String> myHand = new ArrayList<>();
 
+    @Setter
     private String gameId;
+    @Setter
     private String playerId;
 
-    private int currentPot = 0;
-    private int amountToCall = 0; // Ile muszę dołożyć, żeby wejść
     private String currentPhase = "WAITING";
-    private String lastMessage = ""; // Ostatni komunikat systemowy
+    @Setter
+    private String lastMessage = "";
 
     public void updatePlayerInfo(String id, String name, int chips) {
         if (name != null) playerNames.put(id, name);
         if (chips >= 0) playerChips.put(id, chips);
-    }
-
-    public void updateTurnInfo(int toCall) {
-        this.amountToCall = toCall;
     }
 
     public void deductChips(String id, int amount) {
@@ -47,14 +49,15 @@ public class ClientGameState {
 
     public void updateRoundInfo(int pot, int highestBet) {
         this.currentPot = pot;
-        }
+        this.currentBet = highestBet; // Wcześniej to było ignorowane!
+    }
 
     public void updatePhase(String phase) {
         this.currentPhase = phase;
     }
 
-    public void updateTurn(String phase, int toCall) {
-        this.currentPhase = phase;
+
+    public void updateTurnInfo(int toCall) {
         this.amountToCall = toCall;
     }
 
@@ -68,21 +71,14 @@ public class ClientGameState {
         }
     }
 
-    public void updatePot(int pot) {
-        this.currentPot = pot;
-    }
-
-    public void setLastMessage(String msg) {
-        this.lastMessage = msg;
-    }
-
-
     public void reset() {
         this.gameId = null;
         this.playerId = null;
         this.playerNames.clear();
         this.playerChips.clear();
         this.currentPot = 0;
+        this.currentBet = 0;
+        this.amountToCall = 0;
         this.myHand.clear();
         this.lastMessage = "";
         this.currentPhase = "WAITING";
@@ -91,10 +87,9 @@ public class ClientGameState {
     public String getPlayerName(String id) {
         if (id == null) return "?";
         if (id.equals(this.playerId)) return "You";
-        return playerNames.getOrDefault(id, id); // Zwraca imię lub ID
+        return playerNames.getOrDefault(id, id);
     }
 
-    // Helper: Pobiera moje imię
     public String getMyName() {
         return playerNames.getOrDefault(playerId, "Unknown");
     }
