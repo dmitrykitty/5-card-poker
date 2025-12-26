@@ -1,5 +1,10 @@
 help/
 
+**/logs/
+
+# Ignoruj wszystkie pliki z rozszerzeniem .log
+*.log
+
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
