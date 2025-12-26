@@ -18,6 +18,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+
         <maven.compiler.release>25</maven.compiler.release>
 
         <sonar.projectKey>sonar-demo</sonar.projectKey>
@@ -105,15 +108,20 @@
                                     <filter>
                                         <artifact>*:*</artifact>
                                         <excludes>
-                                            <exclude>module-info.class</exclude> <exclude>META-INF/*.SF</exclude>      <exclude>META-INF/*.DSA</exclude>
+                                            <exclude>module-info.class</exclude>
+                                            <exclude>META-INF/*.SF</exclude>
+                                            <exclude>META-INF/*.DSA</exclude>
                                             <exclude>META-INF/*.RSA</exclude>
-                                            <exclude>META-INF/LICENSE*</exclude>  </excludes>
+                                            <exclude>META-INF/LICENSE*</exclude>
+                                        </excludes>
                                     </filter>
                                 </filters>
 
                                 <transformers>
-                                    <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-                                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <transformer
+                                            implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                    <transformer
+                                            implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     </transformer>
                                 </transformers>
                             </configuration>
