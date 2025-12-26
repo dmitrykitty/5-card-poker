@@ -4,10 +4,9 @@ A robust, modular, and scalable implementation of the classic **5-Card Draw Poke
 
 ## Project Demonstration
 
-[](https://www.google.com/search?q=YOUR_VIDEO_URL_HERE)
-*(Replace the URL above with your recorded demonstration)*
-
----
+<video src="https://github.com/user-attachments/assets/e72a8e0c-05a9-4833-b7a5-0fd93014925f" width="80%" controls>
+  Ups, change your browser to run the video
+</video>
 
 ## System Architecture
 
