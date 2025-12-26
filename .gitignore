@@ -7,6 +7,8 @@ client.log
 # Ignoruj wszystkie pliki z rozszerzeniem .log
 *.log
 
+**/javadoc/
+
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

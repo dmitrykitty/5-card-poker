@@ -1,9 +1,0 @@
-com.dnikitin.poker.exceptions
-com.dnikitin.poker.exceptions.moves
-com.dnikitin.poker.exceptions.rules
-com.dnikitin.poker.game
-com.dnikitin.poker.game.engine
-com.dnikitin.poker.game.setup
-com.dnikitin.poker.game.state
-com.dnikitin.poker.gamelogic
-com.dnikitin.poker.model

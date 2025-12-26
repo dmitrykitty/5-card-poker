@@ -1,6 +1,0 @@
-com.dnikitin.poker.common.exceptions
-com.dnikitin.poker.common.model.events
-com.dnikitin.poker.common.model.game
-com.dnikitin.poker.common.protocol.clientserver
-com.dnikitin.poker.common.protocol.clientserver.commands
-com.dnikitin.poker.common.protocol.serverclient
