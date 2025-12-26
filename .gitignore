@@ -1,5 +1,13 @@
 help/
 
+### Build and Logs ###
+# Ignoruje wszystkie foldery o nazwie logs na dowolnym poziomie zagłębienia
+**/logs/
+# Ignoruje wszystkie pliki z rozszerzeniem .log
+*.log
+# Ignoruje wygenerowaną dokumentację Javadoc na dowolnym poziomie
+**/javadoc/
+
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
