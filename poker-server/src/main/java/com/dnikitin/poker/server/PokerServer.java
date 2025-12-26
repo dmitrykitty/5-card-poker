@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 public class PokerServer {
     private static final int MAX_MESSAGES_PER_SECOND = 10;
     private static final int RATE_LIMIT_WINDOW_MS = 1000;
-    private static final int TURN_TIMEOUT_SECONDS = 45;
+    private static final int TURN_TIMEOUT_SECONDS = 180;
     private static final int CLEANUP_INTERVAL_MINUTES = 5;
 
     /**

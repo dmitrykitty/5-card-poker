@@ -49,7 +49,7 @@ public class ProtocolEncoder {
                     cd.playerId(), formatCards(cd.cards()));
 
             case GameEvent.GameFinished gf -> String.format("WINNER PLAYER=%s POT=%d RANK=%s CARDS=%s",
-                    gf.winnerId(), gf.potAmount(), gf.handRank(), formatCards(gf.cards()));
+                    gf.winnerId(), gf.potAmount(), sanitize(gf.handRank()), formatCards(gf.cards()));
 
             case GameEvent.RoundInfo ri -> encodeRound(ri.potAmount(), ri.highestBet());
         };

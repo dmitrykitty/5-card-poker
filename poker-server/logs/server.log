@@ -1,195 +1,239 @@
-2025-12-17 10:52:05.401 [main] DEBUG c.d.poker.server.ClientHandler - Client 714d8321-763d-4a30-8acb-e5953d88c887: JOIN GAME=valid-id NAME=Bob!
-2025-12-17 10:52:05.405 [main] DEBUG c.d.poker.server.ClientHandler - To client 714d8321-763d-4a30-8acb-e5953d88c887: ERR CODE=INVALID_NAME REASON=Player_name_must_be_2-20_alphanumeric_characters
-2025-12-17 10:52:05.552 [main] DEBUG c.d.poker.server.ClientHandler - Client 714d8321-763d-4a30-8acb-e5953d88c887: JOIN GAME=short NAME=Bob
-2025-12-17 10:52:05.552 [main] DEBUG c.d.poker.server.ClientHandler - To client 714d8321-763d-4a30-8acb-e5953d88c887: ERR CODE=INVALID_GAME_ID REASON=Invalid_game_ID_format
-2025-12-17 10:52:05.557 [main] DEBUG c.d.poker.server.ClientHandler - Client 714d8321-763d-4a30-8acb-e5953d88c887: JOIN GAME=invalid-id NAME=Bob
-2025-12-17 10:52:05.564 [main] DEBUG c.d.poker.server.ClientHandler - To client 714d8321-763d-4a30-8acb-e5953d88c887: ERR CODE=GAME_NOT_FOUND REASON=Game_does_not_exist
-2025-12-17 10:52:05.591 [main] DEBUG c.d.poker.server.ClientHandler - Client 6d70e0ab-61cb-4f81-9da1-354a6c8e4b07: JOIN GAME=game-123 NAME=Alice
-2025-12-17 10:52:05.594 [main] DEBUG c.d.poker.server.ClientHandler - To client 6d70e0ab-61cb-4f81-9da1-354a6c8e4b07: WELCOME GAME=game-123 PLAYER=a5ba45d1-61af-459e-ae2c-dc761d6e45c3 NAME=Alice
-2025-12-17 10:52:05.594 [main] INFO  c.d.poker.server.ClientHandler - Client 6d70e0ab-61cb-4f81-9da1-354a6c8e4b07 joined game game-123 as Alice
-2025-12-17 10:52:05.605 [main] DEBUG c.d.poker.server.ClientHandler - Client 57a1fac0-dc1e-4588-b8bd-dba6fa6eebd2: JOIN GAME=game-123 NAME=Alice
-2025-12-17 10:52:05.606 [main] DEBUG c.d.poker.server.ClientHandler - To client 57a1fac0-dc1e-4588-b8bd-dba6fa6eebd2: WELCOME GAME=game-123 PLAYER=004d27af-d574-4548-b106-0669ff6f8dbb NAME=Alice
-2025-12-17 10:52:05.607 [main] INFO  c.d.poker.server.ClientHandler - Client 57a1fac0-dc1e-4588-b8bd-dba6fa6eebd2 joined game game-123 as Alice
-2025-12-17 10:52:05.614 [main] DEBUG c.d.poker.server.ClientHandler - To client 57a1fac0-dc1e-4588-b8bd-dba6fa6eebd2: DEAL PLAYER=004d27af-d574-4548-b106-0669ff6f8dbb CARDS=A♠
-2025-12-17 10:52:05.620 [main] DEBUG c.d.poker.server.ClientHandler - Client 6dbaf005-5919-490d-a36f-d83bd0410b0d: CREATE ANTE=10 BET=10
-2025-12-17 10:52:05.620 [main] DEBUG c.d.poker.server.ClientHandler - To client 6dbaf005-5919-490d-a36f-d83bd0410b0d: OK MESSAGE=GAME_ID=game-123
-2025-12-17 10:52:05.621 [main] INFO  c.d.poker.server.ClientHandler - Client 6dbaf005-5919-490d-a36f-d83bd0410b0d created game game-123
-2025-12-17 10:52:05.627 [main] DEBUG c.d.poker.server.ClientHandler - To client 9cd80acf-857b-48b8-8862-7eaeb6bbe7a9: LOBBY PLAYER=p-1 CHIPS=1000 NAME=Bob
-2025-12-17 10:52:05.632 [main] DEBUG c.d.poker.server.ClientHandler - Client d2095d6e-ea5a-4e03-a229-f655545a5dff: JOIN GAME=game-1234 NAME=Bob
-2025-12-17 10:52:05.633 [main] DEBUG c.d.poker.server.ClientHandler - To client d2095d6e-ea5a-4e03-a229-f655545a5dff: WELCOME GAME=game-1234 PLAYER=85ab4e97-9cca-4ce8-a0fa-39df7516df19 NAME=Bob
-2025-12-17 10:52:05.633 [main] INFO  c.d.poker.server.ClientHandler - Client d2095d6e-ea5a-4e03-a229-f655545a5dff joined game game-1234 as Bob
-2025-12-17 10:52:05.634 [main] DEBUG c.d.poker.server.ClientHandler - Client d2095d6e-ea5a-4e03-a229-f655545a5dff: game-1234 85ab4e97-9cca-4ce8-a0fa-39df7516df19 CHECK
-2025-12-17 10:52:05.636 [main] DEBUG c.d.poker.server.ClientHandler - To client d2095d6e-ea5a-4e03-a229-f655545a5dff: OK
-2025-12-17 10:52:05.641 [main] DEBUG c.d.poker.server.ClientHandler - Client 8fd41df6-c96f-4f8f-9d23-ce95d83e94d1: HELLO VERSION=1.0
-2025-12-17 10:52:05.642 [main] INFO  c.d.poker.server.ClientHandler - Client 8fd41df6-c96f-4f8f-9d23-ce95d83e94d1 hello: version 1.0
-2025-12-17 10:52:05.642 [main] DEBUG c.d.poker.server.ClientHandler - To client 8fd41df6-c96f-4f8f-9d23-ce95d83e94d1: OK MESSAGE=Connected_to_poker_server_v10
-2025-12-17 10:52:05.648 [main] DEBUG c.d.poker.server.ClientHandler - Client 480ad36b-b181-40bb-8f10-437b7c222217: JOIN GAME=game-123 NAME=Alice
-2025-12-17 10:52:05.649 [main] DEBUG c.d.poker.server.ClientHandler - To client 480ad36b-b181-40bb-8f10-437b7c222217: WELCOME GAME=game-123 PLAYER=399aa102-9d44-418c-b959-50cbc6e839b8 NAME=Alice
-2025-12-17 10:52:05.649 [main] INFO  c.d.poker.server.ClientHandler - Client 480ad36b-b181-40bb-8f10-437b7c222217 joined game game-123 as Alice
-2025-12-17 10:52:05.650 [main] DEBUG c.d.poker.server.ClientHandler - Client 480ad36b-b181-40bb-8f10-437b7c222217: game-123 399aa102-9d44-418c-b959-50cbc6e839b8 RAISE AMOUNT=100
-2025-12-17 10:52:05.650 [main] DEBUG c.d.poker.server.ClientHandler - To client 480ad36b-b181-40bb-8f10-437b7c222217: OK
-2025-12-17 10:52:05.656 [main] DEBUG c.d.poker.server.ClientHandler - Client a648b751-7b33-4beb-8869-a70b0b1e8c4d: JOIN GAME=game-123 NAME=Alice
-2025-12-17 10:52:05.656 [main] DEBUG c.d.poker.server.ClientHandler - To client a648b751-7b33-4beb-8869-a70b0b1e8c4d: WELCOME GAME=game-123 PLAYER=0bd0dc6e-22f5-4ccc-9ef2-33c598eef8ae NAME=Alice
-2025-12-17 10:52:05.656 [main] INFO  c.d.poker.server.ClientHandler - Client a648b751-7b33-4beb-8869-a70b0b1e8c4d joined game game-123 as Alice
-2025-12-17 10:52:05.657 [main] DEBUG c.d.poker.server.ClientHandler - Client a648b751-7b33-4beb-8869-a70b0b1e8c4d: game-123 0bd0dc6e-22f5-4ccc-9ef2-33c598eef8ae START
-2025-12-17 10:52:05.657 [main] DEBUG c.d.poker.server.ClientHandler - To client a648b751-7b33-4beb-8869-a70b0b1e8c4d: OK MESSAGE=Game_started
-2025-12-17 10:52:05.657 [main] INFO  c.d.poker.server.ClientHandler - Client a648b751-7b33-4beb-8869-a70b0b1e8c4d started game
-2025-12-17 10:52:05.663 [main] DEBUG c.d.poker.server.ClientHandler - Client bd9ad2d8-1678-4999-95b5-d3f944857f01: JOIN GAME=game-123 NAME=Alice
-2025-12-17 10:52:05.664 [main] DEBUG c.d.poker.server.ClientHandler - To client bd9ad2d8-1678-4999-95b5-d3f944857f01: WELCOME GAME=game-123 PLAYER=17dc30fe-c167-4f10-a6fa-7f2c11fd2ee6 NAME=Alice
-2025-12-17 10:52:05.664 [main] INFO  c.d.poker.server.ClientHandler - Client bd9ad2d8-1678-4999-95b5-d3f944857f01 joined game game-123 as Alice
-2025-12-17 10:52:05.665 [main] DEBUG c.d.poker.server.ClientHandler - To client bd9ad2d8-1678-4999-95b5-d3f944857f01: DEAL PLAYER=other-player-id CARDS=HIDDEN COUNT=1
-2025-12-17 10:52:05.672 [main] DEBUG c.d.poker.server.ClientHandler - Client 1d07bb5d-8322-414c-80e1-078ecf45b030: JOIN GAME=game-1234 NAME=Alice
-2025-12-17 10:52:05.673 [main] DEBUG c.d.poker.server.ClientHandler - To client 1d07bb5d-8322-414c-80e1-078ecf45b030: WELCOME GAME=game-1234 PLAYER=1b235dad-e7d9-4ff1-a1c5-adcb7417ddf0 NAME=Alice
-2025-12-17 10:52:05.674 [main] INFO  c.d.poker.server.ClientHandler - Client 1d07bb5d-8322-414c-80e1-078ecf45b030 joined game game-1234 as Alice
-2025-12-17 10:52:05.674 [main] DEBUG c.d.poker.server.ClientHandler - Client 1d07bb5d-8322-414c-80e1-078ecf45b030: game-1234 1b235dad-e7d9-4ff1-a1c5-adcb7417ddf0 CALL
-2025-12-17 10:52:05.674 [main] DEBUG c.d.poker.server.ClientHandler - To client 1d07bb5d-8322-414c-80e1-078ecf45b030: OK
-2025-12-17 10:52:05.681 [main] DEBUG c.d.poker.server.ClientHandler - Client d4e7cbd7-f9a1-4d04-8f1c-eeacd1a57d58: JOIN GAME=game-1234 NAME=Charlie
-2025-12-17 10:52:05.682 [main] DEBUG c.d.poker.server.ClientHandler - To client d4e7cbd7-f9a1-4d04-8f1c-eeacd1a57d58: WELCOME GAME=game-1234 PLAYER=80e78337-8c43-41ae-a819-68791d4b4a06 NAME=Charlie
-2025-12-17 10:52:05.683 [main] INFO  c.d.poker.server.ClientHandler - Client d4e7cbd7-f9a1-4d04-8f1c-eeacd1a57d58 joined game game-1234 as Charlie
-2025-12-17 10:52:05.683 [main] DEBUG c.d.poker.server.ClientHandler - Client d4e7cbd7-f9a1-4d04-8f1c-eeacd1a57d58: game-1234 80e78337-8c43-41ae-a819-68791d4b4a06 DRAW CARDS=0,2,4
-2025-12-17 10:52:05.684 [main] DEBUG c.d.poker.server.ClientHandler - To client d4e7cbd7-f9a1-4d04-8f1c-eeacd1a57d58: OK
-2025-12-17 10:52:05.691 [main] DEBUG c.d.poker.server.ClientHandler - Client 07f9c011-58e1-4370-afab-c60df95d7aef: JOIN GAME=game-123 NAME=Alice
-2025-12-17 10:52:05.692 [main] DEBUG c.d.poker.server.ClientHandler - To client 07f9c011-58e1-4370-afab-c60df95d7aef: WELCOME GAME=game-123 PLAYER=cde7bcb9-4aae-489d-9d99-e5968fe8bd6f NAME=Alice
-2025-12-17 10:52:05.692 [main] INFO  c.d.poker.server.ClientHandler - Client 07f9c011-58e1-4370-afab-c60df95d7aef joined game game-123 as Alice
-2025-12-17 10:52:05.693 [main] DEBUG c.d.poker.server.ClientHandler - Client 07f9c011-58e1-4370-afab-c60df95d7aef: game-123 cde7bcb9-4aae-489d-9d99-e5968fe8bd6f FOLD
-2025-12-17 10:52:05.693 [main] DEBUG c.d.poker.server.ClientHandler - To client 07f9c011-58e1-4370-afab-c60df95d7aef: OK
-2025-12-17 10:52:05.706 [main] INFO  c.dnikitin.poker.server.PokerServer - PokerServer initialized with security features:
-2025-12-17 10:52:05.706 [main] INFO  c.dnikitin.poker.server.PokerServer -   - Rate limit: 10 messages per second
-2025-12-17 10:52:05.706 [main] INFO  c.dnikitin.poker.server.PokerServer -   - Turn timeout: 45 seconds
-2025-12-17 10:52:05.718 [ForkJoinPool.commonPool-worker-1] INFO  c.dnikitin.poker.server.PokerServer - Poker Server started on port: 9998
-2025-12-17 10:52:05.718 [ForkJoinPool.commonPool-worker-1] INFO  c.dnikitin.poker.server.PokerServer - Using virtual threads for client handling
-2025-12-17 10:52:05.856 [ForkJoinPool.commonPool-worker-1] INFO  c.dnikitin.poker.server.PokerServer - New connection accepted: /127.0.0.1:50268
-2025-12-17 10:52:05.856 [ForkJoinPool.commonPool-worker-3] INFO  c.dnikitin.poker.client.PokerClient - Connected to server at localhost:9998
-2025-12-17 10:52:05.856 [ForkJoinPool.commonPool-worker-2] INFO  c.dnikitin.poker.client.PokerClient - Connected to server at localhost:9998
-2025-12-17 10:52:05.857 [ForkJoinPool.commonPool-worker-1] INFO  c.dnikitin.poker.server.PokerServer - New connection accepted: /127.0.0.1:50267
-2025-12-17 10:52:05.858 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: HELLO VERSION=1.0
-2025-12-17 10:52:05.858 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: HELLO VERSION=1.0
-2025-12-17 10:52:05.858 [virtual-51] INFO  c.d.poker.server.ClientHandler - Client 0e8d8a84-8f07-45fc-81ad-8e7731102139 connected
-2025-12-17 10:52:05.858 [virtual-56] DEBUG c.d.poker.server.ClientHandler - To client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: HELLO VERSION=1.0
-2025-12-17 10:52:05.859 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: HELLO VERSION=1.0
-2025-12-17 10:52:05.859 [virtual-56] INFO  c.d.poker.server.ClientHandler - Client 28f6c612-c664-42c2-8bb4-9a66a60fc16f connected
-2025-12-17 10:52:05.948 [ForkJoinPool.commonPool-worker-2] DEBUG c.dnikitin.poker.client.PokerClient - Sent: CREATE ANTE=10 BET=10 LIMIT=FIXED
-2025-12-17 10:52:05.949 [virtual-51] DEBUG c.d.poker.server.ClientHandler - Client 0e8d8a84-8f07-45fc-81ad-8e7731102139: CREATE ANTE=10 BET=10 LIMIT=FIXED
-2025-12-17 10:52:05.953 [virtual-51] INFO  com.dnikitin.poker.model.Deck - Deck shuffled. Cards count: 52
-2025-12-17 10:52:05.954 [virtual-51] INFO  c.dnikitin.poker.game.engine.Dealer - Dealer received new deck and shuffled it. Cards: 52
-2025-12-17 10:52:05.955 [virtual-51] DEBUG c.d.poker.game.engine.PotManager - PotManager reset
-2025-12-17 10:52:05.955 [virtual-51] INFO  com.dnikitin.poker.game.GameManager - Created new game table: ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd. Active games: 1
-2025-12-17 10:52:05.956 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: OK MESSAGE=GAME_ID=ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd
-2025-12-17 10:52:05.956 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: OK MESSAGE=GAME_ID=ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd
-2025-12-17 10:52:05.956 [virtual-51] INFO  c.d.poker.server.ClientHandler - Client 0e8d8a84-8f07-45fc-81ad-8e7731102139 created game ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd
-2025-12-17 10:52:06.054 [ForkJoinPool.commonPool-worker-2] DEBUG c.dnikitin.poker.client.PokerClient - Sent: JOIN GAME=ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd NAME=Alice
-2025-12-17 10:52:06.055 [virtual-51] DEBUG c.d.poker.server.ClientHandler - Client 0e8d8a84-8f07-45fc-81ad-8e7731102139: JOIN GAME=ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd NAME=Alice
-2025-12-17 10:52:06.055 [virtual-51] INFO  com.dnikitin.poker.game.Table - Player Alice joined table ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd. Total players: 1
-2025-12-17 10:52:06.056 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: LOBBY PLAYER=f97872e0-bbde-4286-bd3d-5bcb57a0293f CHIPS=1000 NAME=Alice
-2025-12-17 10:52:06.056 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: LOBBY PLAYER=f97872e0-bbde-4286-bd3d-5bcb57a0293f CHIPS=1000 NAME=Alice
-2025-12-17 10:52:06.056 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: WELCOME GAME=ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd PLAYER=f97872e0-bbde-4286-bd3d-5bcb57a0293f NAME=Alice
-2025-12-17 10:52:06.056 [virtual-51] INFO  c.d.poker.server.ClientHandler - Client 0e8d8a84-8f07-45fc-81ad-8e7731102139 joined game ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd as Alice
-2025-12-17 10:52:06.057 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: WELCOME GAME=ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd PLAYER=f97872e0-bbde-4286-bd3d-5bcb57a0293f NAME=Alice
-2025-12-17 10:52:06.156 [ForkJoinPool.commonPool-worker-3] DEBUG c.dnikitin.poker.client.PokerClient - Sent: JOIN GAME=ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd NAME=Bob
-2025-12-17 10:52:06.157 [virtual-56] DEBUG c.d.poker.server.ClientHandler - Client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: JOIN GAME=ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd NAME=Bob
-2025-12-17 10:52:06.157 [virtual-56] INFO  com.dnikitin.poker.game.Table - Player Bob joined table ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd. Total players: 2
-2025-12-17 10:52:06.157 [virtual-56] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: LOBBY PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 CHIPS=1000 NAME=Bob
-2025-12-17 10:52:06.157 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: LOBBY PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 CHIPS=1000 NAME=Bob
-2025-12-17 10:52:06.157 [virtual-56] DEBUG c.d.poker.server.ClientHandler - To client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: LOBBY PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 CHIPS=1000 NAME=Bob
-2025-12-17 10:52:06.157 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: LOBBY PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 CHIPS=1000 NAME=Bob
-2025-12-17 10:52:06.158 [virtual-56] DEBUG c.d.poker.server.ClientHandler - To client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: WELCOME GAME=ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 NAME=Bob
-2025-12-17 10:52:06.158 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: WELCOME GAME=ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 NAME=Bob
-2025-12-17 10:52:06.158 [virtual-56] DEBUG c.d.poker.server.ClientHandler - To client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: LOBBY PLAYER=f97872e0-bbde-4286-bd3d-5bcb57a0293f CHIPS=1000 NAME=Alice
-2025-12-17 10:52:06.158 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: LOBBY PLAYER=f97872e0-bbde-4286-bd3d-5bcb57a0293f CHIPS=1000 NAME=Alice
-2025-12-17 10:52:06.158 [virtual-56] INFO  c.d.poker.server.ClientHandler - Client 28f6c612-c664-42c2-8bb4-9a66a60fc16f joined game ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd as Bob
-2025-12-17 10:52:06.360 [ForkJoinPool.commonPool-worker-2] DEBUG c.dnikitin.poker.client.PokerClient - Sent: ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd f97872e0-bbde-4286-bd3d-5bcb57a0293f START
-2025-12-17 10:52:06.360 [virtual-51] DEBUG c.d.poker.server.ClientHandler - Client 0e8d8a84-8f07-45fc-81ad-8e7731102139: ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd f97872e0-bbde-4286-bd3d-5bcb57a0293f START
-2025-12-17 10:52:06.360 [virtual-51] INFO  com.dnikitin.poker.game.Table - Starting game on table ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd
-2025-12-17 10:52:06.361 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: STARTED GAME=ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd
-2025-12-17 10:52:06.361 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STARTED GAME=ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd
-2025-12-17 10:52:06.361 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STARTED GAME=ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd
-2025-12-17 10:52:06.361 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: STARTED GAME=ab1d3183-99bb-4ffb-93fb-2cdb38c0d7bd
-2025-12-17 10:52:06.362 [virtual-51] DEBUG c.d.poker.game.engine.TurnOrder - Dealer rotated to position 0: Alice
-2025-12-17 10:52:06.362 [virtual-51] DEBUG c.d.poker.game.engine.PotManager - PotManager reset
-2025-12-17 10:52:06.363 [virtual-51] INFO  com.dnikitin.poker.model.Deck - Deck shuffled. Cards count: 52
-2025-12-17 10:52:06.363 [virtual-51] INFO  c.dnikitin.poker.game.engine.Dealer - Dealer received new deck and shuffled it. Cards: 52
-2025-12-17 10:52:06.363 [virtual-51] INFO  com.dnikitin.poker.game.Table - Hand started. Dealer: Alice
-2025-12-17 10:52:06.364 [virtual-51] INFO  com.dnikitin.poker.game.Table - State transition: LOBBY -> ANTE
-2025-12-17 10:52:06.364 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: STATE PHASE=ANTE
-2025-12-17 10:52:06.364 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=ANTE
-2025-12-17 10:52:06.364 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: STATE PHASE=ANTE
-2025-12-17 10:52:06.364 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=ANTE
-2025-12-17 10:52:06.364 [virtual-51] DEBUG c.d.poker.game.engine.PotManager - Added 10 to main pot. Total: 10
-2025-12-17 10:52:06.365 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: ACTION PLAYER=f97872e0-bbde-4286-bd3d-5bcb57a0293f TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
-2025-12-17 10:52:06.365 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=f97872e0-bbde-4286-bd3d-5bcb57a0293f TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
-2025-12-17 10:52:06.365 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: ACTION PLAYER=f97872e0-bbde-4286-bd3d-5bcb57a0293f TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
-2025-12-17 10:52:06.365 [virtual-51] DEBUG c.d.poker.game.engine.PotManager - Added 10 to main pot. Total: 20
-2025-12-17 10:52:06.365 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=f97872e0-bbde-4286-bd3d-5bcb57a0293f TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
-2025-12-17 10:52:06.365 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: ACTION PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
-2025-12-17 10:52:06.365 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: ACTION PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
-2025-12-17 10:52:06.366 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
-2025-12-17 10:52:06.366 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
-2025-12-17 10:52:06.367 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: ROUND POT=20 HIGHESTBET=0
-2025-12-17 10:52:06.367 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ROUND POT=20 HIGHESTBET=0
-2025-12-17 10:52:06.367 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: ROUND POT=20 HIGHESTBET=0
-2025-12-17 10:52:06.367 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ROUND POT=20 HIGHESTBET=0
-2025-12-17 10:52:06.367 [virtual-51] INFO  com.dnikitin.poker.game.Table - State transition: ANTE -> DEALING
-2025-12-17 10:52:06.368 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=DEALING
-2025-12-17 10:52:06.368 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: STATE PHASE=DEALING
-2025-12-17 10:52:06.368 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: STATE PHASE=DEALING
-2025-12-17 10:52:06.368 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=DEALING
-2025-12-17 10:52:06.368 [virtual-51] INFO  c.dnikitin.poker.game.engine.Dealer - Dealing 5 cards to 2 players
-2025-12-17 10:52:06.368 [virtual-51] DEBUG c.dnikitin.poker.game.engine.Dealer - Dealt 5 cards to player Alice
-2025-12-17 10:52:06.368 [virtual-51] DEBUG c.dnikitin.poker.game.engine.Dealer - Dealt 5 cards to player Bob
-2025-12-17 10:52:06.369 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: DEAL PLAYER=f97872e0-bbde-4286-bd3d-5bcb57a0293f CARDS=8♠,10♥,3♠,6♦,Q♥
-2025-12-17 10:52:06.370 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: DEAL PLAYER=f97872e0-bbde-4286-bd3d-5bcb57a0293f CARDS=8♠,10♥,3♠,6♦,Q♥
-2025-12-17 10:52:06.370 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: DEAL PLAYER=f97872e0-bbde-4286-bd3d-5bcb57a0293f CARDS=HIDDEN COUNT=5
-2025-12-17 10:52:06.370 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: DEAL PLAYER=f97872e0-bbde-4286-bd3d-5bcb57a0293f CARDS=HIDDEN COUNT=5
-2025-12-17 10:52:06.370 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: DEAL PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 CARDS=HIDDEN COUNT=5
-2025-12-17 10:52:06.370 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: DEAL PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 CARDS=K♠,8♥,5♥,K♦,J♦
-2025-12-17 10:52:06.370 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: DEAL PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 CARDS=K♠,8♥,5♥,K♦,J♦
-2025-12-17 10:52:06.370 [virtual-51] DEBUG c.d.poker.game.engine.TurnOrder - Starting turn from left of dealer: Bob
-2025-12-17 10:52:06.370 [virtual-51] INFO  com.dnikitin.poker.game.Table - State transition: DEALING -> BETTING_1
-2025-12-17 10:52:06.371 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: STATE PHASE=BETTING_1
-2025-12-17 10:52:06.371 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: DEAL PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 CARDS=HIDDEN COUNT=5
-2025-12-17 10:52:06.371 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=BETTING_1
-2025-12-17 10:52:06.371 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: STATE PHASE=BETTING_1
-2025-12-17 10:52:06.371 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=BETTING_1
-2025-12-17 10:52:06.371 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: TURN PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 PHASE=BETTING_1 CALL=0 MINRAISE=10
-2025-12-17 10:52:06.371 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: TURN PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 PHASE=BETTING_1 CALL=0 MINRAISE=10
-2025-12-17 10:52:06.372 [virtual-51] DEBUG c.d.p.server.security.TimeoutManager - Timeout started for player 8139844e-7904-4a9f-a6f5-d175be964ed1: 45s
-2025-12-17 10:52:06.372 [virtual-51] DEBUG c.d.poker.server.ClientHandler - Started timeout for player Bob
-2025-12-17 10:52:06.372 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: TURN PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 PHASE=BETTING_1 CALL=0 MINRAISE=10
-2025-12-17 10:52:06.372 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: TURN PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 PHASE=BETTING_1 CALL=0 MINRAISE=10
-2025-12-17 10:52:06.372 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: OK MESSAGE=Game_started
-2025-12-17 10:52:06.373 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: OK MESSAGE=Game_started
-2025-12-17 10:52:06.373 [virtual-51] INFO  c.d.poker.server.ClientHandler - Client 0e8d8a84-8f07-45fc-81ad-8e7731102139 started game
-2025-12-17 10:52:06.464 [ForkJoinPool.commonPool-worker-2] DEBUG c.dnikitin.poker.client.PokerClient - Sent: QUIT
-2025-12-17 10:52:06.464 [ForkJoinPool.commonPool-worker-3] DEBUG c.dnikitin.poker.client.PokerClient - Sent: QUIT
-2025-12-17 10:52:06.464 [main] INFO  c.dnikitin.poker.server.PokerServer - Shutting down server...
-2025-12-17 10:52:06.464 [virtual-51] DEBUG c.d.poker.server.ClientHandler - Client 0e8d8a84-8f07-45fc-81ad-8e7731102139: QUIT
-2025-12-17 10:52:06.464 [virtual-56] DEBUG c.d.poker.server.ClientHandler - Client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: QUIT
-2025-12-17 10:52:06.465 [virtual-51] WARN  c.d.poker.server.ClientHandler - Protocol error from client 0e8d8a84-8f07-45fc-81ad-8e7731102139: Standard command requires: GAME_ID PLAYER_ID ACTION [PARAMS]
-2025-12-17 10:52:06.465 [virtual-56] WARN  c.d.poker.server.ClientHandler - Protocol error from client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: Standard command requires: GAME_ID PLAYER_ID ACTION [PARAMS]
-2025-12-17 10:52:06.465 [ForkJoinPool.commonPool-worker-1] INFO  c.dnikitin.poker.server.PokerServer - Server socket closed.
-2025-12-17 10:52:06.465 [ForkJoinPool.commonPool-worker-1] INFO  c.dnikitin.poker.server.PokerServer - Shutting down server...
-2025-12-17 10:52:06.465 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: ERR CODE=INVALID_FORMAT REASON=Standard_command_requires_GAME_ID_PLAYER_ID_ACTION_PARAMS
-2025-12-17 10:52:06.465 [virtual-56] DEBUG c.d.poker.server.ClientHandler - To client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: ERR CODE=INVALID_FORMAT REASON=Standard_command_requires_GAME_ID_PLAYER_ID_ACTION_PARAMS
-2025-12-17 10:52:06.465 [main] INFO  c.d.p.server.security.TimeoutManager - TimeoutManager shut down
-2025-12-17 10:52:06.465 [ForkJoinPool.commonPool-worker-1] INFO  c.d.p.server.security.TimeoutManager - TimeoutManager shut down
-2025-12-17 10:52:06.465 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ERR CODE=INVALID_FORMAT REASON=Standard_command_requires_GAME_ID_PLAYER_ID_ACTION_PARAMS
-2025-12-17 10:52:06.465 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ERR CODE=INVALID_FORMAT REASON=Standard_command_requires_GAME_ID_PLAYER_ID_ACTION_PARAMS
-2025-12-17 10:52:06.466 [ForkJoinPool.commonPool-worker-2] INFO  c.dnikitin.poker.client.PokerClient - Disconnected from server
-2025-12-17 10:52:06.466 [ForkJoinPool.commonPool-worker-3] INFO  c.dnikitin.poker.client.PokerClient - Disconnected from server
-2025-12-17 10:52:06.467 [virtual-51] INFO  com.dnikitin.poker.game.Table - Player Alice disconnected during game. Auto-folding.
-2025-12-17 10:52:06.468 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: ACTION PLAYER=f97872e0-bbde-4286-bd3d-5bcb57a0293f TYPE=FOLD AMOUNT=0 MSG=Disconnected_Auto-Fold
-2025-12-17 10:52:06.468 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: ACTION PLAYER=f97872e0-bbde-4286-bd3d-5bcb57a0293f TYPE=FOLD AMOUNT=0 MSG=Disconnected_Auto-Fold
-2025-12-17 10:52:06.472 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: ROUND POT=20 HIGHESTBET=0
-2025-12-17 10:52:06.472 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: ROUND POT=20 HIGHESTBET=0
-2025-12-17 10:52:06.472 [virtual-51] INFO  com.dnikitin.poker.game.Table - Game ended prematurely. Player Bob won 20 (Opponents folded).
-2025-12-17 10:52:06.473 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: WINNER PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 POT=20 RANK=Opponents Folded CARDS=K♠,8♥,5♥,K♦,J♦
-2025-12-17 10:52:06.473 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: WINNER PLAYER=8139844e-7904-4a9f-a6f5-d175be964ed1 POT=20 RANK=Opponents Folded CARDS=K♠,8♥,5♥,K♦,J♦
-2025-12-17 10:52:06.473 [virtual-51] INFO  com.dnikitin.poker.game.Table - State transition: BETTING_1 -> FINISHED
-2025-12-17 10:52:06.473 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 0e8d8a84-8f07-45fc-81ad-8e7731102139: STATE PHASE=FINISHED
-2025-12-17 10:52:06.473 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 28f6c612-c664-42c2-8bb4-9a66a60fc16f: STATE PHASE=FINISHED
-2025-12-17 10:52:06.474 [virtual-51] INFO  c.d.poker.server.ClientHandler - Player Alice disconnected from game
-2025-12-17 10:52:06.474 [virtual-56] INFO  c.d.poker.server.ClientHandler - Player Bob disconnected from game
-2025-12-17 10:52:06.474 [virtual-56] INFO  c.d.poker.server.ClientHandler - Client 28f6c612-c664-42c2-8bb4-9a66a60fc16f disconnected
-2025-12-17 10:52:06.474 [virtual-51] INFO  c.d.poker.server.ClientHandler - Client 0e8d8a84-8f07-45fc-81ad-8e7731102139 disconnected
-2025-12-17 10:52:06.474 [ForkJoinPool.commonPool-worker-1] INFO  c.dnikitin.poker.server.PokerServer - Server stopped successfully.
-2025-12-17 10:52:06.474 [main] INFO  c.dnikitin.poker.server.PokerServer - Server stopped successfully.
+2025-12-26 12:24:47.311 [main] DEBUG c.d.poker.server.ClientHandler - Client 2aa65694-ae02-4dc0-8cb9-32361122b4ad: JOIN GAME=valid-id NAME=Bob!
+2025-12-26 12:24:47.315 [main] DEBUG c.d.poker.server.ClientHandler - To client 2aa65694-ae02-4dc0-8cb9-32361122b4ad: ERR CODE=INVALID_NAME REASON=Player_name_must_be_2-20_alphanumeric_characters
+2025-12-26 12:24:47.452 [main] DEBUG c.d.poker.server.ClientHandler - Client 2aa65694-ae02-4dc0-8cb9-32361122b4ad: JOIN GAME=short NAME=Bob
+2025-12-26 12:24:47.452 [main] DEBUG c.d.poker.server.ClientHandler - To client 2aa65694-ae02-4dc0-8cb9-32361122b4ad: ERR CODE=INVALID_GAME_ID REASON=Invalid_game_ID_format
+2025-12-26 12:24:47.455 [main] DEBUG c.d.poker.server.ClientHandler - Client 2aa65694-ae02-4dc0-8cb9-32361122b4ad: JOIN GAME=invalid-id NAME=Bob
+2025-12-26 12:24:47.459 [main] DEBUG c.d.poker.server.ClientHandler - To client 2aa65694-ae02-4dc0-8cb9-32361122b4ad: ERR CODE=GAME_NOT_FOUND REASON=Game_does_not_exist
+2025-12-26 12:24:47.480 [main] DEBUG c.d.poker.server.ClientHandler - Client 2c17a6f1-253c-404b-998e-a96c854a0764: JOIN GAME=game-123 NAME=Alice
+2025-12-26 12:24:47.482 [main] DEBUG c.d.poker.server.ClientHandler - To client 2c17a6f1-253c-404b-998e-a96c854a0764: WELCOME GAME=game-123 PLAYER=39527221-1d99-467f-80b5-58e5a2c9d275 NAME=Alice
+2025-12-26 12:24:47.482 [main] INFO  c.d.poker.server.ClientHandler - Client 2c17a6f1-253c-404b-998e-a96c854a0764 joined game game-123 as Alice
+2025-12-26 12:24:47.490 [main] DEBUG c.d.poker.server.ClientHandler - Client a6aaeb80-d996-41c8-ad21-5ef7a4f909fa: JOIN GAME=game-123 NAME=Alice
+2025-12-26 12:24:47.491 [main] DEBUG c.d.poker.server.ClientHandler - To client a6aaeb80-d996-41c8-ad21-5ef7a4f909fa: WELCOME GAME=game-123 PLAYER=5c0a64a1-bc61-4e5e-818c-01e83b6e4b8e NAME=Alice
+2025-12-26 12:24:47.491 [main] INFO  c.d.poker.server.ClientHandler - Client a6aaeb80-d996-41c8-ad21-5ef7a4f909fa joined game game-123 as Alice
+2025-12-26 12:24:47.499 [main] DEBUG c.d.poker.server.ClientHandler - To client a6aaeb80-d996-41c8-ad21-5ef7a4f909fa: DEAL PLAYER=5c0a64a1-bc61-4e5e-818c-01e83b6e4b8e CARDS=A♠
+2025-12-26 12:24:47.505 [main] DEBUG c.d.poker.server.ClientHandler - Client 5fa239f8-0ab9-4759-ab9c-e40a1ba2a1bc: CREATE ANTE=10 BET=10
+2025-12-26 12:24:47.506 [main] DEBUG c.d.poker.server.ClientHandler - To client 5fa239f8-0ab9-4759-ab9c-e40a1ba2a1bc: OK MESSAGE=GAME_ID=game-123
+2025-12-26 12:24:47.506 [main] INFO  c.d.poker.server.ClientHandler - Client 5fa239f8-0ab9-4759-ab9c-e40a1ba2a1bc created game game-123
+2025-12-26 12:24:47.511 [main] DEBUG c.d.poker.server.ClientHandler - To client ed5448b0-fb64-4c08-95d1-c4253adfa2d9: LOBBY PLAYER=p-1 CHIPS=1000 NAME=Bob
+2025-12-26 12:24:47.516 [main] DEBUG c.d.poker.server.ClientHandler - Client 65afbdce-09b0-47d2-ad49-a6546b92f535: JOIN GAME=game-1234 NAME=Bob
+2025-12-26 12:24:47.517 [main] DEBUG c.d.poker.server.ClientHandler - To client 65afbdce-09b0-47d2-ad49-a6546b92f535: WELCOME GAME=game-1234 PLAYER=444152b3-afc0-4e65-a5d7-dc9c2522bcc1 NAME=Bob
+2025-12-26 12:24:47.517 [main] INFO  c.d.poker.server.ClientHandler - Client 65afbdce-09b0-47d2-ad49-a6546b92f535 joined game game-1234 as Bob
+2025-12-26 12:24:47.517 [main] DEBUG c.d.poker.server.ClientHandler - Client 65afbdce-09b0-47d2-ad49-a6546b92f535: game-1234 444152b3-afc0-4e65-a5d7-dc9c2522bcc1 CHECK
+2025-12-26 12:24:47.519 [main] DEBUG c.d.poker.server.ClientHandler - To client 65afbdce-09b0-47d2-ad49-a6546b92f535: OK
+2025-12-26 12:24:47.524 [main] DEBUG c.d.poker.server.ClientHandler - Client a32aca49-3543-43e9-beb7-785a074ff62b: HELLO VERSION=1.0
+2025-12-26 12:24:47.525 [main] INFO  c.d.poker.server.ClientHandler - Client a32aca49-3543-43e9-beb7-785a074ff62b hello: version 1.0
+2025-12-26 12:24:47.525 [main] DEBUG c.d.poker.server.ClientHandler - To client a32aca49-3543-43e9-beb7-785a074ff62b: OK MESSAGE=Connected_to_poker_server_v10
+2025-12-26 12:24:47.530 [main] DEBUG c.d.poker.server.ClientHandler - Client 84c9ba28-cb20-4ebf-9cb6-d6bfecf5d4eb: JOIN GAME=game-123 NAME=Alice
+2025-12-26 12:24:47.530 [main] DEBUG c.d.poker.server.ClientHandler - To client 84c9ba28-cb20-4ebf-9cb6-d6bfecf5d4eb: WELCOME GAME=game-123 PLAYER=a7265360-fa36-4c76-953e-fe133e39eabd NAME=Alice
+2025-12-26 12:24:47.531 [main] INFO  c.d.poker.server.ClientHandler - Client 84c9ba28-cb20-4ebf-9cb6-d6bfecf5d4eb joined game game-123 as Alice
+2025-12-26 12:24:47.531 [main] DEBUG c.d.poker.server.ClientHandler - Client 84c9ba28-cb20-4ebf-9cb6-d6bfecf5d4eb: game-123 a7265360-fa36-4c76-953e-fe133e39eabd RAISE AMOUNT=100
+2025-12-26 12:24:47.532 [main] DEBUG c.d.poker.server.ClientHandler - To client 84c9ba28-cb20-4ebf-9cb6-d6bfecf5d4eb: OK
+2025-12-26 12:24:47.536 [main] DEBUG c.d.poker.server.ClientHandler - Client 2c2d6563-6281-48f6-b822-848e7abdc2a7: JOIN GAME=game-123 NAME=Alice
+2025-12-26 12:24:47.536 [main] DEBUG c.d.poker.server.ClientHandler - To client 2c2d6563-6281-48f6-b822-848e7abdc2a7: WELCOME GAME=game-123 PLAYER=ecbd2d85-689a-4a8f-9bc4-e418d122fa48 NAME=Alice
+2025-12-26 12:24:47.537 [main] INFO  c.d.poker.server.ClientHandler - Client 2c2d6563-6281-48f6-b822-848e7abdc2a7 joined game game-123 as Alice
+2025-12-26 12:24:47.537 [main] DEBUG c.d.poker.server.ClientHandler - Client 2c2d6563-6281-48f6-b822-848e7abdc2a7: game-123 ecbd2d85-689a-4a8f-9bc4-e418d122fa48 START
+2025-12-26 12:24:47.537 [main] DEBUG c.d.poker.server.ClientHandler - To client 2c2d6563-6281-48f6-b822-848e7abdc2a7: OK MESSAGE=Game_started
+2025-12-26 12:24:47.537 [main] INFO  c.d.poker.server.ClientHandler - Client 2c2d6563-6281-48f6-b822-848e7abdc2a7 started game
+2025-12-26 12:24:47.541 [main] DEBUG c.d.poker.server.ClientHandler - Client ae4d9f06-c745-45d3-94c3-f8b100e7e9a9: JOIN GAME=game-123 NAME=Alice
+2025-12-26 12:24:47.542 [main] DEBUG c.d.poker.server.ClientHandler - To client ae4d9f06-c745-45d3-94c3-f8b100e7e9a9: WELCOME GAME=game-123 PLAYER=120a1d61-0e9a-49a4-b105-ae44629635a8 NAME=Alice
+2025-12-26 12:24:47.542 [main] INFO  c.d.poker.server.ClientHandler - Client ae4d9f06-c745-45d3-94c3-f8b100e7e9a9 joined game game-123 as Alice
+2025-12-26 12:24:47.543 [main] DEBUG c.d.poker.server.ClientHandler - To client ae4d9f06-c745-45d3-94c3-f8b100e7e9a9: DEAL PLAYER=other-player-id CARDS=HIDDEN COUNT=1
+2025-12-26 12:24:47.547 [main] DEBUG c.d.poker.server.ClientHandler - Client ff385f6c-942b-425c-90b0-b1287272c24e: JOIN GAME=game-1234 NAME=Alice
+2025-12-26 12:24:47.548 [main] DEBUG c.d.poker.server.ClientHandler - To client ff385f6c-942b-425c-90b0-b1287272c24e: WELCOME GAME=game-1234 PLAYER=9bf061c0-58bb-425e-8104-a0a9fc05e4d6 NAME=Alice
+2025-12-26 12:24:47.549 [main] INFO  c.d.poker.server.ClientHandler - Client ff385f6c-942b-425c-90b0-b1287272c24e joined game game-1234 as Alice
+2025-12-26 12:24:47.549 [main] DEBUG c.d.poker.server.ClientHandler - Client ff385f6c-942b-425c-90b0-b1287272c24e: game-1234 9bf061c0-58bb-425e-8104-a0a9fc05e4d6 CALL
+2025-12-26 12:24:47.549 [main] DEBUG c.d.poker.server.ClientHandler - To client ff385f6c-942b-425c-90b0-b1287272c24e: OK
+2025-12-26 12:24:47.554 [main] DEBUG c.d.poker.server.ClientHandler - Client b2b97fd6-3ef3-433a-b5cd-25c22c3f59e2: JOIN GAME=game-1234 NAME=Charlie
+2025-12-26 12:24:47.555 [main] DEBUG c.d.poker.server.ClientHandler - To client b2b97fd6-3ef3-433a-b5cd-25c22c3f59e2: WELCOME GAME=game-1234 PLAYER=4070ef49-98c5-445f-876a-fa5fef1d130f NAME=Charlie
+2025-12-26 12:24:47.555 [main] INFO  c.d.poker.server.ClientHandler - Client b2b97fd6-3ef3-433a-b5cd-25c22c3f59e2 joined game game-1234 as Charlie
+2025-12-26 12:24:47.555 [main] DEBUG c.d.poker.server.ClientHandler - Client b2b97fd6-3ef3-433a-b5cd-25c22c3f59e2: game-1234 4070ef49-98c5-445f-876a-fa5fef1d130f DRAW CARDS=0,2,4
+2025-12-26 12:24:47.556 [main] DEBUG c.d.poker.server.ClientHandler - To client b2b97fd6-3ef3-433a-b5cd-25c22c3f59e2: OK
+2025-12-26 12:24:47.561 [main] DEBUG c.d.poker.server.ClientHandler - Client 70089846-a0de-46ab-8b47-bc2f5db4e4ac: JOIN GAME=game-123 NAME=Alice
+2025-12-26 12:24:47.562 [main] DEBUG c.d.poker.server.ClientHandler - To client 70089846-a0de-46ab-8b47-bc2f5db4e4ac: WELCOME GAME=game-123 PLAYER=ba350843-e847-41bd-86b3-d6dce5e1cd21 NAME=Alice
+2025-12-26 12:24:47.562 [main] INFO  c.d.poker.server.ClientHandler - Client 70089846-a0de-46ab-8b47-bc2f5db4e4ac joined game game-123 as Alice
+2025-12-26 12:24:47.562 [main] DEBUG c.d.poker.server.ClientHandler - Client 70089846-a0de-46ab-8b47-bc2f5db4e4ac: game-123 ba350843-e847-41bd-86b3-d6dce5e1cd21 FOLD
+2025-12-26 12:24:47.563 [main] DEBUG c.d.poker.server.ClientHandler - To client 70089846-a0de-46ab-8b47-bc2f5db4e4ac: OK
+2025-12-26 12:24:47.573 [main] INFO  c.dnikitin.poker.server.PokerServer - PokerServer initialized with security features:
+2025-12-26 12:24:47.573 [main] INFO  c.dnikitin.poker.server.PokerServer -   - Rate limit: 10 messages per second
+2025-12-26 12:24:47.573 [main] INFO  c.dnikitin.poker.server.PokerServer -   - Turn timeout: 180 seconds
+2025-12-26 12:24:47.583 [ForkJoinPool.commonPool-worker-1] INFO  c.dnikitin.poker.server.PokerServer - Poker Server started on port: 9998
+2025-12-26 12:24:47.583 [ForkJoinPool.commonPool-worker-1] INFO  c.dnikitin.poker.server.PokerServer - Using virtual threads for client handling
+2025-12-26 12:24:47.716 [ForkJoinPool.commonPool-worker-1] INFO  c.dnikitin.poker.server.PokerServer - New connection accepted: /127.0.0.1:56721
+2025-12-26 12:24:47.716 [ForkJoinPool.commonPool-worker-3] INFO  c.dnikitin.poker.client.PokerClient - Connected to server at localhost:9998
+2025-12-26 12:24:47.716 [ForkJoinPool.commonPool-worker-2] INFO  c.dnikitin.poker.client.PokerClient - Connected to server at localhost:9998
+2025-12-26 12:24:47.716 [ForkJoinPool.commonPool-worker-1] INFO  c.dnikitin.poker.server.PokerServer - New connection accepted: /127.0.0.1:56720
+2025-12-26 12:24:47.718 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: HELLO VERSION=1.0
+2025-12-26 12:24:47.718 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: HELLO VERSION=1.0
+2025-12-26 12:24:47.717 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: HELLO VERSION=1.0
+2025-12-26 12:24:47.717 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: HELLO VERSION=1.0
+2025-12-26 12:24:47.718 [virtual-51] INFO  c.d.poker.server.ClientHandler - Client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53 connected
+2025-12-26 12:24:47.718 [virtual-52] INFO  c.d.poker.server.ClientHandler - Client b4ce5b73-b824-48cb-9a6e-e189656e8845 connected
+2025-12-26 12:24:47.810 [ForkJoinPool.commonPool-worker-2] DEBUG c.dnikitin.poker.client.PokerClient - Sent: CREATE ANTE=10 BET=10 LIMIT=FIXED
+2025-12-26 12:24:47.811 [virtual-52] DEBUG c.d.poker.server.ClientHandler - Client b4ce5b73-b824-48cb-9a6e-e189656e8845: CREATE ANTE=10 BET=10 LIMIT=FIXED
+2025-12-26 12:24:47.815 [virtual-52] INFO  com.dnikitin.poker.model.Deck - Deck shuffled. Cards count: 52
+2025-12-26 12:24:47.815 [virtual-52] INFO  c.dnikitin.poker.game.engine.Dealer - Dealer received new deck and shuffled it. Cards: 52
+2025-12-26 12:24:47.816 [virtual-52] DEBUG c.d.poker.game.engine.PotManager - PotManager reset
+2025-12-26 12:24:47.816 [virtual-52] INFO  com.dnikitin.poker.game.GameManager - Created new game table: 483bf48b-2876-4a78-a3fb-f8fe4932c842. Active games: 1
+2025-12-26 12:24:47.817 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: OK MESSAGE=GAME_ID=483bf48b-2876-4a78-a3fb-f8fe4932c842
+2025-12-26 12:24:47.817 [virtual-52] INFO  c.d.poker.server.ClientHandler - Client b4ce5b73-b824-48cb-9a6e-e189656e8845 created game 483bf48b-2876-4a78-a3fb-f8fe4932c842
+2025-12-26 12:24:47.817 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: OK MESSAGE=GAME_ID=483bf48b-2876-4a78-a3fb-f8fe4932c842
+2025-12-26 12:24:47.913 [ForkJoinPool.commonPool-worker-2] DEBUG c.dnikitin.poker.client.PokerClient - Sent: JOIN GAME=483bf48b-2876-4a78-a3fb-f8fe4932c842 NAME=Alice
+2025-12-26 12:24:47.914 [virtual-52] DEBUG c.d.poker.server.ClientHandler - Client b4ce5b73-b824-48cb-9a6e-e189656e8845: JOIN GAME=483bf48b-2876-4a78-a3fb-f8fe4932c842 NAME=Alice
+2025-12-26 12:24:47.914 [virtual-52] INFO  com.dnikitin.poker.game.Table - Player Alice joined table 483bf48b-2876-4a78-a3fb-f8fe4932c842. Total players: 1
+2025-12-26 12:24:47.914 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: LOBBY PLAYER=3ae6af00-a6b8-4484-9b29-bfaf5da4ebbb CHIPS=1000 NAME=Alice
+2025-12-26 12:24:47.914 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: LOBBY PLAYER=3ae6af00-a6b8-4484-9b29-bfaf5da4ebbb CHIPS=1000 NAME=Alice
+2025-12-26 12:24:47.915 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: WELCOME GAME=483bf48b-2876-4a78-a3fb-f8fe4932c842 PLAYER=3ae6af00-a6b8-4484-9b29-bfaf5da4ebbb NAME=Alice
+2025-12-26 12:24:47.915 [virtual-52] INFO  c.d.poker.server.ClientHandler - Client b4ce5b73-b824-48cb-9a6e-e189656e8845 joined game 483bf48b-2876-4a78-a3fb-f8fe4932c842 as Alice
+2025-12-26 12:24:47.915 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: WELCOME GAME=483bf48b-2876-4a78-a3fb-f8fe4932c842 PLAYER=3ae6af00-a6b8-4484-9b29-bfaf5da4ebbb NAME=Alice
+2025-12-26 12:24:48.016 [ForkJoinPool.commonPool-worker-3] DEBUG c.dnikitin.poker.client.PokerClient - Sent: JOIN GAME=483bf48b-2876-4a78-a3fb-f8fe4932c842 NAME=Bob
+2025-12-26 12:24:48.016 [virtual-51] DEBUG c.d.poker.server.ClientHandler - Client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: JOIN GAME=483bf48b-2876-4a78-a3fb-f8fe4932c842 NAME=Bob
+2025-12-26 12:24:48.016 [virtual-51] INFO  com.dnikitin.poker.game.Table - Player Bob joined table 483bf48b-2876-4a78-a3fb-f8fe4932c842. Total players: 2
+2025-12-26 12:24:48.017 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: LOBBY PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 CHIPS=1000 NAME=Bob
+2025-12-26 12:24:48.017 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: LOBBY PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 CHIPS=1000 NAME=Bob
+2025-12-26 12:24:48.017 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: LOBBY PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 CHIPS=1000 NAME=Bob
+2025-12-26 12:24:48.017 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: LOBBY PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 CHIPS=1000 NAME=Bob
+2025-12-26 12:24:48.017 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: WELCOME GAME=483bf48b-2876-4a78-a3fb-f8fe4932c842 PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 NAME=Bob
+2025-12-26 12:24:48.017 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: LOBBY PLAYER=3ae6af00-a6b8-4484-9b29-bfaf5da4ebbb CHIPS=1000 NAME=Alice
+2025-12-26 12:24:48.017 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: WELCOME GAME=483bf48b-2876-4a78-a3fb-f8fe4932c842 PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 NAME=Bob
+2025-12-26 12:24:48.017 [virtual-51] INFO  c.d.poker.server.ClientHandler - Client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53 joined game 483bf48b-2876-4a78-a3fb-f8fe4932c842 as Bob
+2025-12-26 12:24:48.017 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: LOBBY PLAYER=3ae6af00-a6b8-4484-9b29-bfaf5da4ebbb CHIPS=1000 NAME=Alice
+2025-12-26 12:24:48.219 [ForkJoinPool.commonPool-worker-2] DEBUG c.dnikitin.poker.client.PokerClient - Sent: 483bf48b-2876-4a78-a3fb-f8fe4932c842 3ae6af00-a6b8-4484-9b29-bfaf5da4ebbb START
+2025-12-26 12:24:48.221 [virtual-52] DEBUG c.d.poker.server.ClientHandler - Client b4ce5b73-b824-48cb-9a6e-e189656e8845: 483bf48b-2876-4a78-a3fb-f8fe4932c842 3ae6af00-a6b8-4484-9b29-bfaf5da4ebbb START
+2025-12-26 12:24:48.221 [virtual-52] INFO  com.dnikitin.poker.game.Table - Starting game on table 483bf48b-2876-4a78-a3fb-f8fe4932c842
+2025-12-26 12:24:48.221 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: STARTED GAME=483bf48b-2876-4a78-a3fb-f8fe4932c842
+2025-12-26 12:24:48.221 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: STARTED GAME=483bf48b-2876-4a78-a3fb-f8fe4932c842
+2025-12-26 12:24:48.221 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STARTED GAME=483bf48b-2876-4a78-a3fb-f8fe4932c842
+2025-12-26 12:24:48.221 [virtual-52] DEBUG c.d.poker.game.engine.TurnOrder - Dealer rotated to position 0: Alice
+2025-12-26 12:24:48.221 [virtual-52] DEBUG c.d.poker.game.engine.PotManager - PotManager reset
+2025-12-26 12:24:48.221 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STARTED GAME=483bf48b-2876-4a78-a3fb-f8fe4932c842
+2025-12-26 12:24:48.222 [virtual-52] INFO  com.dnikitin.poker.model.Deck - Deck shuffled. Cards count: 52
+2025-12-26 12:24:48.223 [virtual-52] INFO  c.dnikitin.poker.game.engine.Dealer - Dealer received new deck and shuffled it. Cards: 52
+2025-12-26 12:24:48.223 [virtual-52] INFO  com.dnikitin.poker.game.Table - Hand started. Dealer: Alice
+2025-12-26 12:24:48.223 [virtual-52] INFO  com.dnikitin.poker.game.Table - State transition: LOBBY -> ANTE
+2025-12-26 12:24:48.224 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: STATE PHASE=ANTE
+2025-12-26 12:24:48.224 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=ANTE
+2025-12-26 12:24:48.224 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: STATE PHASE=ANTE
+2025-12-26 12:24:48.224 [virtual-52] DEBUG c.d.poker.game.engine.PotManager - Added 10 to main pot. Total: 10
+2025-12-26 12:24:48.224 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=ANTE
+2025-12-26 12:24:48.224 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: ACTION PLAYER=3ae6af00-a6b8-4484-9b29-bfaf5da4ebbb TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
+2025-12-26 12:24:48.224 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=3ae6af00-a6b8-4484-9b29-bfaf5da4ebbb TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
+2025-12-26 12:24:48.225 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: ACTION PLAYER=3ae6af00-a6b8-4484-9b29-bfaf5da4ebbb TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
+2025-12-26 12:24:48.225 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=3ae6af00-a6b8-4484-9b29-bfaf5da4ebbb TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
+2025-12-26 12:24:48.225 [virtual-52] DEBUG c.d.poker.game.engine.PotManager - Added 10 to main pot. Total: 20
+2025-12-26 12:24:48.225 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: ACTION PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
+2025-12-26 12:24:48.225 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: ACTION PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
+2025-12-26 12:24:48.226 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
+2025-12-26 12:24:48.226 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
+2025-12-26 12:24:48.227 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: ROUND POT=20 HIGHESTBET=0
+2025-12-26 12:24:48.227 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ROUND POT=20 HIGHESTBET=0
+2025-12-26 12:24:48.227 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: ROUND POT=20 HIGHESTBET=0
+2025-12-26 12:24:48.227 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ROUND POT=20 HIGHESTBET=0
+2025-12-26 12:24:48.227 [virtual-52] INFO  com.dnikitin.poker.game.Table - State transition: ANTE -> DEALING
+2025-12-26 12:24:48.227 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: STATE PHASE=DEALING
+2025-12-26 12:24:48.227 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=DEALING
+2025-12-26 12:24:48.227 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: STATE PHASE=DEALING
+2025-12-26 12:24:48.227 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=DEALING
+2025-12-26 12:24:48.227 [virtual-52] INFO  c.dnikitin.poker.game.engine.Dealer - Dealing 5 cards to 2 players
+2025-12-26 12:24:48.228 [virtual-52] DEBUG c.dnikitin.poker.game.engine.Dealer - Dealt 5 cards to player Alice
+2025-12-26 12:24:48.228 [virtual-52] DEBUG c.dnikitin.poker.game.engine.Dealer - Dealt 5 cards to player Bob
+2025-12-26 12:24:48.228 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: DEAL PLAYER=3ae6af00-a6b8-4484-9b29-bfaf5da4ebbb CARDS=Q♣,K♦,8♥,7♥,3♠
+2025-12-26 12:24:48.228 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: DEAL PLAYER=3ae6af00-a6b8-4484-9b29-bfaf5da4ebbb CARDS=Q♣,K♦,8♥,7♥,3♠
+2025-12-26 12:24:48.228 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: DEAL PLAYER=3ae6af00-a6b8-4484-9b29-bfaf5da4ebbb CARDS=HIDDEN COUNT=5
+2025-12-26 12:24:48.228 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: DEAL PLAYER=3ae6af00-a6b8-4484-9b29-bfaf5da4ebbb CARDS=HIDDEN COUNT=5
+2025-12-26 12:24:48.228 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: DEAL PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 CARDS=HIDDEN COUNT=5
+2025-12-26 12:24:48.229 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: DEAL PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 CARDS=8♦,5♥,Q♦,5♦,K♠
+2025-12-26 12:24:48.229 [virtual-52] DEBUG c.d.poker.game.engine.TurnOrder - Starting turn from left of dealer: Bob
+2025-12-26 12:24:48.229 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: DEAL PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 CARDS=8♦,5♥,Q♦,5♦,K♠
+2025-12-26 12:24:48.229 [virtual-52] INFO  com.dnikitin.poker.game.Table - State transition: DEALING -> BETTING_1
+2025-12-26 12:24:48.229 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: STATE PHASE=BETTING_1
+2025-12-26 12:24:48.229 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: STATE PHASE=BETTING_1
+2025-12-26 12:24:48.229 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: TURN PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 PHASE=BETTING_1 CALL=0 MINRAISE=10
+2025-12-26 12:24:48.229 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: DEAL PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 CARDS=HIDDEN COUNT=5
+2025-12-26 12:24:48.229 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=BETTING_1
+2025-12-26 12:24:48.229 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=BETTING_1
+2025-12-26 12:24:48.229 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: TURN PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 PHASE=BETTING_1 CALL=0 MINRAISE=10
+2025-12-26 12:24:48.230 [virtual-52] DEBUG c.d.p.server.security.TimeoutManager - Timeout started for player 803bbb34-bf94-4ef9-8706-e635d662b092: 180s
+2025-12-26 12:24:48.230 [virtual-52] DEBUG c.d.poker.server.ClientHandler - Started timeout for player Bob
+2025-12-26 12:24:48.230 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: TURN PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 PHASE=BETTING_1 CALL=0 MINRAISE=10
+2025-12-26 12:24:48.230 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: TURN PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 PHASE=BETTING_1 CALL=0 MINRAISE=10
+2025-12-26 12:24:48.230 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: OK MESSAGE=Game_started
+2025-12-26 12:24:48.230 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: OK MESSAGE=Game_started
+2025-12-26 12:24:48.230 [virtual-52] INFO  c.d.poker.server.ClientHandler - Client b4ce5b73-b824-48cb-9a6e-e189656e8845 started game
+2025-12-26 12:24:48.323 [ForkJoinPool.commonPool-worker-3] DEBUG c.dnikitin.poker.client.PokerClient - Sent: QUIT
+2025-12-26 12:24:48.323 [virtual-51] DEBUG c.d.poker.server.ClientHandler - Client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: QUIT
+2025-12-26 12:24:48.323 [virtual-52] DEBUG c.d.poker.server.ClientHandler - Client b4ce5b73-b824-48cb-9a6e-e189656e8845: QUIT
+2025-12-26 12:24:48.323 [ForkJoinPool.commonPool-worker-2] DEBUG c.dnikitin.poker.client.PokerClient - Sent: QUIT
+2025-12-26 12:24:48.323 [main] INFO  c.dnikitin.poker.server.PokerServer - Shutting down server...
+2025-12-26 12:24:48.324 [virtual-52] WARN  c.d.poker.server.ClientHandler - Protocol error from client b4ce5b73-b824-48cb-9a6e-e189656e8845: Standard command requires: GAME_ID PLAYER_ID ACTION [PARAMS]
+2025-12-26 12:24:48.324 [ForkJoinPool.commonPool-worker-1] INFO  c.dnikitin.poker.server.PokerServer - Server socket closed.
+2025-12-26 12:24:48.324 [virtual-51] WARN  c.d.poker.server.ClientHandler - Protocol error from client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: Standard command requires: GAME_ID PLAYER_ID ACTION [PARAMS]
+2025-12-26 12:24:48.324 [ForkJoinPool.commonPool-worker-1] INFO  c.dnikitin.poker.server.PokerServer - Shutting down server...
+2025-12-26 12:24:48.324 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: ERR CODE=INVALID_FORMAT REASON=Standard_command_requires_GAME_ID_PLAYER_ID_ACTION_PARAMS
+2025-12-26 12:24:48.324 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: ERR CODE=INVALID_FORMAT REASON=Standard_command_requires_GAME_ID_PLAYER_ID_ACTION_PARAMS
+2025-12-26 12:24:48.324 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ERR CODE=INVALID_FORMAT REASON=Standard_command_requires_GAME_ID_PLAYER_ID_ACTION_PARAMS
+2025-12-26 12:24:48.324 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ERR CODE=INVALID_FORMAT REASON=Standard_command_requires_GAME_ID_PLAYER_ID_ACTION_PARAMS
+2025-12-26 12:24:48.324 [ForkJoinPool.commonPool-worker-1] INFO  c.d.p.server.security.TimeoutManager - TimeoutManager shut down
+2025-12-26 12:24:48.324 [main] INFO  c.d.p.server.security.TimeoutManager - TimeoutManager shut down
+2025-12-26 12:24:48.325 [ForkJoinPool.commonPool-worker-3] INFO  c.dnikitin.poker.client.PokerClient - Disconnected from server
+2025-12-26 12:24:48.325 [ForkJoinPool.commonPool-worker-2] INFO  c.dnikitin.poker.client.PokerClient - Disconnected from server
+2025-12-26 12:24:48.327 [virtual-51] INFO  com.dnikitin.poker.game.Table - Player Bob disconnected during game. Auto-folding.
+2025-12-26 12:24:48.327 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: ACTION PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 TYPE=FOLD AMOUNT=0 MSG=Disconnected_Auto-Fold
+2025-12-26 12:24:48.328 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: ACTION PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 TYPE=FOLD AMOUNT=0 MSG=Disconnected_Auto-Fold
+2025-12-26 12:24:48.329 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: ROUND POT=20 HIGHESTBET=0
+2025-12-26 12:24:48.329 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: ROUND POT=20 HIGHESTBET=0
+2025-12-26 12:24:48.330 [virtual-51] INFO  com.dnikitin.poker.game.Table - State transition: BETTING_1 -> DRAWING
+2025-12-26 12:24:48.330 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: STATE PHASE=DRAWING
+2025-12-26 12:24:48.330 [virtual-51] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: STATE PHASE=DRAWING
+2025-12-26 12:24:48.330 [virtual-51] DEBUG c.d.poker.game.engine.TurnOrder - Starting turn from left of dealer: Alice
+2025-12-26 12:24:48.330 [virtual-52] INFO  com.dnikitin.poker.game.Table - Player Alice disconnected during game. Auto-folding.
+2025-12-26 12:24:48.330 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: ACTION PLAYER=3ae6af00-a6b8-4484-9b29-bfaf5da4ebbb TYPE=FOLD AMOUNT=0 MSG=Disconnected_Auto-Fold
+2025-12-26 12:24:48.330 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: ACTION PLAYER=3ae6af00-a6b8-4484-9b29-bfaf5da4ebbb TYPE=FOLD AMOUNT=0 MSG=Disconnected_Auto-Fold
+2025-12-26 12:24:48.331 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: ROUND POT=20 HIGHESTBET=0
+2025-12-26 12:24:48.331 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: ROUND POT=20 HIGHESTBET=0
+2025-12-26 12:24:48.331 [virtual-52] INFO  com.dnikitin.poker.game.Table - State transition: DRAWING -> BETTING_2
+2025-12-26 12:24:48.331 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: STATE PHASE=BETTING_2
+2025-12-26 12:24:48.331 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53: STATE PHASE=BETTING_2
+2025-12-26 12:24:48.331 [virtual-52] DEBUG c.d.poker.game.engine.TurnOrder - Starting turn from left of dealer: Bob
+2025-12-26 12:24:48.331 [virtual-52] DEBUG c.d.poker.server.ClientHandler - To client b4ce5b73-b824-48cb-9a6e-e189656e8845: TURN PLAYER=803bbb34-bf94-4ef9-8706-e635d662b092 PHASE=BETTING_2 CALL=0 MINRAISE=10
+2025-12-26 12:24:48.331 [virtual-52] ERROR c.d.poker.server.ClientHandler - Error handling player disconnect
+java.util.concurrent.RejectedExecutionException: Task java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask@59bb5977[Not completed, task = java.util.concurrent.Executors$RunnableAdapter@6bf086df[Wrapped task = com.dnikitin.poker.server.security.TimeoutManager$$Lambda/0x000000009c3030e0@7dd05f70]] rejected from java.util.concurrent.ScheduledThreadPoolExecutor@61becbcf[Terminated, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$AbortPolicy.rejectedExecution(ThreadPoolExecutor.java:2032)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.reject(ThreadPoolExecutor.java:787)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor.delayedExecute(ScheduledThreadPoolExecutor.java:345)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor.schedule(ScheduledThreadPoolExecutor.java:549)
+	at com.dnikitin.poker.server.security.TimeoutManager.startTimeout(TimeoutManager.java:44)
+	at com.dnikitin.poker.server.ClientHandler.startTimeout(ClientHandler.java:344)
+	at com.dnikitin.poker.server.ClientHandler.onGameEvent(ClientHandler.java:149)
+	at com.dnikitin.poker.game.Table.notifyObservers(Table.java:574)
+	at com.dnikitin.poker.game.Table.advanceGamePhase(Table.java:392)
+	at com.dnikitin.poker.game.Table.advanceTurn(Table.java:351)
+	at com.dnikitin.poker.game.Table.playerDisconnect(Table.java:331)
+	at com.dnikitin.poker.server.ClientHandler.handleDisconnect(ClientHandler.java:319)
+	at com.dnikitin.poker.server.ClientHandler.run(ClientHandler.java:124)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.ThreadPerTaskExecutor$ThreadBoundFuture.run(ThreadPerTaskExecutor.java:323)
+	at java.base/java.lang.VirtualThread.run(VirtualThread.java:456)
+2025-12-26 12:24:48.330 [virtual-51] ERROR c.d.poker.server.ClientHandler - Error handling player disconnect
+java.util.concurrent.RejectedExecutionException: Task java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask@1ecad133[Not completed, task = java.util.concurrent.Executors$RunnableAdapter@22296f73[Wrapped task = com.dnikitin.poker.server.security.TimeoutManager$$Lambda/0x000000009c3030e0@a818282]] rejected from java.util.concurrent.ScheduledThreadPoolExecutor@61becbcf[Terminated, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$AbortPolicy.rejectedExecution(ThreadPoolExecutor.java:2032)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.reject(ThreadPoolExecutor.java:787)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor.delayedExecute(ScheduledThreadPoolExecutor.java:345)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor.schedule(ScheduledThreadPoolExecutor.java:549)
+	at com.dnikitin.poker.server.security.TimeoutManager.startTimeout(TimeoutManager.java:44)
+	at com.dnikitin.poker.server.ClientHandler.startTimeout(ClientHandler.java:344)
+	at com.dnikitin.poker.server.ClientHandler.onGameEvent(ClientHandler.java:149)
+	at com.dnikitin.poker.game.Table.notifyObservers(Table.java:574)
+	at com.dnikitin.poker.game.Table.advanceGamePhase(Table.java:392)
+	at com.dnikitin.poker.game.Table.advanceTurn(Table.java:351)
+	at com.dnikitin.poker.game.Table.playerDisconnect(Table.java:331)
+	at com.dnikitin.poker.server.ClientHandler.handleDisconnect(ClientHandler.java:319)
+	at com.dnikitin.poker.server.ClientHandler.run(ClientHandler.java:124)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at java.base/java.util.concurrent.ThreadPerTaskExecutor$ThreadBoundFuture.run(ThreadPerTaskExecutor.java:323)
+	at java.base/java.lang.VirtualThread.run(VirtualThread.java:456)
+2025-12-26 12:24:48.336 [virtual-52] INFO  c.d.poker.server.ClientHandler - Client b4ce5b73-b824-48cb-9a6e-e189656e8845 disconnected
+2025-12-26 12:24:48.336 [virtual-51] INFO  c.d.poker.server.ClientHandler - Client 3e73e9e1-e648-41c7-8db2-4bd4c60ceb53 disconnected
+2025-12-26 12:24:48.336 [ForkJoinPool.commonPool-worker-1] INFO  c.dnikitin.poker.server.PokerServer - Server stopped successfully.
+2025-12-26 12:24:48.336 [main] INFO  c.dnikitin.poker.server.PokerServer - Server stopped successfully.

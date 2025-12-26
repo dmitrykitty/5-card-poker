@@ -163,12 +163,8 @@ public class ConsoleUI {
     private String formatHand(List<String> hand) {
         if (hand.isEmpty()) return "[ NO CARDS ]";
 
-        // Copy and sort
-        List<String> sortedHand = new ArrayList<>(hand);
-        sortedHand.sort((c1, c2) -> Integer.compare(getCardValue(c2), getCardValue(c1)));
-
         StringBuilder sb = new StringBuilder();
-        for (String card : sortedHand) {
+        for (String card : hand) {
             sb.append((card)).append(" ");
         }
         return sb.toString().trim();

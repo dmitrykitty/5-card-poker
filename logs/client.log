@@ -1,46 +1,41 @@
-09:52:39.115 [main] INFO  c.dnikitin.poker.client.PokerClient - Connected to server at localhost:9999
-09:52:39.121 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: HELLO VERSION=1.0
-09:53:06.420 [main] DEBUG c.dnikitin.poker.client.PokerClient - Sent: JOIN GAME=b76eb4ec-7afb-4b8a-be21-4d655ffcb456 NAME=dgdhd
-09:53:06.422 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: LOBBY PLAYER=e6939a02-5a5d-4e8d-81ce-b19faad158df CHIPS=1000 NAME=dgdhd
-09:53:06.424 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: WELCOME GAME=b76eb4ec-7afb-4b8a-be21-4d655ffcb456 PLAYER=e6939a02-5a5d-4e8d-81ce-b19faad158df NAME=dgdhd
-09:53:06.424 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: LOBBY PLAYER=6c603f49-010f-4d53-8f28-b1391878f377 CHIPS=1000 NAME=dimwfs
-09:53:09.560 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STARTED GAME=b76eb4ec-7afb-4b8a-be21-4d655ffcb456
-09:53:09.569 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=ANTE
-09:53:09.570 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=6c603f49-010f-4d53-8f28-b1391878f377 TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
-09:53:09.573 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=e6939a02-5a5d-4e8d-81ce-b19faad158df TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
-09:53:09.573 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ROUND POT=20 HIGHESTBET=0
-09:53:09.573 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=DEALING
-09:53:09.577 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: DEAL PLAYER=6c603f49-010f-4d53-8f28-b1391878f377 CARDS=HIDDEN COUNT=5
-09:53:09.577 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: DEAL PLAYER=e6939a02-5a5d-4e8d-81ce-b19faad158df CARDS=A♦,10♣,J♥,Q♥,Q♣
-09:53:09.582 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=BETTING_1
-09:53:09.582 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: TURN PLAYER=e6939a02-5a5d-4e8d-81ce-b19faad158df PHASE=BE09:53:09.586 [ServerListener09:53:20.560 [main] DEBUG c.dnikitin.poker.client.PokerClient - Sent: b76eb4ec-7afb-4b8a-be21-4d655ffcb456 e6939a02-5a5d-4e8d-81ce-b19faad158df CHECK
-09:53:20.562 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=e6939a02-5a5d-4e8d-81ce-b19faad158df TYPE=CHECK AMOUNT=0 MSG=Checked
-09:53:20.564 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: TURN PLAYER=6c603f49-010f-4d53-8f28-b1391878f377 PHASE=BETTING_1 CALL=0 MINRAISE=10
-09:53:20.564 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: OK
-09:53:33.107 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=6c603f49-010f-4d53-8f28-b1391878f377 TYPE=CHECK AMOUNT=0 MSG=Checked
-09:53:33.111 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ROUND POT=20 HIGHESTBET=0
-09:53:33.114 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=DRAWING
-09:53:33.114 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: TURN PLAYER=e6939a02-5a5d-4e8d-81ce-b19faad158df PHASE=DRAWING CALL=0 MINRAISE=10
-09:53:38.401 [main] DEBUG c.dnikitin.poker.client.PokerClient - Sent: b76eb4ec-7afb-4b8a-be21-4d655ffcb456 e6939a02-5a5d-4e8d-81ce-b19faad158df FOLD
-09:53:38.403 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ERR CODE=INVALID_MOVE REASON=Action_allowed_only_during_betting_phases_Current_DRAWING
-09:53:51.069 [main] DEBUG c.dnikitin.poker.client.PokerClient - Sent: b76eb4ec-7afb-4b8a-be21-4d655ffcb456 e6939a02-5a5d-4e8d-81ce-b19faad158df DRAW CARDS=none
-09:53:51.073 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: DEAL PLAYER=e6939a02-5a5d-4e8d-81ce-b19faad158df CARDS=A♦,10♣,J♥,Q♥,Q♣
-09:53:51.075 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=e6939a02-5a5d-4e8d-81ce-b19faad158df TYPE=DRAW AMOUNT=0 MSG=Exchanged_0_cards
-09:53:51.076 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: TURN PLAYER=6c603f49-010f-4d53-8f28-b1391878f377 PHASE=DRAWING CALL=0 MINRAISE=10
-09:53:51.076 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: OK
-09:53:55.308 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: DEAL PLAYER=6c603f49-010f-4d53-8f28-b1391878f377 CARDS=HIDDEN COUNT=5
-09:53:55.308 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=6c603f49-010f-4d53-8f28-b1391878f377 TYPE=DRAW AMOUNT=0 MSG=Exchanged_0_cards
-09:53:55.309 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ROUND POT=20 HIGHESTBET=0
-09:53:55.310 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=BETTING_2
-09:53:55.312 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: TURN PLAYER=e6939a02-5a5d-4e8d-81ce-b19faad158df PHASE=BETTING_2 CALL=0 MINRAISE=10
-09:54:01.756 [main] DEBUG c.dnikitin.poker.client.PokerClient - Sent: b76eb4ec-7afb-4b8a-be21-4d655ffcb456 e6939a02-5a5d-4e8d-81ce-b19faad158df FOLD
-09:54:01.758 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=e6939a02-5a5d-4e8d-81ce-b19faad158df TYPE=FOLD AMOUNT=0 MSG=Folded
-09:54:01.758 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ROUND POT=20 HIGHESTBET=0
-09:54:01.760 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: WINNER PLAYER=6c603f49-010f-4d53-8f28-b1391878f377 POT=20 RANK=Opponents Folded CARDS=A♠,10♦,7♣,2♠,Q♦
-09:54:01.762 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=FINISHED
-09:54:01.762 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: OK
-poker.client.PokerClient - Server: ERR CODE=OUT_OF_TURN REASON=Not_your_turn
-09:54:01.757 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=e6939a02-5a5d-4e8d-81ce-b19faad158df TYPE=FOLD AMOUNT=0 MSG=Folded
-09:54:01.758 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ROUND POT=20 HIGHESTBET=0
-09:54:01.760 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: WINNER PLAYER=6c603f49-010f-4d53-8f28-b1391878f377 POT=20 RANK=Opponents Folded CARDS=A♠,10♦,7♣,2♠,Q♦
-09:54:01.762 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=FINISHED
+12:57:51.221 [main] INFO  c.dnikitin.poker.client.PokerClient - Connected to server at localhost:9999
+12:57:51.229 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: HELLO VERSION=1.0
+12:59:21.202 [main] DEBUG c.dnikitin.poker.client.PokerClient - Sent: JOIN GAME=667c8776-f0f0-449d-b354-e3e8264fb99f NAME=p3
+12:59:21.204 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: LOBBY PLAYER=2573becb-3594-4090-85b6-324c865de385 CHIPS=1000 NAME=p3
+12:59:21.205 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: WELCOME GAME=667c8776-f0f0-449d-b354-e3e8264fb99f PLAYER=2573becb-3594-4090-85b6-324c865de385 NAME=p3
+12:59:21.206 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: LOBBY PLAYER=52a375d7-5347-48d5-9c45-81d74ea9e2d3 CHIPS=1000 NAME=p1
+12:59:21.206 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: LOBBY PLAYER=8a2b6cd4-e993-41da-8c8d-1404193b2cec CHIPS=1000 NAME=p2
+12:59:25.669 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STARTED GAME=667c8776-f0f0-449d-b354-e3e8264fb99f
+12:59:25.676 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=ANTE
+12:59:25.676 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=52a375d7-5347-48d5-9c45-81d74ea9e2d3 TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
+12:59:25.679 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=8a2b6cd4-e993-41da-8c8d-1404193b2cec TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
+12:59:25.679 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=2573becb-3594-4090-85b6-324c865de385 TYPE=ANTE AMOUNT=10 MSG=Paid_Ante
+12:59:25.680 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ROUND POT=30 HIGHESTBET=0
+12:59:25.681 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=DEALING
+12:59:25.683 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: DEAL PLAYER=52a375d7-5347-48d5-9c45-81d74ea9e2d3 CARDS=HIDDEN COUNT=5
+12:59:25.684 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: DEAL PLAYER=8a2b6cd4-e993-41da-8c8d-1404193b2cec CARDS=HIDDEN COUNT=5
+12:59:25.6812:59:25.688 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: DEAL PLAYER=2573becb-3594-4090-85b6-324c865de385 CARDS=HIDDEN COUNT=512:59:25.690 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=BETTING_1
+12:59:25.690 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: TURN PLAYER=8a2b6cd4-e993-41da-8c8d-1404193b2cec PHASE=BETTING_1 CALL=0 MINRAISE=10
+13:01:15.821 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=8a2b6cd4-e993-41da-8c8d-1404193b2cec TYPE=CHECK AMOUNT=0 MSG=Checked
+13:01:15.824 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: TURN PLAYER=2573becb-3594-4090-85b6-324c865de385 PHASE=BETTING_1 CALL=0 MINRAISE=10
+13:01:19.191 [main] DEBUG c.dnikitin.poker.client.PokerClient - Sent: 667c8776-f0f0-449d-b354-e3e8264fb99f 2573becb-3594-4090-85b6-324c865de385 CALL
+13:01:19.193 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=2573becb-3594-4090-85b6-324c865de385 TYPE=CHECK AMOUNT=0 MSG=Checked
+13:01:19.194 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: TURN PLAYER=52a375d7-5347-48d5-9c45-81d74ea9e2d3 PHASE=BETTING_1 CALL=0 MINRAISE=10
+13:01:19.195 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: OK
+13:01:22.074 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=52a375d7-5347-48d5-9c45-81d74ea9e2d3 TYPE=CHECK AMOUNT=0 MSG=Checked
+13:01:22.076 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ROUND POT=30 HIGHESTBET=0
+13:01:22.077 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=DRAWING
+13:01:22.078 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: TURN PLAYER=8a2b6cd4-e993-41da-8c8d-1404193b2cec PHASE=DRAWING CALL=0 MINRAISE=10
+13:01:52.170 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: DEAL PLAYER=8a2b6cd4-e993-41da-8c8d-1404193b2cec CARDS=HIDDEN COUNT=5
+13:01:52.172 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=8a2b6cd4-e993-41da-8c8d-1404193b2cec TYPE=DRAW AMOUNT=0 MSG=Exchanged_2_card13:01:52.173 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=8a2b6cd4-e993-41da-8c8d-1404193b2cec TYPE=DRAW AMOUNT=0 MSG=Exchanged_2_13:02:26.457 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=8a2b6cd4-e993-41da-8c8d-1404193b2cec TYPE=FOLD AMOUNT=0 MSG=Disconnected_Auto-Fold
+.174 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: OK
+=8a2b6cd4-e993-41da-8c8d-1404193b2cec TYPE=DRAW AMOUNT=0 MSG=Exchanged_2_cards
+13:01:52.173 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: TURN PLAYER=2573becb-3594-4090-85b6-324c865de385 PHASE=DRAWING CALL=0 MINRAISE=10
+13:02:26.456 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=8a2b6cd4-e993-41da-8c8d-1404193b2cec TYPE=FOLD AMOUNT=0 MSG=Disconnected_Auto-Fold
+13:02:27.392 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ACTION PLAYER=2573becb-3594-4090-85b6-324c865de385 TYPE=FOLD AMOUNT=0 MSG=Disconnected_Auto-Fold
+13:02:27.392 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ROUND POT=30 HIGHESTBET=0
+13:02:27.393 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=BETTING_2
+13:02:27.393 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: TURN PLAYER=52a375d7-5347-48d5-9c45-81d74ea9e2d3 PHASE=BETTING_2 CALL=0 MINRAISE=10
+13:02:27.396 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: ROUND POT=30 HIGHESTBET=0
+13:02:27.405 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: WINNER PLAYER=52a375d7-5347-48d5-9c45-81d74ea9e2d3 POT=30 RANK=One_Pair CARDS=2♥,9♣,5♠,10♥,2♠
+13:02:27.408 [ServerListener] DEBUG c.dnikitin.poker.client.PokerClient - Server: STATE PHASE=FINISHED

@@ -12,6 +12,8 @@
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
         <configuration>
+          <shadedArtifactAttached>true</shadedArtifactAttached>
+          <shadedClassifierName>with-dependencies</shadedClassifierName>
           <transformers>
             <transformer />
             <transformer>

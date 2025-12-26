@@ -493,11 +493,12 @@ public class Table {
 
         int total = potManager.getTotalPot();
         winner.winChips(total);
+        var rank = evaluator.evaluate(winner.getHand()).getHandRank().getLabel();
 
 
         log.info("Game ended prematurely. Player {} won {} (Opponents folded).", winner.getName(), total);
 
-        notifyObservers(new GameEvent.GameFinished(winner.getId(), total, "Opponents Folded", winner.getHand()));
+        notifyObservers(new GameEvent.GameFinished(winner.getId(), total, rank, winner.getHand()));
         changeState(GameState.FINISHED);
     }
 
